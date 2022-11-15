@@ -2,9 +2,9 @@ name: ci/cd test
 
 on:
   push:
-    branches: [dev, chore/#1/CICD-setting]
+    branches: [dev]
   pull_request:
-    branches: [dev, chore/#1/CICD-setting]
+    branches: [dev]
 
 jobs:
   tests:
