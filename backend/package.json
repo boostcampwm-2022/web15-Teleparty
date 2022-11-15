@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc -p . && node dist/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.14",
+    "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",
     "express": "^4.18.2",
+    "jest": "^29.3.1",
     "to-node": "^0.1.0",
     "typescript": "^4.8.4"
   },
