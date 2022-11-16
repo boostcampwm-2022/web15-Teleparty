@@ -1,27 +1,35 @@
-import { DefaultTheme } from "styled-components";
+import type { DefaultTheme } from "styled-components";
 
 export const colors = {
-	// primary
-	primary: "#212269",
-	primaryDark: "#15164A",
-	primaryLight: "#CCCDFF",
+  // primary
+  primary: "#212269",
+  primaryDark: "#15164A",
+  primaryLight: "#CCCDFF",
+  primaryLightTransparent: "rgba(204,205,255,0.4)",
 
-	// black-white
-	black: "#222",
-	grey1: "#888",
-	grey2: "#BBB",
-	grey3: "#D7D7D7",
-	grey4: "#F6F6F6",
-	white: "#fff",
+  // black-white
+  black: "#222222",
+  grey1: "#888888",
+  grey2: "#BBBBBB",
+  grey3: "#D7D7D7",
+  grey4: "#F6F6F6",
+  white: "#FFFFFF",
 
-	// other colors
-	red: "#F45452",
+  // other colors
+  red: "#F45452",
+  pink: "#FF659A",
+  orange: "#FF922B",
   green: "#5DE173",
-	yellow: "#FFEFA1",
+  "green-palette": "#51CF66",
+  yellow: "#FFEFA1",
+  "yellow-palette": "#FCC419",
+  blue: "#339AF0",
+  indigo: "#5C7CFA",
+  violet: "#845EF7",
 };
 
 export type ColorsType = typeof colors;
 
 export const theme: DefaultTheme = {
-	colors,
+  colors,
 };
