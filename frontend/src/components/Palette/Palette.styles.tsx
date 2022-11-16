@@ -3,12 +3,20 @@ import styled from "styled-components";
 import { ColorsType } from "../../global-styles/theme";
 
 const PaletteLayout = styled.div`
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: flex;
   width: fit-content;
   background-color: ${(props) => props.theme.colors.primaryLightTransparent};
   border-radius: 10px;
   padding: 1rem;
+  gap: 0.25rem;
+  justify-items: center;
+  align-items: center;
+`;
+
+const PaletteGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: fit-content;
   gap: 0.25rem;
   justify-items: center;
   align-items: center;
@@ -36,11 +44,11 @@ const PaletteColorPicker = styled.input`
   border: 1px solid ${(props) => props.theme.colors.primary};
   overflow: hidden;
   width: 2.5rem;
-  height: 100%;
+  height: 5.25rem;
   grid-row: span 2 / span 2;
   border-radius: 5px;
   cursor: pointer;
   padding: 0;
 `;
 
-export { PaletteLayout, PaletteColorBox, PaletteColorPicker };
+export { PaletteLayout, PaletteColorBox, PaletteColorPicker, PaletteGrid };
