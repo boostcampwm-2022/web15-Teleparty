@@ -17,8 +17,8 @@ const PaletteLayout = styled.div`
 const PaletteColorBox = styled.div<{ bgColor: keyof ColorsType }>`
   background-color: ${(props) => props.theme.colors[props.bgColor]};
   border: 1px solid ${(props) => props.theme.colors.primary};
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 5px;
   cursor: pointer;
 `;
@@ -35,8 +35,8 @@ const PaletteColorPicker = styled.input`
   }
   border: 1px solid ${(props) => props.theme.colors.primary};
   overflow: hidden;
-  width: 40px;
-  height: calc(80px + 0.25rem);
+  width: 2.5rem;
+  height: 100%;
   grid-row: span 2 / span 2;
   border-radius: 5px;
   cursor: pointer;

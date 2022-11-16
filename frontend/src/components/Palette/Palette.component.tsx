@@ -11,7 +11,7 @@ import { theme } from "../../global-styles/theme";
 import type { ColorsType } from "../../global-styles/theme";
 
 const Palette = () => {
-  const [color, setColor] = useState("#FF659A");
+  const [color, setColor] = useState(theme.colors.pink);
 
   const onColorBoxClick = (color: keyof ColorsType) => () =>
     setColor(theme.colors[color]);
