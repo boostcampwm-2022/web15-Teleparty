@@ -30,6 +30,9 @@ jobs:
         if: steps.backend_cache.outputs.cache-hit != 'true'
         run: cd ./backend && npm install
 
+      - name: Backend Lint Verification
+        run: cd ./backend && npm run lint
+
       - name: Run Backend Test
         run: cd ./backend && npm run test
 
@@ -55,5 +58,11 @@ jobs:
         if: steps.frontend_cache.outputs.cache-hit != 'true'
         run: cd ./frontend && npm install
 
+      - name: Frontend Lint Verification
+        run: cd ./frontend && npm run lint
+
       - name: Run Frontend Test
         run: cd ./frontend && npm run test
+
+      - name: Frontend Build Test
+        run: cd ./frontend && npm run build
