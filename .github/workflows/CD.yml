@@ -21,4 +21,5 @@ jobs:
           timeout: 40s
           script: |
             echo "SSH 접속 완료"
-            ls
+            cd web15-Teleparty
+            git pull
