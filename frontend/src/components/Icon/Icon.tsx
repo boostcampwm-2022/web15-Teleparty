@@ -1,4 +1,5 @@
 import IcomoonReact from "icomoon-react";
+
 import iconSet from "../../assets/icon-selection.json";
 
 type iconType =

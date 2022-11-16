@@ -1,13 +1,14 @@
-import GlobalStyles from "./global-styles/global-styles";
 import { ThemeProvider } from "styled-components";
+
+import Canvas from "./components/Canvas/Canvas.component";
+import GlobalStyles from "./global-styles/global-styles";
 import { theme } from "./global-styles/theme";
-import Icon from "./components/Icon/Icon";
-import styled from "styled-components";
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
+      <Canvas/>
     </ThemeProvider>
   );
 };
