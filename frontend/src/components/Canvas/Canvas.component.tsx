@@ -1,5 +1,3 @@
-import React from "react";
-
 import { CanvasLayout } from "./Canvas.styles";
 
 const Canvas = () => {
