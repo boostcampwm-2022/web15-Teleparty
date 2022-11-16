@@ -21,5 +21,13 @@ jobs:
           timeout: 40s
           script: |
             echo "SSH 접속 완료"
-            cd web15-Teleparty
+
+            cd web15-Teleparty/frontend
             git pull
+            npm install
+            npm run build && mv dist/* ../backend/public
+
+            cd ../backend
+            npm install
+            pm2 kill
+            pm2 start src/app.ts

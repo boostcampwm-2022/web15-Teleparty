@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"start": "tsc -p . && node dist/app.js",
+		"start": "nodemon src/app.ts",
 		"test": "jest",
 		"lint": "eslint .",
 		"lint-fix": "eslint . --fix"
