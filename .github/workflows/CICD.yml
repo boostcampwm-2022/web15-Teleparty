@@ -7,8 +7,9 @@ on:
     branches: [dev, chore/#1/CICD-setting]
 
 jobs:
-  checkout:
+  backend_tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
@@ -18,11 +19,6 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
-  backend_tests:
-    needs: checkout
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Cache node modules
         uses: actions/cache@v3
         id: backend_cache
@@ -38,9 +34,16 @@ jobs:
         run: cd ./backend && npm run test
 
   frontend_test:
-    needs: checkout
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ secrets.NODE_VERSION }}
+
       - name: Cache node modules
         uses: actions/cache@v3
         id: frontend_cache
