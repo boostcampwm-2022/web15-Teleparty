@@ -30,9 +30,12 @@ jobs:
         if: steps.backend_cache.outputs.cache-hit != 'true'
         run: cd ./backend && npm install
 
+<<<<<<< HEAD
       - name: Backend Lint Verification
         run: cd ./backend && npm run lint
 
+=======
+>>>>>>> 9413b88277122cf57c6eb510853e3001122ea98b
       - name: Run Backend Test
         run: cd ./backend && npm run test
 
