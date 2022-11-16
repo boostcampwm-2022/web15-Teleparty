@@ -8,6 +8,7 @@ on:
 
 jobs:
   checkout:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
