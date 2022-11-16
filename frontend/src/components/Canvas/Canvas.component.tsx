@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 
 import { CanvasLayout } from "./Canvas.styles";
 import Line from "./utils/Line";
@@ -21,7 +21,7 @@ const Canvas = () => {
 	};
 
 	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-		shapeList.current.push(new Line("#000000", 1, 3));
+		shapeList.current.push(new Line("#aa22aa", 1, 1));
 		isDrawing.current = true;
 		lastPoint.current = getCoordRelativeToElement(
 			event.clientX,
