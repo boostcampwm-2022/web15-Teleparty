@@ -5,10 +5,12 @@ export default abstract class Shape {
   private _id = generateUUID();
   protected color = "#000000";
   protected transparency = 1;
+  protected lineWidth = 3;
 
-  constructor(color: string, transparency: number) {
+  constructor(color: string, transparency: number, lineWidth: number) {
     this.color = color;
     this.transparency = transparency;
+    this.lineWidth = lineWidth;
   }
 
   get id() {

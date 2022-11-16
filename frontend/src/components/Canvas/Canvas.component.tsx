@@ -21,7 +21,7 @@ const Canvas = () => {
 	};
 
 	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-		shapeList.current.push(new Line("#000000", 1));
+		shapeList.current.push(new Line("#000000", 1, 3));
 		isDrawing.current = true;
 		lastPoint.current = getCoordRelativeToElement(
 			event.clientX,
