@@ -1,6 +1,6 @@
 import { generateUUID } from "../../../utils/uid";
 
-export abstract class Shape {
+export default abstract class Shape {
   // 소켓 통신시 식별을 위해 uid 필요
   private _id = generateUUID();
   protected color = "#000000";
