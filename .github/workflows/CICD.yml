@@ -2,14 +2,12 @@ name: ci/cd test
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, chore/#1/CICD-setting]
   pull_request:
-    branches: [dev]
+    branches: [dev, chore/#1/CICD-setting]
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-
+  checkout:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
@@ -19,6 +17,11 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
+  backend_tests:
+    needs: checkout
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Cache node modules
         uses: actions/cache@v3
         id: backend_cache
@@ -26,9 +29,27 @@ jobs:
           path: ./backend/node_modules
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install Dependencies
+      - name: Backend Install Dependencies
         if: steps.backend_cache.outputs.cache-hit != 'true'
         run: cd ./backend && npm install
 
       - name: Run Backend Test
         run: cd ./backend && npm run test
+
+  frontend_test:
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: frontend_cache
+        with:
+          path: ./frontend/node_modules
+          key: npm-packages-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Frontend Install Dependencies
+        if: steps.frontend_cache.outputs.cache-hit != 'true'
+        run: cd ./frontend && npm install
+
+      - name: Run Frontend Test
+        run: cd ./frontend && npm run test
