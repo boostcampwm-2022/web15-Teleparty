@@ -24,10 +24,8 @@ export default class Line extends Shape {
 
     ctx.beginPath(); 
     for (const { start, end } of this.lines) {
-      ctx.moveTo(start.x, start.y); 
       ctx.lineTo(end.x, end.y); 
     }
-    console.log(getCanvasContextSetting(ctx));
     ctx.stroke(); 
 
     setCanvasContextSetting(ctx, prevCtxSetting);
