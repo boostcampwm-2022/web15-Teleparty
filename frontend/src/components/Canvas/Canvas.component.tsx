@@ -13,13 +13,6 @@ const Canvas = () => {
 	const isDrawing = useRef<boolean>(false);
 	const lastPoint = useRef<Point>({ x: 0, y: 0 });
 
-	useEffect(() => {
-		const ctx = canvasRef.current?.getContext("2d");
-		if (!ctx) return;
-		const l = new Line("#000000", 1);
-		l.draw(ctx);
-	}, []);
-
 	const drawAllShapes = () => {
 		const ctx = canvasRef.current?.getContext("2d");
 		for (const shape of shapeList.current) {
