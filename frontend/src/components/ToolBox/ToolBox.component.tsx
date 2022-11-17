@@ -13,7 +13,7 @@ const TOOL_ICON_MAP: {
   fill: "bucket",
   circle: "circle",
   erase: "eraser-alt",
-  straightLine: "link",
+  straightLine: "flow-line",
   rectangle: "square",
 };
 
