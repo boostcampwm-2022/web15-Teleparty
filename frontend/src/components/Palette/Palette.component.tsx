@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { useAtom } from "jotai";
 
 
@@ -18,8 +16,6 @@ import type { ColorsType } from "../../global-styles/theme";
 const Palette = () => {
   const [color, setColor] = useAtom(paletteAtom);
 
-  useEffect(()=>setColor(theme.colors.pink), []);
-  
   const onColorBoxClick = (color: keyof ColorsType) => () =>
     setColor(theme.colors[color]);
 

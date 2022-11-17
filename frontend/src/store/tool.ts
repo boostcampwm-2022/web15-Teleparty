@@ -26,12 +26,7 @@ export const PALETTE_COLORS = [
 ] as const;
 
 type ToolTypesTuple = typeof TOOL_TYPES;
-type PaletteTypesTuple = typeof PALETTE_COLORS;
 type Tool = ToolTypesTuple[number];
-type Color = PaletteTypesTuple[number];
-
 
 export const toolAtom = atom<Tool>("pen");
-export const paletteAtom = atom<Color>("palette");
-
-
+export const paletteAtom = atom<string>("pink");
