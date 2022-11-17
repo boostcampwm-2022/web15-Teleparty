@@ -1,13 +1,15 @@
-import GlobalStyles from "./global-styles/global-styles";
-import { ThemeProvider } from "styled-components";
-import { theme } from "./global-styles/theme";
+import styled, { ThemeProvider } from "styled-components";
+
 import Icon from "./components/Icon/Icon";
-import styled from "styled-components";
+import GlobalStyles from "./global-styles/global-styles";
+import { theme } from "./global-styles/theme";
+import Test from "./pages/Test";
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
+      <Test />
     </ThemeProvider>
   );
 };
