@@ -6,7 +6,7 @@ export const TOOL_TYPES = [
   "fill",
   "circle",
   "erase",
-  "straight-line",
+  "straightLine",
   "rectangle",
 ] as const;
 

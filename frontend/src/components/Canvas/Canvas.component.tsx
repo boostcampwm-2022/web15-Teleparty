@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 
+import { useAtom } from "jotai";
+
 import { CanvasLayout } from "./Canvas.styles";
 import Line from "./utils/Line";
 import { Point } from "./utils/Point";
 import Shape from "./utils/Shape";
 
+import { toolAtom } from "../../store/tool";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
@@ -12,6 +15,7 @@ const Canvas = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const shapeList = useRef<Shape[]>([]);
 	const isDrawing = useRef<boolean>(false);
+	const [tool] = useAtom(toolAtom);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -28,7 +32,15 @@ const Canvas = () => {
 	});
 
 	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = () => {
-		shapeList.current.push(new Line("#aa22aa", 1, 10));
+		const shapeCreateFunctionMap = {
+			pen: () => new Line("#aa22aa", 1, 10),
+			fill: () => new Line("#ffffff", 1, 10),
+			circle: () => new Line("#ffffff", 1, 10),
+			erase: () => new Line("#ffffff", 1, 10),
+			straightLine: () => new Line("#ffffff", 1, 10),
+			rectangle: () => new Line("#ffffff", 1, 10),
+		}
+		shapeList.current.push(shapeCreateFunctionMap[tool]());
 		isDrawing.current = true;
 	};
 
