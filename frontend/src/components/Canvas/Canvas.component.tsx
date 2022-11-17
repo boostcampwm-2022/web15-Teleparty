@@ -6,6 +6,7 @@ import { Point } from "./utils/Point";
 import Shape from "./utils/Shape";
 
 import { getCoordRelativeToElement } from "../../utils/coordinate";
+import { debounceByFrame } from "../../utils/debounce";
 
 const Canvas = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,12 +20,12 @@ const Canvas = () => {
     ctx.lineJoin = "round";
   }, []);
 
-	const drawAllShapes = () => {
+	const drawAllShapes = debounceByFrame(() => {
 		const ctx = canvasRef.current?.getContext("2d");
 		for (const shape of shapeList.current) {
 			ctx && shape.draw(ctx);
 		}
-	};
+	});
 
 	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = () => {
 		shapeList.current.push(new Line("#aa22aa", 1, 10));
