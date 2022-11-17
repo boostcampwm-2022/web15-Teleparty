@@ -26,14 +26,16 @@ const Canvas = () => {
   }, []);
 
   const drawAllShapes = debounceByFrame(() => {
-    const ctx = canvasRef.current?.getContext("2d");
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    ctx?.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
     for (const shape of shapeList.current) {
       ctx && shape.draw(ctx);
     }
   });
 
   const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-		const currentPoint = getCoordRelativeToElement(
+    const currentPoint = getCoordRelativeToElement(
       event.clientX,
       event.clientY,
       event.target as Element
@@ -63,10 +65,9 @@ const Canvas = () => {
 
     if (target instanceof Line) {
       target.pushPoint(currentPoint);
+    } else if (target instanceof Rectangle) {
+      target.point2 = currentPoint;
     }
-		else if (target instanceof Rectangle) {
-			target.point2 = currentPoint;
-		}
 
     drawAllShapes();
   };
