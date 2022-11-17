@@ -2,13 +2,6 @@ import { Socket } from "socket.io";
 import { CavasData } from "../../types/canvasData";
 
 const canvasDatas = new Map();
-canvasDatas.set("uu123", {
-  color: "string;",
-  transparency: 0.7,
-  type: "string;",
-  lineWidth: 5,
-  points: [{ x: 1, y: 2 }],
-});
 
 export const canvasEventApplyer = (socket: Socket) => {
   socket.on("login", () => {
@@ -40,8 +33,10 @@ export const canvasEventApplyer = (socket: Socket) => {
   socket.on("drawing-modify", (data) => {
     const { id, point } = data;
 
-    const points = canvasDatas.get(id).points;
-    points[points.lenght - 1] = point;
+    const points = canvasDatas.get(id)?.points;
+    if (points) {
+      points[points.lenght - 1] = point;
+    }
 
     socket.emit("drawing-modify", data);
   });
