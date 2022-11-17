@@ -16,6 +16,7 @@ const testData = {
     },
   ],
 };
+const pointData = { id: "adfla", point: { x: 1, y: 3 } };
 
 describe("socket.io canvas 이벤트 테스트", () => {
   let io: Server, serverSocket: Socket, clientSocket: ClientSocket;
@@ -62,8 +63,6 @@ describe("socket.io canvas 이벤트 테스트", () => {
   });
 
   test("drawing-add", (done) => {
-    const pointData = { id: "adfla", point: { x: 1, y: 3 } };
-
     clientSocket.emit("drawing-add", pointData);
 
     clientSocket.on("drawing-add", (data) => {
@@ -74,19 +73,11 @@ describe("socket.io canvas 이벤트 테스트", () => {
   });
 
   test("drawing-modify 테스트", (done) => {
-    const newPoint = {
-      id: "adfla",
-      point: {
-        x: 1,
-        y: 1,
-      },
-    };
-
-    clientSocket.emit("drawing-modify", newPoint);
+    clientSocket.emit("drawing-modify", pointData);
 
     clientSocket.on("drawing-modify", (data) => {
       expect(data).toHaveProperty("id", "adfla");
-      expect(data).toHaveProperty("point", { x: 1, y: 1 });
+      expect(data).toHaveProperty("point", { x: 1, y: 3 });
       done();
     });
   });
