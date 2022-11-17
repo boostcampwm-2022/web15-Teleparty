@@ -26,8 +26,11 @@ export const canvasEventApplyer = (socket: Socket) => {
   socket.on("drawing-add", (data) => {
     const { id, point } = data;
 
-    canvasDatas.get(id).points.push(point);
-    socket.emit("drawing-add", data);
+    const target = canvasDatas.get(id);
+    if (target) {
+      target.points.push(point);
+      socket.emit("drawing-add", data);
+    }
   });
 
   socket.on("drawing-modify", (data) => {
@@ -36,8 +39,7 @@ export const canvasEventApplyer = (socket: Socket) => {
     const points = canvasDatas.get(id)?.points;
     if (points) {
       points[points.lenght - 1] = point;
+      socket.emit("drawing-modify", data);
     }
-
-    socket.emit("drawing-modify", data);
   });
 };
