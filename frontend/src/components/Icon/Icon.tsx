@@ -2,7 +2,7 @@ import IcomoonReact from "icomoon-react";
 
 import iconSet from "../../assets/icon-selection.json";
 
-type iconType =
+export type IconType =
   | "flow-line"
   | "bucket"
   | "eraser-alt"
@@ -24,7 +24,7 @@ interface IconProps {
   className?: string;
   color?: string;
   size: string | number;
-  icon: iconType;
+  icon: IconType;
 }
 
 const Icon = ({ className, color, size, icon }: IconProps) => {
