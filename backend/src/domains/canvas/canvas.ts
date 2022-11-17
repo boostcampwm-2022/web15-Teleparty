@@ -30,6 +30,11 @@ export const canvasEventApplyer = (socket: Socket) => {
     if (target) {
       target.points.push(point);
       socket.broadcast.emit("drawing-add", data);
+    } else {
+      socket.emit("error", {
+        type: "drawing-add-fail",
+        message: "해당하는 id의 객체가 존재하지 않습니다.",
+      });
     }
   });
 
@@ -40,6 +45,11 @@ export const canvasEventApplyer = (socket: Socket) => {
     if (points) {
       points[points.lenght - 1] = point;
       socket.broadcast.emit("drawing-modify", data);
+    } else {
+      socket.emit("error", {
+        type: "drawing-modify-fail",
+        message: "해당하는 id의 객체가 존재하지 않습니다.",
+      });
     }
   });
 };
