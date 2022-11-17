@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 
 import { CanvasLayout } from "./Canvas.styles";
+import Ellipse from "./utils/Ellipse";
 import Line from "./utils/Line";
 import { Point } from "./utils/Point";
-import Rectangle from "./utils/Rectangle";
+import Rectangle from "./utils/Rectangle"
 import Shape from "./utils/Shape";
 
 import { toolAtom } from "../../store/tool";
@@ -44,7 +45,7 @@ const Canvas = () => {
     const shapeCreateFunctionMap = {
       pen: () => new Line("#aa22aa", 1, 10),
       fill: () => new Line("#ffffff", 1, 10),
-      circle: () => new Line("#ffffff", 1, 10),
+      circle: () => new Ellipse("#aa22aa", 1, 10, currentPoint),
       erase: () => new Line("#ffffff", 1, 10),
       straightLine: () => new Line("#ffffff", 1, 10),
       rectangle: () => new Rectangle("#aa22aa", 1, 10, currentPoint),
@@ -67,7 +68,9 @@ const Canvas = () => {
       target.pushPoint(currentPoint);
     } else if (target instanceof Rectangle) {
       target.point2 = currentPoint;
-    }
+    } else if (target instanceof Ellipse) {
+			target.point2 = currentPoint;
+		}
 
     drawAllShapes();
   };

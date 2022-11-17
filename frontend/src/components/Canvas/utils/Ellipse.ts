@@ -25,12 +25,14 @@ export default class Ellipse extends Shape {
       globalAlpha: this.transparency,
     });
 
-    const x = Math.min(this.point1.x, this.point2.x); 
-    const y = Math.min(this.point1.y, this.point2.y); 
+    const x = (this.point1.x + this.point2.x) / 2
+    const y = (this.point1.y + this.point2.y) / 2
     const radiusX = Math.abs(this.point1.x - this.point2.x) / 2; 
     const radiusY = Math.abs(this.point1.y - this.point2.y) / 2; 
 
+    ctx.beginPath();
     ctx.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
+    ctx.stroke();
 
     setCanvasContextSetting(ctx, prevCtxSetting);
   }
