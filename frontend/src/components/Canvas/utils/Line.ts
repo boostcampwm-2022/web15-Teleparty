@@ -2,16 +2,11 @@ import { getCanvasContextSetting, setCanvasContextSetting } from "./canvas";
 import { Point } from "./Point";
 import Shape from "./Shape";
 
-interface ILine {
-  start: Point;
-  end: Point;
-}
-
 export default class Line extends Shape {
-  protected lines: ILine[] = [];
+  protected points: Point[] = [];
 
-  pushLine(line: ILine) {
-    this.lines.push(line);
+  pushPoint(point: Point) {
+    this.points.push(point);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -23,8 +18,8 @@ export default class Line extends Shape {
     });
 
     ctx.beginPath(); 
-    for (const { start, end } of this.lines) {
-      ctx.lineTo(end.x, end.y); 
+    for (const { x, y } of this.points) {
+      ctx.lineTo(x, y); 
     }
     ctx.stroke(); 
 

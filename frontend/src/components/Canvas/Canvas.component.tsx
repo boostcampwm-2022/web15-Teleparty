@@ -11,7 +11,6 @@ const Canvas = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const shapeList = useRef<Shape[]>([]);
 	const isDrawing = useRef<boolean>(false);
-	const lastPoint = useRef<Point>({ x: 0, y: 0 });
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -27,14 +26,9 @@ const Canvas = () => {
 		}
 	};
 
-	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
+	const drawStart: React.MouseEventHandler<HTMLCanvasElement> = () => {
 		shapeList.current.push(new Line("#aa22aa", 1, 10));
 		isDrawing.current = true;
-		lastPoint.current = getCoordRelativeToElement(
-			event.clientX,
-			event.clientY,
-			event.target as Element
-		);
 	};
 
 	const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
@@ -48,14 +42,10 @@ const Canvas = () => {
     );
 
 		if (target instanceof Line) {
-      // 새로운 선을 추가
-			target.pushLine({
-				start: lastPoint.current,
-				end: currentPoint,
-			});
+      // 새로운 점을 추가
+			target.pushPoint(currentPoint);
 		}
 
-    lastPoint.current = currentPoint;
     drawAllShapes();
 	};
 
