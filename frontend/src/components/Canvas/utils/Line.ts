@@ -52,6 +52,5 @@ export default class Line extends Shape {
     ctx.stroke();
 
     setCanvasContextSetting(ctx, prevCtxSetting);
-    console.log(this.points.length);
   }
 }
