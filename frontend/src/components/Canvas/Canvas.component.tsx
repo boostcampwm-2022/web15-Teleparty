@@ -5,6 +5,7 @@ import { useAtom } from "jotai";
 import { CanvasLayout } from "./Canvas.styles";
 import Line from "./utils/Line";
 import { Point } from "./utils/Point";
+import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 
 import { toolAtom } from "../../store/tool";
@@ -31,14 +32,20 @@ const Canvas = () => {
     }
   });
 
-  const drawStart: React.MouseEventHandler<HTMLCanvasElement> = () => {
+  const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
+		const currentPoint = getCoordRelativeToElement(
+      event.clientX,
+      event.clientY,
+      event.target as Element
+    );
+
     const shapeCreateFunctionMap = {
       pen: () => new Line("#aa22aa", 1, 10),
       fill: () => new Line("#ffffff", 1, 10),
       circle: () => new Line("#ffffff", 1, 10),
       erase: () => new Line("#ffffff", 1, 10),
       straightLine: () => new Line("#ffffff", 1, 10),
-      rectangle: () => new Line("#ffffff", 1, 10),
+      rectangle: () => new Rectangle("#aa22aa", 1, 10, currentPoint),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
@@ -55,9 +62,11 @@ const Canvas = () => {
     );
 
     if (target instanceof Line) {
-      // 새로운 점을 추가
       target.pushPoint(currentPoint);
     }
+		else if (target instanceof Rectangle) {
+			target.point2 = currentPoint;
+		}
 
     drawAllShapes();
   };
