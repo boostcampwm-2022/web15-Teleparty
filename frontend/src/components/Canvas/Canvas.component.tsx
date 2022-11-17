@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
+import { useAtomValue } from 'jotai/utils'
 
 import { CanvasLayout } from "./Canvas.styles";
 import { findEdgePoints } from "./utils/canvas";
@@ -11,7 +12,9 @@ import Rectangle from "./utils/Rectangle"
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
 
-import { toolAtom } from "../../store/tool";
+import { thicknessAtom } from "../../store/thickness";
+import { toolAtom, paletteAtom } from "../../store/tool";
+import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
@@ -25,6 +28,9 @@ const Canvas = () => {
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
   const [tool] = useAtom(toolAtom);
+  const [transparency] = useAtom(transparencyAtom);
+  const [color] = useAtom(paletteAtom);
+  const thickness = useAtomValue(thicknessAtom);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
@@ -51,19 +57,19 @@ const Canvas = () => {
 
 		if (tool === "fill") {
 			if (!canvasRef.current) return;
-			const polygon = new Polygon("#aa22aa", 1, 10, findEdgePoints(canvasRef.current, currentPoint));
+			const polygon = new Polygon(color, transparency, 10, findEdgePoints(canvasRef.current, currentPoint));
 			shapeList.current.push(polygon);
 			drawAllShapes();
 			return;
 		}
 
     const shapeCreateFunctionMap = {
-      pen: () => new Line("#aa22aa", 1, 10),
-      fill: () => new Line("#ffffff", 1, 10),
-      circle: () => new Ellipse("#aa22aa", 1, 10, currentPoint),
-      erase: () => new Line("#ffffff", 1, 10),
-      straightLine: () => new straightLine("#aa22aa", 1, 10, currentPoint),
-      rectangle: () => new Rectangle("#aa22aa", 1, 10, currentPoint),
+      pen: () => new Line(color, transparency, thickness*16),
+      fill: () => new Line(color, transparency, thickness*16),
+      circle: () => new Ellipse(color, transparency, thickness*16, currentPoint),
+      erase: () => new Line("#ffffff", 1, thickness*16),
+      straightLine: () => new straightLine(color, transparency, thickness*16, currentPoint),
+      rectangle: () => new Rectangle(color, transparency, thickness*16, currentPoint),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;

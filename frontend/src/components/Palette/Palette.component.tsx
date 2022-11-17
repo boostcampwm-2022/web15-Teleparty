@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useEffect } from "react";
+
+import { useAtom } from "jotai";
+
 
 import {
   PaletteColorBox,
@@ -8,25 +11,15 @@ import {
 } from "./Palette.styles";
 
 import { theme } from "../../global-styles/theme";
+import { PALETTE_COLORS, paletteAtom } from "../../store/tool"
 
 import type { ColorsType } from "../../global-styles/theme";
 
-const PALETTE_COLORS = [
-  "black",
-  "white",
-  "red",
-  "pink",
-  "orange",
-  "yellow-palette",
-  "green-palette",
-  "blue",
-  "indigo",
-  "violet",
-] as const;
-
 const Palette = () => {
-  const [color, setColor] = useState(theme.colors.pink);
+  const [color, setColor] = useAtom(paletteAtom);
 
+  useEffect(()=>setColor(theme.colors.pink), []);
+  
   const onColorBoxClick = (color: keyof ColorsType) => () =>
     setColor(theme.colors[color]);
 

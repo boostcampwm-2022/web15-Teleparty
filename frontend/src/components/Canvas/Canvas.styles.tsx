@@ -5,4 +5,5 @@ export const CanvasLayout = styled.canvas`
 	height: 644px;
 	border: 2px solid ${(props) => props.theme.colors.primary};
   border-radius: 10px;
+	background-color: ${(props) => props.theme.colors.white};
 `;
