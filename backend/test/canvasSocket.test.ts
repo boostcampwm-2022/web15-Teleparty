@@ -19,38 +19,45 @@ const testData = {
 const pointData = { id: "adfla", point: { x: 1, y: 3 } };
 
 describe("socket.io canvas 이벤트 테스트", () => {
-  let io: Server, serverSocket: Socket, clientSocket: ClientSocket;
+  let io: Server,
+    serverSocket: Socket,
+    clientSocketSender: ClientSocket,
+    clientSocketGether: ClientSocket;
 
   beforeAll((done) => {
     const httpServer = createServer();
     io = new Server(httpServer);
     httpServer.listen(8000, () => {
-      clientSocket = Client(`http://localhost:${8000}`);
+      clientSocketSender = Client(`http://localhost:${8000}`);
+      clientSocketGether = Client(`http://localhost:${8000}`);
       io.on("connection", (socket: Socket) => {
         serverSocket = socket;
         canvasEventApplyer(socket);
       });
-      clientSocket.on("connect", done);
+      clientSocketSender.on("connect", () => {
+        clientSocketGether.on("connect", done);
+      });
     });
   });
 
   afterAll(() => {
     io.close();
-    clientSocket.close();
+    clientSocketSender.close();
+    clientSocketGether.close();
   });
 
   test("login 테스트", (done) => {
-    clientSocket.emit("login");
-    clientSocket.on("login", (data) => {
+    clientSocketSender.emit("login");
+    clientSocketSender.on("login", (data) => {
       expect(data).toHaveLength(0);
       done();
     });
   });
 
   test("draw-start 테스트", (done) => {
-    clientSocket.emit("draw-start", testData);
+    clientSocketSender.emit("draw-start", testData);
 
-    clientSocket.on("draw-start", (data) => {
+    clientSocketGether.on("draw-start", (data) => {
       expect(data).toHaveProperty("id", "adfla");
       expect(data).toHaveProperty("color", "string;");
       expect(data).toHaveProperty("transparency", 0.7);
@@ -63,9 +70,9 @@ describe("socket.io canvas 이벤트 테스트", () => {
   });
 
   test("drawing-add", (done) => {
-    clientSocket.emit("drawing-add", pointData);
+    clientSocketSender.emit("drawing-add", pointData);
 
-    clientSocket.on("drawing-add", (data) => {
+    clientSocketGether.on("drawing-add", (data) => {
       expect(data).toHaveProperty("id", "adfla");
       expect(data).toHaveProperty("point", { x: 1, y: 3 });
       done();
@@ -73,9 +80,9 @@ describe("socket.io canvas 이벤트 테스트", () => {
   });
 
   test("drawing-modify 테스트", (done) => {
-    clientSocket.emit("drawing-modify", pointData);
+    clientSocketSender.emit("drawing-modify", pointData);
 
-    clientSocket.on("drawing-modify", (data) => {
+    clientSocketGether.on("drawing-modify", (data) => {
       expect(data).toHaveProperty("id", "adfla");
       expect(data).toHaveProperty("point", { x: 1, y: 3 });
       done();
