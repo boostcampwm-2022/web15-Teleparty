@@ -15,15 +15,21 @@ export default class Line extends Shape {
       return;
     }
 
-    // 이전 점들과 x좌표가 동일하면, 바로 이전 점의 y좌표만 변경
-    if (point.x === prevPrevPoint.x && prevPoint.x === prevPrevPoint.x) {
-      prevPoint.y = point.y;
-      return;
-    }
+    const dy = point.y - prevPoint.y;
+    const dx = point.x - prevPoint.x;
+    // 같은 위치에 점이 찍힌경우 무시
+    if (dy === 0 && dx === 0) return;
 
-    // 이전 점들과 y좌표가 동일하면, 바로 이전 점의 x좌표만 변경
-    if (point.y === prevPrevPoint.y && prevPoint.y === prevPrevPoint.y) {
+    const prevDy = prevPoint.y - prevPrevPoint.y;
+    const prevDx = prevPoint.x - prevPrevPoint.x;
+
+    const theta = Math.atan2(dy, dx);
+    const prevTheta = Math.atan2(prevDy, prevDx);
+
+    // 이전 점들과 유사한 각도인 경우, 점을 추가하지 않고 바로 이전 점을 업데이트
+    if (Math.abs(prevTheta - theta) < 0.001) {
       prevPoint.x = point.x;
+      prevPoint.y = point.y;
       return;
     }
 
@@ -39,11 +45,11 @@ export default class Line extends Shape {
       globalAlpha: this.transparency,
     });
 
-    ctx.beginPath(); 
+    ctx.beginPath();
     for (const { x, y } of this.points) {
-      ctx.lineTo(x, y); 
+      ctx.lineTo(x, y);
     }
-    ctx.stroke(); 
+    ctx.stroke();
 
     setCanvasContextSetting(ctx, prevCtxSetting);
     console.log(this.points.length);
