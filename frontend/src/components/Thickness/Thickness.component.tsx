@@ -1,23 +1,17 @@
-import { useState } from "react";
+import {useAtom} from "jotai"
 
 import { ThicknessButton, ThicknessLayout } from "./Thickness.styles";
 
-const THICKNESS = {
-  X_SMALL: 0.375,
-  SMALL: 0.75,
-  MEDIUM: 1.125,
-  LARGE: 1.5,
-  X_LARGE: 1.875,
-};
+import { THICKNESS_VALUES, thicknessAtom } from "../../store/thickness"
 
 const Thickness = () => {
-  const [thick, setThick] = useState(THICKNESS.MEDIUM);
+  const [thick, setThick] = useAtom(thicknessAtom);
 
   const onThicknessClick = (thickness: number) => () => setThick(thickness);
 
   return (
     <ThicknessLayout>
-      {Object.values(THICKNESS).map((thickness, index) => (
+      {THICKNESS_VALUES.map((thickness, index) => (
         <ThicknessButton
           key={index}
           size={thickness}

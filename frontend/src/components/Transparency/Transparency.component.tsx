@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import {  useRef  } from "react";
+
+import { useAtom } from "jotai";
 
 import {
   TransparencyCircle,
   TransparencyLayout,
   TransparencyRange,
 } from "./Transparency.styles";
+
+import { transparencyAtom } from "../../store/transparency";
 
 const RANGE_PROPS = {
   MIN: "0",
@@ -13,7 +17,7 @@ const RANGE_PROPS = {
 };
 
 const Transparency = () => {
-  const [transparency, setTransparency] = useState(RANGE_PROPS.MAX);
+  const [, setTransparency] = useAtom(transparencyAtom);
   const rangeRef = useRef<HTMLInputElement>(null);
 
   const setRangeProps = () => {
@@ -24,12 +28,8 @@ const Transparency = () => {
   };
   const onTransparencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRangeProps();
-    setTransparency(e.target.value);
+    setTransparency(+e.target.value);
   };
-
-  useEffect(() => {
-    console.log(transparency);
-  }, [transparency]);
 
   return (
     <TransparencyLayout>
