@@ -8,6 +8,7 @@ import Line from "./utils/Line";
 import { Point } from "./utils/Point";
 import Rectangle from "./utils/Rectangle"
 import Shape from "./utils/Shape";
+import straightLine from "./utils/StraightLine";
 
 import { toolAtom } from "../../store/tool";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
@@ -47,7 +48,7 @@ const Canvas = () => {
       fill: () => new Line("#ffffff", 1, 10),
       circle: () => new Ellipse("#aa22aa", 1, 10, currentPoint),
       erase: () => new Line("#ffffff", 1, 10),
-      straightLine: () => new Line("#ffffff", 1, 10),
+      straightLine: () => new straightLine("#aa22aa", 1, 10, currentPoint),
       rectangle: () => new Rectangle("#aa22aa", 1, 10, currentPoint),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
@@ -70,7 +71,9 @@ const Canvas = () => {
       target.point2 = currentPoint;
     } else if (target instanceof Ellipse) {
 			target.point2 = currentPoint;
-		}
+		} else if (target instanceof straightLine) {
+			target.point2 = currentPoint;
+		} 
 
     drawAllShapes();
   };
