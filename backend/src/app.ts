@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 
-import { WebSocketServer } from "ws";
+import { Server } from "socket.io";
 import { canvasEventApplyer } from "./domains/canvas/canvas";
 
 const app = express();
@@ -59,8 +59,6 @@ const server = app.listen("8000", () => {
 `);
 });
 
-const socketServer = new WebSocketServer({
-  server,
-});
+const io = new Server(server, { cors: { origin: "*" } });
 
-socketServer.on("connection", canvasEventApplyer);
+io.on("connection", canvasEventApplyer);
