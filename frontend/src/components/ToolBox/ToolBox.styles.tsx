@@ -19,6 +19,10 @@ export const ToolBoxCell = styled.button`
   cursor: pointer;
 
   &:hover {
-    opacity: 0.8;
+    opacity: 0.75;
+  }
+
+  &.selected {
+    opacity: 1;
   }
 `

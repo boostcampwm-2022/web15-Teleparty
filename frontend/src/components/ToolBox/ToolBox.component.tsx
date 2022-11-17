@@ -1,17 +1,10 @@
+import { useAtom } from "jotai";
+
 import { ToolBoxLayout, ToolBoxCell } from "./ToolBox.styles";
 
 import { colors } from "../../global-styles/theme";
+import { TOOL_TYPES, toolAtom } from "../../store/tool";
 import Icon, { IconType } from "../Icon/Icon";
-
-
-const TOOL_TYPES = [
-  "pen",
-  "fill",
-  "circle",
-  "erase",
-  "straight-line",
-  "rectangle",
-];
 
 const TOOL_ICON_MAP: {
   [key: string]: IconType;
@@ -25,11 +18,23 @@ const TOOL_ICON_MAP: {
 };
 
 const ToolBox = () => {
+  const [tool, setTool] = useAtom(toolAtom);
+
   return (
     <ToolBoxLayout>
-      {TOOL_TYPES.map((toolType) => <ToolBoxCell key={toolType}>
-        <Icon color={colors.primary} size={24} icon={TOOL_ICON_MAP[toolType]}></Icon>
-        </ToolBoxCell>)}
+      {TOOL_TYPES.map((toolType) => (
+        <ToolBoxCell
+          className={toolType === tool ? "selected" : ""}
+          key={toolType}
+          onClick={() => setTool(toolType)}
+        >
+          <Icon
+            color={colors.primary}
+            size={24}
+            icon={TOOL_ICON_MAP[toolType]}
+          ></Icon>
+        </ToolBoxCell>
+      ))}
     </ToolBoxLayout>
   );
 };
