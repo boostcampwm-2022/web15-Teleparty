@@ -3,9 +3,10 @@ import { useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 
 import { CanvasLayout } from "./Canvas.styles";
+import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
 import Line from "./utils/Line";
-import { Point } from "./utils/Point";
+import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle"
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
@@ -13,6 +14,7 @@ import straightLine from "./utils/StraightLine";
 import { toolAtom } from "../../store/tool";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
+
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,6 +44,14 @@ const Canvas = () => {
       event.clientY,
       event.target as Element
     );
+
+		if (tool === "fill") {
+			if (!canvasRef.current) return;
+			const polygon = new Polygon("#aa22aa", 1, 10, findEdgePoints(canvasRef.current, currentPoint));
+			shapeList.current.push(polygon);
+			drawAllShapes();
+			return;
+		}
 
     const shapeCreateFunctionMap = {
       pen: () => new Line("#aa22aa", 1, 10),
