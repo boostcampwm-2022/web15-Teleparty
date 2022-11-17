@@ -8,6 +8,11 @@ import Shape from "./utils/Shape";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
+const CANVAS_PROPS = {
+  WIDTH: 1036,
+  HEIGHT: 644,
+};
+
 const Canvas = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const shapeList = useRef<Shape[]>([]);
@@ -32,10 +37,10 @@ const Canvas = () => {
 		isDrawing.current = true;
 	};
 
-	const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-		if (!isDrawing.current) return;
+  const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
+    if (!isDrawing.current) return;
 
-		const target = shapeList.current.at(-1);
+    const target = shapeList.current.at(-1);
     const currentPoint = getCoordRelativeToElement(
       event.clientX,
       event.clientY,
@@ -48,23 +53,34 @@ const Canvas = () => {
 		}
 
     drawAllShapes();
-	};
+  };
 
   const drawEnd: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
     draw(event);
     isDrawing.current = false;
-  }
+  };
 
-	return (
-		<CanvasLayout
-			width={1036}
-			height={644}
-			ref={canvasRef}
-			onMouseDown={drawStart}
-			onMouseMove={draw}
-			onMouseUp={drawEnd}
-		/>
-	);
+  const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+      const ctx = canvasRef.current?.getContext("2d");
+      shapeList.current.pop();
+      ctx?.clearRect(0, 0, CANVAS_PROPS.WIDTH, CANVAS_PROPS.HEIGHT);
+      drawAllShapes();
+    }
+  };
+
+  return (
+    <CanvasLayout
+      width={CANVAS_PROPS.WIDTH}
+      height={CANVAS_PROPS.HEIGHT}
+      ref={canvasRef}
+      onMouseDown={drawStart}
+      onMouseMove={draw}
+      onMouseUp={drawEnd}
+      onKeyDown={undo}
+      tabIndex={1}
+    />
+  );
 };
 
 export default Canvas;
