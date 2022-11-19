@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { io as Client, Socket as ClientSocket } from "socket.io-client";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { canvasEventApplyer } from "../src/domains/canvas/canvas";
 
 const testData = {
