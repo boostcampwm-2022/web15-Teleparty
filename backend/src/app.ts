@@ -13,15 +13,7 @@ app.use(express.static("public"));
 // morgan 로그 설정
 app.use(morgan("dev"));
 
-app.get("/welcome", (req: Request, res: Response, next: NextFunction) => {
-  res.send("welcome!");
-});
-
-app.get("/test", (req: Request, res: Response, next: NextFunction) => {
-  throw new Error("에러발생테스트");
-});
-
-app.get("/*", (req: Request, res: Response, next: NextFunction) => {
+app.get("/*", (req: Request, res: Response) => {
   res.sendFile("index.html");
 });
 
@@ -35,12 +27,7 @@ const logHandler = (
   next(err);
 };
 
-const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const errorHandler = (err: Error, req: Request, res: Response) => {
   const error = { status: 500, message: "서버 내부 Error!!" };
   const { message, status } = Object.assign(error, { ...err });
 
