@@ -5,20 +5,12 @@ const canvasDataMap = new Map();
 
 export const canvasEventApplyer = (socket: Socket) => {
   socket.on("login", () => {
-    const sendData = [...canvasDataMap.entries()];
+    const sendData = [...canvasDataMap.values()];
     socket.emit("login", sendData);
   });
 
   socket.on("draw-start", (data: CanvasData) => {
-    const { id, color, transparency, type, lineWidth, points } = data;
-
-    canvasDataMap.set(id, {
-      color,
-      transparency,
-      type,
-      lineWidth,
-      points,
-    });
+    canvasDataMap.set(data.id, data);
 
     socket.broadcast.emit("draw-start", data);
   });
