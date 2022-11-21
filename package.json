@@ -4,7 +4,7 @@
   "description": "내 마음을 읽어봐! ( ु⁎ᴗ_ᴗ⁎)ु.｡oO 다같이 모여서 노는 그림 퀴즈 게임",
   "main": "index.js",
   "scripts": {
-    "lint-staged": "lint-staged",
+    "lint-staged": "lint-staged -q",
     "prepare": "husky install"
   },
   "repository": {
