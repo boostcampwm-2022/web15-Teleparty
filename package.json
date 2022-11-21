@@ -4,7 +4,13 @@
   "description": "내 마음을 읽어봐! ( ु⁎ᴗ_ᴗ⁎)ु.｡oO 다같이 모여서 노는 그림 퀴즈 게임",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint-staged": "lint-staged",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --config ./.prettierrc --write"
+    ]
   },
   "repository": {
     "type": "git",
@@ -21,5 +27,9 @@
     "packages/frontend",
     "packages/backend",
     "packages/shared"
-  ]
+  ],
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.3"
+  }
 }
