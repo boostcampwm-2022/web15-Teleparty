@@ -24,18 +24,18 @@ jobs:
         uses: actions/cache@v3
         id: backend_cache
         with:
-          path: ./backend/node_modules
+          path: ./packages/backend/node_modules
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Backend Install Dependencies
         if: steps.backend_cache.outputs.cache-hit != 'true'
-        run: cd ./backend && npm install
+        run: cd ./packages/backend && npm install
 
       - name: Backend Lint Verification
-        run: cd ./backend && npm run lint
+        run: cd ./packages/backend && npm run lint
 
       - name: Run Backend Test
-        run: cd ./backend && npm run test
+        run: cd ./packages/backend && npm run test
 
   frontend_test:
     runs-on: ubuntu-latest
@@ -52,21 +52,21 @@ jobs:
         uses: actions/cache@v3
         id: frontend_cache
         with:
-          path: ./frontend/node_modules
+          path: ./packages/frontend/node_modules
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Frontend Install Dependencies
         if: steps.frontend_cache.outputs.cache-hit != 'true'
-        run: cd ./frontend && npm install
+        run: cd ./packages/frontend && npm install
 
       - name: Frontend Lint Verification
-        run: cd ./frontend && npm run lint
+        run: cd ./packages/frontend && npm run lint
 
       - name: Run Frontend Test
-        run: cd ./frontend && npm run test
+        run: cd ./packages/frontend && npm run test
 
       - name: Frontend Build Test
-        run: cd ./frontend && npm run build
+        run: cd ./packages/frontend && npm run build
 
   deploy:
     needs: [frontend_test, backend_tests]
@@ -84,7 +84,7 @@ jobs:
           script: |
             echo "SSH 접속 완료"
 
-            cd web15-Teleparty/frontend
+            cd web15-Teleparty/packages/frontend
             git pull
             npm install
             npm run build && mv -f dist/* ../backend/public
