@@ -7,11 +7,6 @@
     "lint-staged": "lint-staged",
     "prepare": "husky install"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "prettier --config ./.prettierrc --write"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/boostcampwm-2022/web15-Teleparty.git"
