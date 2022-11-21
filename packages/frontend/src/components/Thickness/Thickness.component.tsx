@@ -1,8 +1,8 @@
-import {useAtom} from "jotai"
+import { useAtom } from "jotai";
 
 import { ThicknessButton, ThicknessLayout } from "./Thickness.styles";
 
-import { THICKNESS_VALUES, thicknessAtom } from "../../store/thickness"
+import { THICKNESS_VALUES, thicknessAtom } from "../../store/thickness";
 
 const Thickness = () => {
   const [thick, setThick] = useAtom(thicknessAtom);

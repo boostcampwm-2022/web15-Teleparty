@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
-import { useAtomValue } from 'jotai/utils'
+import { useAtomValue } from "jotai/utils";
 
 import { CanvasLayout } from "./Canvas.styles";
 import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
 import Line from "./utils/Line";
 import Polygon from "./utils/Polygon";
-import Rectangle from "./utils/Rectangle"
+import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
 
@@ -55,21 +55,29 @@ const Canvas = () => {
       event.target as Element
     );
 
-		if (tool === "fill") {
-			if (!canvasRef.current) return;
-			const polygon = new Polygon(color, transparency, 10, findEdgePoints(canvasRef.current, currentPoint));
-			shapeList.current.push(polygon);
-			drawAllShapes();
-			return;
-		}
+    if (tool === "fill") {
+      if (!canvasRef.current) return;
+      const polygon = new Polygon(
+        color,
+        transparency,
+        10,
+        findEdgePoints(canvasRef.current, currentPoint)
+      );
+      shapeList.current.push(polygon);
+      drawAllShapes();
+      return;
+    }
 
     const shapeCreateFunctionMap = {
-      pen: () => new Line(color, transparency, thickness*16),
-      fill: () => new Line(color, transparency, thickness*16),
-      circle: () => new Ellipse(color, transparency, thickness*16, currentPoint),
-      erase: () => new Line("#ffffff", 1, thickness*16),
-      straightLine: () => new straightLine(color, transparency, thickness*16, currentPoint),
-      rectangle: () => new Rectangle(color, transparency, thickness*16, currentPoint),
+      pen: () => new Line(color, transparency, thickness * 16),
+      fill: () => new Line(color, transparency, thickness * 16),
+      circle: () =>
+        new Ellipse(color, transparency, thickness * 16, currentPoint),
+      erase: () => new Line("#ffffff", 1, thickness * 16),
+      straightLine: () =>
+        new straightLine(color, transparency, thickness * 16, currentPoint),
+      rectangle: () =>
+        new Rectangle(color, transparency, thickness * 16, currentPoint),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
@@ -90,10 +98,10 @@ const Canvas = () => {
     } else if (target instanceof Rectangle) {
       target.point2 = currentPoint;
     } else if (target instanceof Ellipse) {
-			target.point2 = currentPoint;
-		} else if (target instanceof straightLine) {
-			target.point2 = currentPoint;
-		} 
+      target.point2 = currentPoint;
+    } else if (target instanceof straightLine) {
+      target.point2 = currentPoint;
+    }
 
     drawAllShapes();
   };

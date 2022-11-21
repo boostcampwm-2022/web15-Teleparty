@@ -5,10 +5,10 @@
  * @param element
  */
 export const getCoordRelativeToElement = (
-	clientX: number,
-	clientY: number,
-	element: Element
+  clientX: number,
+  clientY: number,
+  element: Element
 ) => {
-	const { top, left } = element.getBoundingClientRect();
-	return { x: clientX - left, y: clientY - top };
+  const { top, left } = element.getBoundingClientRect();
+  return { x: clientX - left, y: clientY - top };
 };

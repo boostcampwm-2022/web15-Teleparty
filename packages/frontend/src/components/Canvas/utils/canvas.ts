@@ -93,12 +93,12 @@ export const findEdgePoints = (
   }
 
   const getAngle = (point: Point, centerPoint: Point) =>
-    (Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x) * 180) / Math.PI;
+    (Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x) * 180) /
+    Math.PI;
 
   // 시계 방향 정렬
   const sortedEdgePoints = edgePoints.sort(
-    (p1, p2) =>
-      getAngle(p1, point) - getAngle(p2, point)
+    (p1, p2) => getAngle(p1, point) - getAngle(p2, point)
   );
 
   return sortedEdgePoints;
