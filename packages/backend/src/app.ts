@@ -2,7 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 
 import { Server } from "socket.io";
-import { canvasEventApplyer } from "./domains/canvas/canvas";
+
+import { roomController } from "./domains/room/room.controller";
 
 const app = express();
 
@@ -48,4 +49,4 @@ const server = app.listen("8000", () => {
 
 const io = new Server(server, { cors: { origin: "*" } });
 
-io.on("connection", canvasEventApplyer);
+io.on("connection", roomController);
