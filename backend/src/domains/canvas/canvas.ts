@@ -1,24 +1,16 @@
 import { Socket } from "socket.io";
-import { CavasData } from "../../types/canvasData";
+import { CanvasData } from "../../types/canvasData";
 
-const canvasDatas = new Map();
+const canvasDataMap = new Map();
 
 export const canvasEventApplyer = (socket: Socket) => {
   socket.on("login", () => {
-    const sendData = [...canvasDatas.entries()];
+    const sendData = [...canvasDataMap.values()];
     socket.emit("login", sendData);
   });
 
-  socket.on("draw-start", (data: CavasData) => {
-    const { id, color, transparency, type, lineWidth, points } = data;
-
-    canvasDatas.set(id, {
-      color,
-      transparency,
-      type,
-      lineWidth,
-      points,
-    });
+  socket.on("draw-start", (data: CanvasData) => {
+    canvasDataMap.set(data.id, data);
 
     socket.broadcast.emit("draw-start", data);
   });
@@ -26,7 +18,7 @@ export const canvasEventApplyer = (socket: Socket) => {
   socket.on("drawing-add", (data) => {
     const { id, point } = data;
 
-    const target = canvasDatas.get(id);
+    const target = canvasDataMap.get(id);
     if (target) {
       target.points.push(point);
       socket.broadcast.emit("drawing-add", data);
@@ -41,7 +33,7 @@ export const canvasEventApplyer = (socket: Socket) => {
   socket.on("drawing-modify", (data) => {
     const { id, point } = data;
 
-    const points = canvasDatas.get(id)?.points;
+    const points = canvasDataMap.get(id)?.points;
     if (points) {
       points[points.lenght - 1] = point;
       socket.broadcast.emit("drawing-modify", data);

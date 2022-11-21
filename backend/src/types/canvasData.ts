@@ -3,7 +3,7 @@ type Coordinate = {
   y: number;
 };
 
-export interface CavasData {
+export interface CanvasData {
   id: string;
   color: string;
   transparency: number;

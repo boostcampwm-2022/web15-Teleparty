@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import { io as Client, Socket as ClientSocket } from "socket.io-client";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { canvasEventApplyer } from "../src/domains/canvas/canvas";
 
 const testData = {
@@ -20,7 +20,6 @@ const pointData = { id: "adfla", point: { x: 1, y: 3 } };
 
 describe("socket.io canvas 이벤트 테스트", () => {
   let io: Server,
-    serverSocket: Socket,
     clientSocketSender: ClientSocket,
     clientSocketGether: ClientSocket;
 
@@ -30,10 +29,7 @@ describe("socket.io canvas 이벤트 테스트", () => {
     httpServer.listen(8000, () => {
       clientSocketSender = Client(`http://localhost:${8000}`);
       clientSocketGether = Client(`http://localhost:${8000}`);
-      io.on("connection", (socket: Socket) => {
-        serverSocket = socket;
-        canvasEventApplyer(socket);
-      });
+      io.on("connection", canvasEventApplyer);
       clientSocketSender.on("connect", () => {
         clientSocketGether.on("connect", done);
       });
