@@ -39,6 +39,11 @@
 						"position": "before"
 					},
 					{
+						"pattern": "{shared*,shared*/**}",
+						"group": "external",
+						"position": "after"
+					},
+					{
 						"pattern": "{@*,@*/**}",
 						"group": "internal",
 						"position": "before"
