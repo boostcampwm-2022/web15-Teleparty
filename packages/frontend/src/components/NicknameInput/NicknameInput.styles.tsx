@@ -5,6 +5,7 @@ export const WarningText = styled.p`
   font-size: 0.75rem;
   color: ${(props) => props.theme.colors.red};
   word-wrap: break-word;
+  white-space: pre-line;
 `;
 
 export const NicknameInputLayout = styled.div`
