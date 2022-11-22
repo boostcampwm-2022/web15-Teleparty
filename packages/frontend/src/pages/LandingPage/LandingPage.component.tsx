@@ -1,6 +1,6 @@
 import { LandingPageLayout } from "./LandingPage.styles";
 
-import { ReactComponent as Logo } from "../../assets/logo.svg";
+import { Logo } from "../../components/Logo/Logo.component";
 
 const LandingPage = () => {
   return (
