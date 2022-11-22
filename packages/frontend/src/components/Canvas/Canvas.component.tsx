@@ -60,10 +60,15 @@ const Canvas = () => {
     // draw saved image to canvas
     if (canvasImageData.current) {
       ctx.putImageData(canvasImageData.current, 0, 0);
+    } else {
+      // draw all shapes
+      for (const shape of shapeList.current) {
+        shape.draw(ctx);
+      }
     }
 
     // draw drawing shape to canvas
-    if (isDrawing) {
+    if (canvasImageData.current && isDrawing) {
       shapeList.current.at(-1)?.draw(ctx);
     }
   });
@@ -137,7 +142,7 @@ const Canvas = () => {
       const ctx = canvasRef.current?.getContext("2d");
       shapeList.current.pop();
       ctx?.clearRect(0, 0, CANVAS_PROPS.WIDTH, CANVAS_PROPS.HEIGHT);
-      captureCanvas();
+      canvasImageData.current = null;
       drawAllShapes();
     }
   };
