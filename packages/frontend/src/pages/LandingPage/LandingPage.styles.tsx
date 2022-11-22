@@ -5,5 +5,5 @@ export const LandingPageLayout = styled.main`
   flex-direction: column;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(0deg, #373067, #ab6684);
+  background: ${(props) => props.theme.gradients.background};
 `;

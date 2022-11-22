@@ -31,8 +31,15 @@ export const colors = {
   violet: "#845EF7",
 };
 
+export const gradients = {
+  // purple tone
+  background: "linear-gradient(0deg, #373067, #ab6684)",
+};
+
 export type ColorsType = typeof colors;
+export type GradientsType = typeof gradients;
 
 export const theme: DefaultTheme = {
   colors,
+  gradients,
 };
