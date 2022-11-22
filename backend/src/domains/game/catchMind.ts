@@ -48,7 +48,7 @@ export class CatchMind implements Game {
 
   validKeyWord(answer: string, player: Player) {
     if (this.keyWord === answer) {
-      player.pulsScore(1); // 여기 나중에 상수화
+      player.plusScore(1); // 여기 나중에 상수화
       // 모두에게 라운드 종료 및 정답자, 턴 플레이어 변경 이벤트 전송
       // if player.score >= this.maxScore : 게임 종료 이벤트
       // 턴플레이어 변경

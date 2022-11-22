@@ -14,7 +14,7 @@ export class Player {
     this.avata = "";
   }
 
-  pulsScore(score: number) {
+  plusScore(score: number) {
     this.score += score;
   }
 
