@@ -18,6 +18,7 @@ const ChatBubble = ({
   isFirst,
   isMine,
   username,
+  variant,
 }: ChatBubbleProps) => {
   const isNotMyFirstChat = !isMine && isFirst;
   return (
@@ -25,7 +26,7 @@ const ChatBubble = ({
       {isNotMyFirstChat && <Avatar variant="small" />}
       <ChatTextLayout isFirst={isFirst}>
         {isNotMyFirstChat && <ChatUsernameText>{username}</ChatUsernameText>}
-        <ChatText isMine={isMine} isFirst={isFirst}>
+        <ChatText variant={variant} isMine={isMine} isFirst={isFirst}>
           {children}
         </ChatText>
       </ChatTextLayout>

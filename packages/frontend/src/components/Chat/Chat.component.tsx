@@ -12,6 +12,10 @@ interface ChatData {
   message: string;
 }
 
+interface ChatProps {
+  variant?: "horizontal";
+}
+
 const mock = [
   { username: "me", message: "안녕하세요" },
   {
@@ -40,7 +44,7 @@ const mock = [
   },
 ];
 
-const Chat = () => {
+const Chat = ({ variant }: ChatProps) => {
   const [chats, setChats] = useState<ChatData[]>(mock);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
@@ -66,10 +70,11 @@ const Chat = () => {
 
   return (
     <>
-      <ChatLayout>
+      <ChatLayout variant={variant}>
         {chats.map(({ username, message }, index, messages) => (
           <ChatBubble
             key={index}
+            variant={variant}
             isMine={username === "me"}
             isFirst={messages[index - 1]?.username !== username}
             username={username}
@@ -79,7 +84,7 @@ const Chat = () => {
         ))}
         <div ref={chatEndRef}></div>
       </ChatLayout>
-      <ChatInputForm onSubmit={onChatSubmit}>
+      <ChatInputForm variant={variant} onSubmit={onChatSubmit}>
         <Input
           variant="medium"
           placeholder="메세지를 입력하세요."

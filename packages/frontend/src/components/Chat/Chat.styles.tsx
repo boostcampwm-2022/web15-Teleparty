@@ -1,14 +1,18 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 interface ChatRowProps {
   isMine?: boolean;
 }
 
-export interface ChatTextProps extends ChatRowProps {
+interface ChatVariant {
+  variant?: "horizontal";
+}
+
+export interface ChatTextProps extends ChatRowProps, ChatVariant {
   isFirst?: boolean;
 }
 
-const ChatLayout = styled.div`
+const ChatLayout = styled.div<ChatVariant>`
   width: 18rem;
   height: 31rem;
   padding: 2rem 1rem;
@@ -19,6 +23,13 @@ const ChatLayout = styled.div`
   & > * + * {
     margin-top: 0.5rem;
   }
+
+  ${({ variant }) =>
+    variant === "horizontal" &&
+    css`
+      width: 57rem;
+      height: 22.5rem;
+    `}
 `;
 
 const ChatRow = styled.div<ChatRowProps>`
@@ -48,6 +59,13 @@ const ChatText = styled.span<ChatTextProps>`
   color: ${({ isMine, theme: { colors } }) =>
     isMine ? colors.white : colors.primaryDark};
   word-break: break-all;
+  line-height: 22px;
+
+  ${({ variant }) =>
+    variant === "horizontal" &&
+    css`
+      max-width: 30rem;
+    `}
 `;
 
 const ChatUsernameText = styled.span`
@@ -56,7 +74,7 @@ const ChatUsernameText = styled.span`
   color: ${({ theme: { colors } }) => colors.white};
 `;
 
-const ChatInputForm = styled.form`
+const ChatInputForm = styled.form<ChatVariant>`
   width: 18rem;
   padding: 1rem;
   background-color: ${({ theme: { colors } }) =>
@@ -67,6 +85,12 @@ const ChatInputForm = styled.form`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+
+  ${({ variant }) =>
+    variant === "horizontal" &&
+    css`
+      width: 57rem;
+    `}
 `;
 
 export {
