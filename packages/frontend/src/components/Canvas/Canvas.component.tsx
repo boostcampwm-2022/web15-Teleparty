@@ -101,6 +101,7 @@ const Canvas = () => {
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
+    captureCanvas();
   };
 
   const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
@@ -129,7 +130,6 @@ const Canvas = () => {
   const drawEnd: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
     draw(event);
     isDrawing.current = false;
-    captureCanvas();
   };
 
   const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
