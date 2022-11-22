@@ -1,6 +1,5 @@
 import { useAtom } from "jotai";
 
-
 import {
   PaletteColorBox,
   PaletteLayout,
@@ -9,7 +8,7 @@ import {
 } from "./Palette.styles";
 
 import { theme } from "../../global-styles/theme";
-import { PALETTE_COLORS, paletteAtom } from "../../store/tool"
+import { PALETTE_COLORS, paletteAtom } from "../../store/tool";
 
 import type { ColorsType } from "../../global-styles/theme";
 

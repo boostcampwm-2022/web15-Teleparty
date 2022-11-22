@@ -10,8 +10,6 @@ export const TOOL_TYPES = [
   "rectangle",
 ] as const;
 
-
-
 export const PALETTE_COLORS = [
   "black",
   "white",

@@ -25,4 +25,4 @@ export const ToolBoxCell = styled.button`
   &.selected {
     opacity: 1;
   }
-`
+`;

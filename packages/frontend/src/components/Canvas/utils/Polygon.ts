@@ -29,7 +29,6 @@ export default class Polygon extends Shape {
     ctx.moveTo(startPoint.x, startPoint.y);
     for (const { x, y } of this.points) {
       ctx.lineTo(x, y);
-    
     }
     ctx.fill();
 

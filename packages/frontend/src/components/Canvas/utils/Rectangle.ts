@@ -25,10 +25,10 @@ export default class Rectangle extends Shape {
       globalAlpha: this.transparency,
     });
 
-    const x = Math.min(this.point1.x, this.point2.x); 
-    const y = Math.min(this.point1.y, this.point2.y); 
-    const width = Math.abs(this.point1.x - this.point2.x); 
-    const height = Math.abs(this.point1.y - this.point2.y); 
+    const x = Math.min(this.point1.x, this.point2.x);
+    const y = Math.min(this.point1.y, this.point2.y);
+    const width = Math.abs(this.point1.x - this.point2.x);
+    const height = Math.abs(this.point1.y - this.point2.y);
 
     ctx.strokeRect(x, y, width, height);
 

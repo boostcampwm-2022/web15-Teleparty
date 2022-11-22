@@ -8,6 +8,6 @@ const THICKNESS = {
   X_LARGE: 1.875,
 } as const;
 
-export const THICKNESS_VALUES = Object.values(THICKNESS)
+export const THICKNESS_VALUES = Object.values(THICKNESS);
 
 export const thicknessAtom = atom<number>(THICKNESS.MEDIUM);
