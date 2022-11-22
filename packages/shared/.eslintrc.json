@@ -11,5 +11,7 @@
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint"],
-  "rules": {}
+  "rules": {
+    "eol-last": [1, "always"]
+  }
 }
