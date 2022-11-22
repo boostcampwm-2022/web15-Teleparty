@@ -31,8 +31,15 @@ export const colors = {
   violet: "#845EF7",
 };
 
+export const shadows = {
+  small: "0px 1px 2px 0px rgba(0, 0, 0, 0.1)",
+  medium: "0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -2px rgb(0, 0, 0, 0.1)",
+};
+
 export type ColorsType = typeof colors;
+export type ShadowsType = typeof shadows;
 
 export const theme: DefaultTheme = {
   colors,
+  shadows,
 };
