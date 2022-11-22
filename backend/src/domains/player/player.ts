@@ -5,11 +5,13 @@ export class Player {
   socket: Socket;
   userName: string;
   score: number;
+  avata: string;
 
   constructor(socket: Socket, userName: string) {
     this.socket = socket;
     this.userName = userName;
     this.score = 0;
+    this.avata = "";
   }
 
   pulsScore(score: number) {
