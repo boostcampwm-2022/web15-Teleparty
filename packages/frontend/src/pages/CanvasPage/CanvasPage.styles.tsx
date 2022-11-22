@@ -5,4 +5,5 @@ export const CanvasPageLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  ${(props) => props.theme.backgrounds.nightCity}
 `;

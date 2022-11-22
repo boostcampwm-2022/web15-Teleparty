@@ -7,5 +7,5 @@ export const LandingPageLayout = styled.main`
   justify-content: center;
   gap: 100px;
   height: 100vh;
-  background: ${(props) => props.theme.gradients.background};
+  ${(props) => props.theme.backgrounds.nightCity}
 `;

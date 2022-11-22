@@ -1,9 +1,10 @@
 import "styled-components";
-import { ColorsType, GradientsType } from "./theme";
+import { ColorsType, GradientsType, BackgroundsType } from "./theme";
 
 declare module "styled-components" {
   export interface DefaultTheme {
     colors: ColorsType;
     gradients: GradientsType;
+    backgrounds: BackgroundsType;
   }
 }

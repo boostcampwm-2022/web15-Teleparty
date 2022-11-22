@@ -7,3 +7,5 @@ export const CanvasLayout = styled.canvas`
   border-radius: 10px;
   background-color: ${(props) => props.theme.colors.white};
 `;
+
+const Button = styled.button``;
