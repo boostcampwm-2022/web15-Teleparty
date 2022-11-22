@@ -84,12 +84,12 @@ jobs:
           script: |
             echo "SSH 접속 완료"
 
-            cd web15-Teleparty/packages/frontend
+            cd web15-Teleparty
             git pull
             npm install
+            cd packages/frontend
             npm run build && mv -f dist/* ../backend/public
 
             cd ../backend
-            npm install
             pm2 kill
             pm2 start src/app.ts
