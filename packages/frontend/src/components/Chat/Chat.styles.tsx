@@ -47,6 +47,7 @@ const ChatText = styled.span<ChatTextProps>`
     isMine ? colors.primaryDark : colors.primaryLight};
   color: ${({ isMine, theme: { colors } }) =>
     isMine ? colors.white : colors.primaryDark};
+  word-break: break-all;
 `;
 
 const ChatUsernameText = styled.span`
@@ -58,7 +59,8 @@ const ChatUsernameText = styled.span`
 const ChatInputForm = styled.form`
   width: 18rem;
   padding: 1rem;
-  background-color: ${({ theme: { colors } }) => colors.primaryLight};
+  background-color: ${({ theme: { colors } }) =>
+    colors.primaryLightLowTransparent};
   border-radius: 0 0 25px 25px;
   box-shadow: ${({ theme: { shadows } }) => shadows.medium};
   display: flex;

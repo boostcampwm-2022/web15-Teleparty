@@ -6,6 +6,7 @@ export const colors = {
   primaryDark: "#15164A",
   primaryLight: "#CCCDFF",
   primaryLightTransparent: "rgba(204,205,255,0.4)",
+  primaryLightLowTransparent: "rgba(204,205,255,0.8)",
   primaryLowTransparent: "rgba(33,34,105,0.6)",
   primaryHighTransparent: "rgba(33,34,105,0.3)",
   primaryTransparent: "rgba(33,34,105,0.4)",
