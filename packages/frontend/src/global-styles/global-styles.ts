@@ -14,6 +14,9 @@ const GlobalStyles = createGlobalStyle`
   }
   body{
     font-family: 'Noto Sans KR', sans-serif;
+    background: ${({ theme: { colors } }) => colors.background};
+    background-repeat: no-repeat;
+    height: 100vh;
   }
 `;
 
