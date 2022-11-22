@@ -1,6 +1,7 @@
 import { Game } from "../game/game";
 import { Player } from "../player/player";
 import { CatchMind } from "../game/catchMind";
+import { io as socketServer } from "../../app";
 
 export class Room {
   roomId: string;
@@ -27,6 +28,19 @@ export class Room {
         (player) => player.id !== newPlayer.id
       );
     });
+
+    // 우리 방에 들어와 있는 사람들에게 (나 포함)
+    socketServer.to(this.roomId).emit(
+      "join",
+      this.players.map((player: Player) => {
+        return {
+          userName: player.userName,
+          userId: player.socket.id,
+          avata: player.avata,
+          score: player.score,
+        };
+      })
+    );
 
     newPlayer.on("game-start", (data: { gameMode: string }) => {
       if (newPlayer !== this.host) {

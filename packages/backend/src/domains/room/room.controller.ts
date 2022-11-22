@@ -1,5 +1,4 @@
 import { Socket } from "socket.io";
-import { io as socketServer } from "../../app";
 import { Player } from "../player/player";
 import { Room } from "./room.model";
 
@@ -16,18 +15,6 @@ export const roomController = (socket: Socket) => {
 
       if (room) {
         room.join(player);
-        socketServer.to(room.roomId).emit(
-          "join",
-          room.players.map((player: Player) => {
-            return {
-              userName: player.userName,
-              userId: player.socket.id,
-              avata: player.avata,
-              score: player.score,
-            };
-          })
-        );
-
         return;
       }
     }
@@ -35,17 +22,5 @@ export const roomController = (socket: Socket) => {
     const room = new Room("123123");
     room.join(player);
     rooms.push(room);
-
-    socketServer.to(room.roomId).emit(
-      "join",
-      room.players.map((player: Player) => {
-        return {
-          userName: player.userName,
-          userId: player.socket.id,
-          avata: player.avata,
-          score: player.score,
-        };
-      })
-    );
   });
 };
