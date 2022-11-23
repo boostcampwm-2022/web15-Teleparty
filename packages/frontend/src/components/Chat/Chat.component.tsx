@@ -6,9 +6,9 @@ import { ChatInputForm, ChatLayout } from "./Chat.styles";
 import ChatBubble from "./ChatBubble.component";
 
 import { socketAtom } from "../../store/socket";
-import { Button } from "../Button/Button.styles";
+import { Button } from "../common/Button";
+import { Input } from "../common/Input";
 import Icon from "../Icon/Icon";
-import { Input } from "../Input/Input.styles";
 
 interface ChatData {
   peerId: string;
