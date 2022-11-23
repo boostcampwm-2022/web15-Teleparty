@@ -1,8 +1,8 @@
 import { Game } from "../entity/game";
-import { GameRepository } from "./gameRepository.port";
 
-export class CatchMindRepo implements GameRepository {
+export class CatchMindRepo {
   games: Game[] = [];
+
   save(game: Game) {
     this.games.push(game);
   }
