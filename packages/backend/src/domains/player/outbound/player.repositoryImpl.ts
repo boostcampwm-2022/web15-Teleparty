@@ -13,4 +13,12 @@ export class PlayerRepositoryImpl implements PlayerRepository {
     this.players.push(player);
     return player;
   }
+
+  removeByPeerId(peerId: string) {
+    this.players.filter((player) => {
+      return player.peerId !== peerId;
+    });
+
+    return;
+  }
 }

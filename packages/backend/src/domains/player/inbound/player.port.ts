@@ -5,4 +5,6 @@ export interface PlayerPort {
     avata: string,
     roomId: string
   ) => void;
+
+  leavePlayer: (peerId: string) => void;
 }
