@@ -15,7 +15,7 @@ interface PlayerListProps {
 
 const PlayerList = ({ sizeType, players, maxPlayer }: PlayerListProps) => {
   return (
-    <PlayerListLayout>
+    <PlayerListLayout sizeType={sizeType}>
       <PersonnelCountParagraph>{`${players.length}/${maxPlayer}`}</PersonnelCountParagraph>
       <PlayerItemList>
         {players.map((player) => (
