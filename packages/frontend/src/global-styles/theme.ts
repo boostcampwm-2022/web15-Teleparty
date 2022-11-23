@@ -1,3 +1,7 @@
+import { css } from "styled-components";
+
+import backgroundSrc from "../assets/background.svg";
+
 import type { DefaultTheme } from "styled-components";
 
 export const colors = {
@@ -38,10 +42,27 @@ export const shadows = {
   medium: "0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -2px rgb(0, 0, 0, 0.1)",
 };
 
+export const gradients = {
+  // purple tone
+  background: "linear-gradient(0deg, #373067, #ab6684)",
+};
+
+export const backgrounds = {
+  nightCity: css`
+    background-image: url(${backgroundSrc});
+    background-position: center;
+    background-size: cover;
+  `,
+};
+
 export type ColorsType = typeof colors;
+export type GradientsType = typeof gradients;
+export type BackgroundsType = typeof backgrounds;
 export type ShadowsType = typeof shadows;
 
 export const theme: DefaultTheme = {
   colors,
+  gradients,
+  backgrounds,
   shadows,
 };
