@@ -7,5 +7,7 @@ export interface PlayerApiPort {
 
 export interface PlayerRepository {
   create: (peerId: string, userName: string, avata: string) => Player;
-  removeByPeerId: (peerId: string) => void;
+  deleteByPeerId: (peerId: string) => void;
+  findOneByPeerId: (peerId: string) => Player | undefined;
+  findAll: () => Player[];
 }

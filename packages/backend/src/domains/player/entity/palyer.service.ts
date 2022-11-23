@@ -27,7 +27,7 @@ export class PlayerService implements PlayerPort {
   }
 
   leavePlayer(peerId: string) {
-    this.playerRepository.removeByPeerId(peerId);
+    this.playerRepository.deleteByPeerId(peerId);
 
     // roomController로 leave 실행
     this.playerApiAdapter.leavePlayer(peerId);

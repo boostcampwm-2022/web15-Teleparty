@@ -1,21 +1,54 @@
 import { Room } from "../entity/room.entity";
-import { RoomRepository } from "./room.repository";
+import { RoomRepository } from "./room.port";
 
 export class RoomRepositoryImpl implements RoomRepository {
-  private rooms: Room[];
-
-  constructor() {
-    this.rooms = [];
-  }
+  private static rooms: Room[] = [];
 
   create(roomId: string) {
     const room = new Room(roomId);
-    this.rooms.push(room);
+    RoomRepositoryImpl.rooms.push(room);
     return room;
   }
 
-  findRoomIdByRoomId(roomId?: string) {
-    const room = this.rooms.find((room) => room.roomId === roomId);
+  findOneByRoomId(roomId?: string) {
+    const room = RoomRepositoryImpl.rooms.find(
+      (room) => room.roomId === roomId
+    );
     return room;
+  }
+
+  findOneByPeerId(peerId: string) {
+    const room = RoomRepositoryImpl.rooms.find((room) => {
+      return room.players.includes(peerId);
+    });
+
+    return room;
+  }
+
+  findAll() {
+    return [...RoomRepositoryImpl.rooms];
+  }
+
+  updateRoomHostByRoomId(roomId: string, peerId: string) {
+    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+      if (room.roomId === roomId) {
+        room.host = peerId;
+      }
+      return room;
+    });
+  }
+
+  deleteByRoomId(roomId: string) {
+    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.filter((room) => {
+      room.roomId !== roomId;
+    });
+  }
+
+  deletePlayerofRoomByPeerId(peerId: string) {
+    RoomRepositoryImpl.rooms.forEach((room) => {
+      room.players = room.players.filter((id) => {
+        return id !== peerId;
+      });
+    });
   }
 }

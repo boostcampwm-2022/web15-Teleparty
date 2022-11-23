@@ -1,6 +1,6 @@
 export interface RoomPort {
-  join: (userName: string, roomId?: string) => void;
-  leave: () => void;
+  join: (peerId: string, roomId?: string) => void;
+  leave: (peerId: string) => void;
   gameStart: () => void;
   chooseMode: () => void;
 }
