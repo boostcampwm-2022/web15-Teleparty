@@ -63,13 +63,27 @@ export class CatchMind {
   nextTurn() {
     this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
     this.currentRound++;
-    this.keyword = "";
 
     this.players.forEach((player) => (player.isReady = false));
   }
 
-  isRightAnswer(keyword: string) {
-    return !this.keyword?.length && keyword === this.keyword;
+  isRightAnswer(keyword: string, playerId: string) {
+    return (
+      this.keyword?.length &&
+      keyword === this.keyword &&
+      playerId !== this.turnPlayer.id
+    );
+  }
+
+  addScore(playerId: string) {
+    const player = this.players.find((player) => player.id == playerId);
+    if (player) {
+      player.score++;
+    }
+  }
+
+  clearKeyword() {
+    this.keyword = "";
   }
 
   findPlayer(id: string) {

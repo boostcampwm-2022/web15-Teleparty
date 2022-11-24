@@ -23,7 +23,7 @@ export class CatchMindEventAdapter implements CatchMindEvent {
   }
 
   drawStart(roomId: string, { id }: Player) {
-    this.emitter.broadcastRoom(roomId, "draw-start", { peerId: id });
+    this.emitter.broadcastRoom(roomId, "draw-start", { turnPlayer: id });
   }
 
   roundEnd(roomId: string, data: RoundEndData) {

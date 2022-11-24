@@ -1,9 +1,9 @@
 import { CatchMind, Player } from "./catchMind";
-import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
+import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.adapter";
 import { CatchMindEvent } from "../outBound/catchMindEvent.port";
-import { CatchMindRepositoryDataPort } from "../outBound/catchMind.Ropository.port";
+import { CatchMindRepositoryDataPort } from "../outBound/catchMind.repository.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
-import { CatchMindRepository } from "../outBound/catchMindRepository";
+import { CatchMindRepository } from "../outBound/catchMind.repository";
 
 export class CatchMindService implements CatchMindInputPort {
   eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
@@ -65,7 +65,9 @@ export class CatchMindService implements CatchMindInputPort {
     const game = this.repository.findById(id);
     if (!game) return;
 
-    if (game.isRightAnswer(answer)) {
+    if (game.isRightAnswer(answer, playerId)) {
+      game.addScore(playerId);
+      game.clearKeyword();
       this.roundEnd(game, playerId);
       clearTimeout(game.timerId);
       this.repository.save(game);
