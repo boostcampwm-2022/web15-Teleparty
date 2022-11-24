@@ -13,7 +13,8 @@ export type StartGameData = {
 
 export type RoundEndData = {
   roundWinner: string | null;
-  playerScoreList: { id: string; score: number }[];
+  suggestedWord: string;
+  playerScoreMap: { [K: string]: number };
   isLastRound: boolean;
 };
 

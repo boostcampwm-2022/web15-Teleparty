@@ -2,18 +2,15 @@ import { CatchMind } from "../entity/catchMind";
 import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
 
 export class CatchMindRepository implements CatchMindRepositoryDataPort {
-  games: CatchMind[] = [];
+  games: Map<string, CatchMind> = new Map();
 
   save(game: CatchMind) {
-    const isExist = (roomId: string) =>
-      this.games.some((game) => game.roomId === roomId);
-
-    if (!isExist(game.roomId)) this.games.push(game);
+    this.games.set(game.roomId, game);
   }
   findById(id: string) {
-    return this.games.find((game) => game.roomId === id) || undefined;
+    return this.games.get(id) || undefined;
   }
   delete(roomId: string) {
-    this.games = this.games.filter((game) => game.roomId !== roomId);
+    this.games.delete(roomId);
   }
 }

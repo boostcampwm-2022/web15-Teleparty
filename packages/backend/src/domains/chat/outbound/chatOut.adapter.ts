@@ -3,7 +3,11 @@ import { ChatOutPort } from "./chatOut.port";
 
 export class ChatOutAdapter implements ChatOutPort {
   emitter: SocketEmitter = new SocketEmitter();
-  broadcast(roomId: string, data: { message: string; id: string }) {
-    this.emitter.broadcastRoom(roomId, "chatting", data);
+  broadcast(
+    roomId: string,
+    peerId: string,
+    data: { message: string; id: string }
+  ) {
+    this.emitter.broadcastRoomNotMe(roomId, peerId, "chatting", data);
   }
 }

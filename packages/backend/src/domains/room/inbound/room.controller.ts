@@ -42,6 +42,9 @@ export const RoomApiController = {
 
     return;
   },
+  endGame: (roomId: string) => {
+    roomService.endGame(roomId);
+  },
 };
 
 export const RoomController = router.router;

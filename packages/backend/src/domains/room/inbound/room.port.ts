@@ -4,4 +4,5 @@ export interface RoomPort {
   gameStart: (peerId: string, gameMode: string) => void;
   chooseMode: (peerId: string, gameMode: string) => void;
   chatting: (peerId: string, message: string) => void;
+  endGame: (roomId: string) => void;
 }
