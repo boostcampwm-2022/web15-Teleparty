@@ -1,13 +1,16 @@
 import { CatchMind, Player } from "./catchMind";
-import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.adapter";
+import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
 import { CatchMindEvent } from "../outBound/catchMindEvent.port";
 import { CatchMindRepositoryDataPort } from "../outBound/catchMind.repository.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
 import { CatchMindRepository } from "../outBound/catchMind.repository";
+import { CatchMindToRoomAdapter } from "../outBound/catchMindToRoom.adapter";
+import { CatchMindToRoom } from "../outBound/catchMindToRoom.port";
 
 export class CatchMindService implements CatchMindInputPort {
   eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
   repository: CatchMindRepositoryDataPort = new CatchMindRepository();
+  roomAPI: CatchMindToRoom = new CatchMindToRoomAdapter();
 
   gameStart(
     goalScore: number,
@@ -29,7 +32,6 @@ export class CatchMindService implements CatchMindInputPort {
       totalRound,
       roundInfo,
     });
-
     this.repository.save(game);
   }
 
@@ -48,14 +50,21 @@ export class CatchMindService implements CatchMindInputPort {
   }
 
   roundEnd(game: CatchMind, winner: string | null) {
+    const playerScoreMap: { [K: string]: number } = {};
+    game.players.forEach((player: Player) => {
+      playerScoreMap[player.id] = player.score;
+    });
+
     this.eventEmitter.roundEnd(game.roomId, {
       isLastRound: game.isGameEnded,
-      playerScoreList: game.players,
+      suggestedWord: game.keyword,
+      playerScoreMap: playerScoreMap,
       roundWinner: winner,
     });
 
     if (game.isGameEnded) {
       this.repository.delete(game.roomId);
+      this.roomAPI.gameEnded(game.roomId);
     } else {
       this.repository.save(game);
     }
@@ -67,10 +76,12 @@ export class CatchMindService implements CatchMindInputPort {
 
     if (game.isRightAnswer(answer, playerId)) {
       game.addScore(playerId);
-      game.clearKeyword();
       this.roundEnd(game, playerId);
+      game.clearKeyword();
       clearTimeout(game.timerId);
-      this.repository.save(game);
+      if (!game.isGameEnded) {
+        this.repository.save(game);
+      }
     }
   }
 
@@ -80,14 +91,15 @@ export class CatchMindService implements CatchMindInputPort {
 
     const player = game.findPlayer(playerId);
 
-    if (player) this.eventEmitter.roundReady(game.roomId, player);
-    game.ready(playerId);
+    if (player && !player.isReady) {
+      this.eventEmitter.roundReady(game.roomId, player);
+      game.ready(playerId);
+      this.repository.save(game);
+    }
 
     if (game.isAllReady) {
       this.roundStart(game);
     }
-
-    this.repository.save(game);
   }
 
   roundStart(game: CatchMind) {

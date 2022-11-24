@@ -76,7 +76,7 @@ export class CatchMind {
   }
 
   addScore(playerId: string) {
-    const player = this.players.find((player) => player.id == playerId);
+    const player = this.players.find((player) => player.id === playerId);
     if (player) {
       player.score++;
     }

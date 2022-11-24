@@ -26,7 +26,7 @@ export class RoomApiAdapter implements RoomApiPort {
 
     gameStart(goalScore, players, roundTime, roomId, totalRound);
 
-    console.log(roomId, gameMode, "gameStart");
+    // console.log(roomId, gameMode, "gameStart");
 
     return;
   }

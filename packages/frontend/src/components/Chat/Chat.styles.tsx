@@ -20,6 +20,9 @@ const ChatLayout = styled.div<ChatVariant>`
   border-radius: 25px 25px 0 0;
   box-shadow: ${({ theme: { shadows } }) => shadows.medium};
   overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
   & > * + * {
     margin-top: 0.5rem;
   }

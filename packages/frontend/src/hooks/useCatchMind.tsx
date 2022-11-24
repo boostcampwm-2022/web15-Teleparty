@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { Socket } from "socket.io-client";
 
@@ -36,24 +36,23 @@ export const useCatchMind = (
     initialRoundInfo.turnPlayer === socket.id
   );
 
-  const initSocket = () => {
-    socket.on(
-      "round-start",
-      ({ roundInfo }: { roundInfo: CatchMindRoundInfo }) => {
-        const { turnPlayer } = roundInfo;
-        setGameState("inputKeyword");
-        setRoundInfo(roundInfo);
-        setIsMyTurn(socket.id === roundInfo.turnPlayer);
-        setGamePlayerList(
-          gamePlayerList.map((player) => {
-            return {
-              ...player,
-              isCurrentTurn: player.peerId === turnPlayer,
-            };
-          })
-        );
-      }
-    );
+  const initSocket = useCallback(() => {
+    socket.on("round-start", (roundInfo: CatchMindRoundInfo) => {
+      console.log("round start!!: ", roundInfo);
+      const { turnPlayer } = roundInfo;
+      setGameState("inputKeyword");
+      setRoundInfo(roundInfo);
+      setIsMyTurn(socket.id === roundInfo.turnPlayer);
+      setGamePlayerList(
+        gamePlayerList.map((player) => {
+          return {
+            ...player,
+            isReady: false,
+            isCurrentTurn: player.peerId === turnPlayer,
+          };
+        })
+      );
+    });
 
     socket.on("draw-start", () => {
       setGameState("drawing");
@@ -74,20 +73,16 @@ export const useCatchMind = (
     });
 
     socket.on("round-ready", ({ peerId }: { peerId: string }) => {
-      setGamePlayerList(
-        gamePlayerList.map((player) => {
-          return {
-            ...player,
-            isReady: player.peerId === peerId,
-          };
-        })
-      );
+      const player = gamePlayerList.find((player) => player.peerId === peerId);
+      if (!player) return;
+      player.isReady = !player.isReady;
+      setGamePlayerList([...gamePlayerList]);
     });
-  };
+  }, [gamePlayerList, socket]);
 
   useEffect(() => {
     initSocket();
-  }, []);
+  }, [initSocket]);
 
   return { roundInfo, gameState, gamePlayerList, roundEndInfo, isMyTurn };
 };

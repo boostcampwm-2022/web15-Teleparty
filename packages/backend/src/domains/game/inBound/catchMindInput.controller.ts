@@ -17,25 +17,16 @@ router.get(
   }
 );
 
-router.get(
-  "chatting",
-  (
-    socket: Socket,
-    { message, peerId }: { message: string; peerId: string }
-  ) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
+router.get("chatting", (socket: Socket, { message }: { message: string }) => {
+  const room = roomSearcher.getRoomByPlayerId(socket.id);
 
-    if (room) gameService.checkAnswer(room.roomId, message, peerId);
-  }
-);
+  if (room) gameService.checkAnswer(room.roomId, message, socket.id);
+});
 
-router.get(
-  "round-ready",
-  (socket: Socket, { playerId }: { playerId: string }) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
-    if (room) gameService.roundReady(room.roomId, playerId);
-  }
-);
+router.get("round-ready", (socket: Socket) => {
+  const room = roomSearcher.getRoomByPlayerId(socket.id);
+  if (room) gameService.roundReady(room.roomId, socket.id);
+});
 
 // 임시
 // router.get(

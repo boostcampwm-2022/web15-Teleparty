@@ -16,6 +16,6 @@ export class Room {
     this.gameMode = "";
     this.totalRound = 10;
     this.roundTime = 60000;
-    this.goalScore = 5;
+    this.goalScore = 3;
   }
 }

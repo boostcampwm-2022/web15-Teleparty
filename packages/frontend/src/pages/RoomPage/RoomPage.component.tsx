@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import {
   RoomPageButtonBox,
@@ -10,7 +10,9 @@ import {
   RoomPageRightContentBox,
 } from "./RoomPage.styles";
 
+import Chat from "../../components/Chat/Chat.component";
 import { Button } from "../../components/common/Button";
+import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { gameInfoAtom } from "../../store/game";
@@ -18,12 +20,12 @@ import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 
-import type { GameInfo } from "../../types/game";
+import type { GameInfo, Player } from "../../types/game";
 
 const RoomPage = () => {
   const roomId = useAtomValue(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const players = useAtomValue(playersAtom);
+  const [players, setPlayers] = useAtom(playersAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
 
@@ -64,13 +66,23 @@ const RoomPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const newJoinListener = (player: Player) => {
+      setPlayers((prev) => [...prev, player]);
+    };
+    socket.on("new-join", newJoinListener);
+    return () => {
+      socket.off("new-join", newJoinListener);
+    };
+  }, []);
+
   return (
     <RoomPageLayout>
       <Logo />
       <RoomPageContentBox>
         <PlayerList maxPlayer={10} players={players} sizeType="large" />
         <RoomPageRightContentBox>
-          {/* 게임 모드 선택 컴포넌트 */}
+          <GameModeSegmentedControl />
           <RoomPageButtonBox>
             <Button variant="medium" onClick={onInviteClick}>
               초대
@@ -83,7 +95,7 @@ const RoomPage = () => {
               게임시작
             </Button>
           </RoomPageButtonBox>
-          {/* 채팅 컴포넌트 */}
+          <Chat variant="horizontal" />
         </RoomPageRightContentBox>
       </RoomPageContentBox>
     </RoomPageLayout>

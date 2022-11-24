@@ -27,14 +27,7 @@ export class CatchMindEventAdapter implements CatchMindEvent {
   }
 
   roundEnd(roomId: string, data: RoundEndData) {
-    const players = data.playerScoreList;
-
-    this.emitter.broadcastRoom(roomId, "round-end", {
-      ...data,
-      playerScoreList: players.map(({ id, score }) => {
-        return { peerId: id, score };
-      }),
-    });
+    this.emitter.broadcastRoom(roomId, "round-end", data);
   }
 
   roundReady(roomId: string, { id }: Player) {

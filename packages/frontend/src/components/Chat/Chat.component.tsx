@@ -5,13 +5,14 @@ import { useAtomValue } from "jotai";
 import { ChatInputForm, ChatLayout } from "./Chat.styles";
 import ChatBubble from "./ChatBubble.component";
 
+import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 import Icon from "../Icon/Icon";
 
 interface ChatData {
-  peerId: string;
+  id: string;
   message: string;
 }
 
@@ -24,17 +25,24 @@ const Chat = ({ variant }: ChatProps) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const socket = useAtomValue(socketAtom);
+  const players = useAtomValue(playersAtom);
+
+  const getUserNameById = (id: string | undefined | null) => {
+    return players.find(({ peerId }) => peerId === id)?.userName;
+  };
 
   const onChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!chatInputRef.current || !chatInputRef.current.value) return;
 
     const newChat = {
+      id: socket.id,
       message: chatInputRef.current.value,
     };
 
     // socket emit
     socket.emit("chatting", newChat);
+    setChats((prev) => [...prev, newChat]);
 
     chatInputRef.current.value = "";
   };
@@ -51,18 +59,19 @@ const Chat = ({ variant }: ChatProps) => {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    console.log(chats);
   }, [chats]);
 
   return (
-    <>
+    <div>
       <ChatLayout variant={variant}>
-        {chats.map(({ peerId, message }, index, messages) => (
+        {chats.map(({ id, message }, index, messages) => (
           <ChatBubble
             key={index}
             variant={variant}
-            isMine={peerId === socket.id}
-            isFirst={messages[index - 1]?.peerId !== peerId}
-            username={peerId} // user list 추가되면 변경 필요
+            isMine={id === socket.id}
+            isFirst={messages[index - 1]?.id !== id}
+            username={getUserNameById(id)}
           >
             {message}
           </ChatBubble>
@@ -79,7 +88,7 @@ const Chat = ({ variant }: ChatProps) => {
           <Icon size={24} icon="paper-plane" />
         </Button>
       </ChatInputForm>
-    </>
+    </div>
   );
 };
 

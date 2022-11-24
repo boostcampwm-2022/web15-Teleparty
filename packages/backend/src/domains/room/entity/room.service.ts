@@ -144,20 +144,20 @@ export class RoomService implements RoomPort {
       }) as PlayerInfo[],
     });
 
-    console.log({
-      roomId: room?.roomId,
-      players: players.map((player) => {
-        if (room?.players.includes(player.peerId)) {
-          return {
-            peerId: player.peerId,
-            userName: player.userName,
-            avataURL: player.avata,
-            isHost: player.peerId === room?.host,
-            isMicOn: player.isMicOn,
-          };
-        }
-      }),
-    });
+    // console.log({
+    //   roomId: room?.roomId,
+    //   players: players.map((player) => {
+    //     if (room?.players.includes(player.peerId)) {
+    //       return {
+    //         peerId: player.peerId,
+    //         userName: player.userName,
+    //         avataURL: player.avata,
+    //         isHost: player.peerId === room?.host,
+    //         isMicOn: player.isMicOn,
+    //       };
+    //     }
+    //   }),
+    // });
 
     return;
   }
@@ -179,11 +179,11 @@ export class RoomService implements RoomPort {
         room.goalScore
       );
 
-      console.log({
-        roomId: room.roomId,
-        gameMode,
-      });
-      console.log(room);
+      // console.log({
+      //   roomId: room.roomId,
+      //   gameMode,
+      // });
+      // console.log(room);
     }
 
     return;
@@ -224,6 +224,14 @@ export class RoomService implements RoomPort {
       this.roomApiAdapter.chatting(peerId, room.roomId, message);
     }
 
+    return;
+  }
+
+  endGame(roomId: string) {
+    const room = this.roomRepository.findOneByRoomId(roomId);
+    if (room) {
+      this.roomRepository.updateStateByRoomId(room.roomId, true);
+    }
     return;
   }
 }
