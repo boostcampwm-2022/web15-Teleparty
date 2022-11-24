@@ -1,4 +1,5 @@
 import { Room } from "../entity/room.entity";
+import { Player } from "../../player/entity/player.entitiy";
 
 export type PlayerInfo = {
   peerId: string;
@@ -23,11 +24,19 @@ export interface RoomEvent {
 }
 
 export interface RoomApiPort {
-  gameStart: (roomId: string, gameMode: string) => void;
+  gameStart: (
+    roomId: string,
+    gameMode: string,
+    players: string[],
+    totalRound: number,
+    roundTime: number,
+    goalScore: number
+  ) => void;
   chatting: (peerId: string, roomId: string, message: string) => void;
+  getAllPlayer: () => Player[];
 }
 
-export interface RoomRepository {
+export interface RoomRepositoryDataPort {
   create: (roomId: string) => Room;
   findOneByRoomId: (roomId?: string) => Room | undefined;
   findOneByPeerId: (peerId: string) => Room | undefined;

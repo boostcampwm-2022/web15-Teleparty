@@ -1,25 +1,27 @@
-import { PlayerRepository } from "../../player/outbound/player.port";
-import { PlayerRepositoryImpl } from "../../player/outbound/player.repositoryImpl";
 import { RoomPort } from "../inbound/room.port";
 import { RoomApiAdapter } from "../outbound/room.api.adapter";
-import { RoomApiPort, RoomRepository } from "../outbound/room.port";
-import { RoomRepositoryImpl } from "../outbound/room.repositoryImpl";
+import { RoomEventAdapter } from "../outbound/room.event.adapter";
+import {
+  RoomApiPort,
+  RoomRepositoryDataPort,
+  RoomEvent,
+} from "../outbound/room.port";
+import { RoomRepository } from "../outbound/room.repository";
 import { Room } from "./room.entity";
 
 export class RoomService implements RoomPort {
-  roomRepository: RoomRepository;
-  playerRepository: PlayerRepository;
+  roomRepository: RoomRepositoryDataPort;
   roomApiAdapter: RoomApiPort;
+  roomEventEmitter: RoomEvent;
 
   constructor() {
-    this.roomRepository = new RoomRepositoryImpl();
-    this.playerRepository = new PlayerRepositoryImpl();
+    this.roomRepository = new RoomRepository();
     this.roomApiAdapter = new RoomApiAdapter();
   }
 
   join(peerId: string, roomId?: string) {
     const room = this.roomRepository.findOneByRoomId(roomId);
-    const players = this.playerRepository.findAll();
+    const players = this.roomApiAdapter.getAllPlayer();
 
     if (!room) {
       const rooms = this.roomRepository.findAll();
@@ -37,8 +39,9 @@ export class RoomService implements RoomPort {
       }
 
       newRoom.players.push(peerId);
+      this.roomEventEmitter = new RoomEventAdapter(newRoom.roomId);
 
-      console.log({
+      this.roomEventEmitter.newJoin({
         roomId: newRoom.roomId,
         players: players.map((player) => {
           if (newRoom.players.includes(player.peerId)) {
@@ -63,7 +66,9 @@ export class RoomService implements RoomPort {
 
     room.players.push(peerId);
 
-    console.log({
+    this.roomEventEmitter = new RoomEventAdapter(newRoom.roomId);
+
+    this.roomEventEmitter.newJoin({
       roomId: room.roomId,
       players: players.map((player) => {
         if (room.players.includes(player.peerId)) {
@@ -95,7 +100,7 @@ export class RoomService implements RoomPort {
 
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
 
-    const players = this.playerRepository.findAll();
+    const players = this.roomApiAdapter.getAllPlayer();
 
     console.log({
       roomId: room?.roomId,
@@ -123,7 +128,14 @@ export class RoomService implements RoomPort {
       this.roomRepository.updateStateByRoomId(room.roomId, false);
 
       // 게임시작 신호 보내기(game한테)
-      this.roomApiAdapter.gameStart(room.roomId, gameMode);
+      this.roomApiAdapter.gameStart(
+        room.roomId,
+        gameMode,
+        room.players,
+        room.totalRound,
+        room.roundTime,
+        room.goalScore
+      );
 
       console.log({
         roomId: room.roomId,

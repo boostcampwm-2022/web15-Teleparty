@@ -1,24 +1,22 @@
 import { Room } from "../entity/room.entity";
-import { RoomRepository } from "./room.port";
+import { RoomRepositoryDataPort } from "./room.port";
 
-export class RoomRepositoryImpl implements RoomRepository {
+export class RoomRepository implements RoomRepositoryDataPort {
   private static rooms: Room[] = [];
 
   create(roomId: string) {
     const room = new Room(roomId);
-    RoomRepositoryImpl.rooms.push(room);
+    RoomRepository.rooms.push(room);
     return room;
   }
 
   findOneByRoomId(roomId?: string) {
-    const room = RoomRepositoryImpl.rooms.find(
-      (room) => room.roomId === roomId
-    );
+    const room = RoomRepository.rooms.find((room) => room.roomId === roomId);
     return room;
   }
 
   findOneByPeerId(peerId: string) {
-    const room = RoomRepositoryImpl.rooms.find((room) => {
+    const room = RoomRepository.rooms.find((room) => {
       return room.players.includes(peerId);
     });
 
@@ -26,11 +24,11 @@ export class RoomRepositoryImpl implements RoomRepository {
   }
 
   findAll() {
-    return [...RoomRepositoryImpl.rooms];
+    return [...RoomRepository.rooms];
   }
 
   updateHostByRoomId(roomId: string, peerId: string) {
-    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
       if (room.roomId === roomId) {
         room.host = peerId;
       }
@@ -39,7 +37,7 @@ export class RoomRepositoryImpl implements RoomRepository {
   }
 
   updateStateByRoomId(roomId: string, state: boolean) {
-    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
       if (room.roomId === roomId) {
         room.state = state;
       }
@@ -48,7 +46,7 @@ export class RoomRepositoryImpl implements RoomRepository {
   }
 
   updateGameModeByRoomId(roomId: string, gameMode: string) {
-    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
       if (room.roomId === roomId) {
         room.gameMode = gameMode;
       }
@@ -57,13 +55,13 @@ export class RoomRepositoryImpl implements RoomRepository {
   }
 
   deleteByRoomId(roomId: string) {
-    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.filter((room) => {
+    RoomRepository.rooms = RoomRepository.rooms.filter((room) => {
       room.roomId !== roomId;
     });
   }
 
   deletePlayerofRoomByPeerId(peerId: string) {
-    RoomRepositoryImpl.rooms.forEach((room) => {
+    RoomRepository.rooms.forEach((room) => {
       room.players = room.players.filter((id) => {
         return id !== peerId;
       });

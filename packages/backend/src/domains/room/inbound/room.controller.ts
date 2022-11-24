@@ -1,5 +1,33 @@
 import { RoomService } from "../entity/room.service";
 import { RoomPort } from "./room.port";
+import { SocketRouter } from "../../../utils/socketMiddlware";
+import { Socket } from "socket.io";
+
+const router = new SocketRouter();
+const roomService = new RoomService();
+router.get(
+  "game-start",
+  (socket: Socket, { gameMode }: { gameMode: string }) => {
+    roomService.gameStart(socket.id, gameMode);
+  }
+);
+
+router.get(
+  "mode-change",
+  (socket: Socket, { gameMode }: { gameMode: string }) => {
+    roomService.chooseMode(socket.id, gameMode);
+  }
+);
+
+router.get(
+  "chatting",
+  (
+    socket: Socket,
+    { peerId, message }: { peerId: string; message: string }
+  ) => {
+    roomService.chatting(socket.id, message);
+  }
+);
 
 export class RoomController {
   roomService: RoomPort;
