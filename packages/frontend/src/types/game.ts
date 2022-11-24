@@ -23,3 +23,14 @@ export interface CatchMindRoundInfo {
   currentRound: number;
   turnPlayer: string;
 }
+
+type PlayerScoreMap = {
+  [K: string]: number;
+};
+
+export interface CatchMindRoundEndInfo {
+  roundWinner: string | null;
+  suggestedWord: string;
+  playerScoreMap: PlayerScoreMap;
+  isLastRound: boolean;
+}

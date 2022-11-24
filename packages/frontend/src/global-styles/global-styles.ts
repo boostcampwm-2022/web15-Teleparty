@@ -12,6 +12,12 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
     font-family: 'Noto Sans KR', sans-serif;
   }
+  body{
+    font-family: 'Noto Sans KR', sans-serif;
+    background: ${({ theme: { colors } }) => colors.background};
+    background-repeat: no-repeat;
+    height: 100vh;
+  }
 `;
 
 export default GlobalStyles;
