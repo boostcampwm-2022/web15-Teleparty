@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import {
   RoomPageButtonBox,
@@ -20,12 +20,12 @@ import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 
-import type { GameInfo } from "../../types/game";
+import type { GameInfo, Player } from "../../types/game";
 
 const RoomPage = () => {
   const roomId = useAtomValue(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const players = useAtomValue(playersAtom);
+  const [players, setPlayers] = useAtom(playersAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
 
@@ -63,6 +63,16 @@ const RoomPage = () => {
     socket.on("game-start", gameStartListener);
     return () => {
       socket.off("game-start", gameStartListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    const newJoinListener = (player: Player) => {
+      setPlayers((prev) => [...prev, player]);
+    };
+    socket.on("new-join", newJoinListener);
+    return () => {
+      socket.off("new-join", newJoinListener);
     };
   }, []);
 
