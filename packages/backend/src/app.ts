@@ -3,6 +3,7 @@ import morgan from "morgan";
 
 import { Server } from "socket.io";
 import { canvasEventApplyer } from "./domains/canvas/canvas";
+import { WebRTCSignalRouter } from "./utils/webrtcSignalServer";
 
 const app = express();
 
@@ -49,3 +50,4 @@ const server = app.listen("8000", () => {
 const io = new Server(server, { cors: { origin: "*" } });
 
 io.on("connection", canvasEventApplyer);
+io.use(WebRTCSignalRouter);
