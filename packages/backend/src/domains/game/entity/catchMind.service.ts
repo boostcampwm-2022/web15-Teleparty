@@ -1,110 +1,95 @@
-import { Game, Player } from "./game";
+import { CatchMind, Player } from "./catchMind";
 import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
 import { CatchMindEvent } from "../outBound/catchMindEvent.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
+import { CatchMindRepo } from "../outBound/catchMindRepository";
 
-export class CatchMind implements Game, CatchMindInputPort {
-  keyword: string;
-  timerId: NodeJS.Timeout | undefined;
-  roomState: number;
-  goalScore: number;
+export class CatchMindService implements CatchMindInputPort {
+  eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
+  repository: CatchMindRepo = new CatchMindRepo();
 
-  gameMode: string;
-  currentRound: number;
-  roundTime: number;
-  totalRound: number;
-  players: Player[];
-  roomId: string;
-
-  eventEmitter: CatchMindEvent;
-  isGameEnded = false;
-  readyCount = 0;
-  turnPlayerIdx = 0;
-
-  constructor(
+  gameStart(
     goalScore: number,
     players: Player[],
     roundTime: number,
-    roomId: string
+    roomId: string,
+    totalRound: number
   ) {
-    this.players = players;
-    this.goalScore = goalScore;
-    this.keyword = "";
-    this.timerId = undefined;
-    this.roomState = 0;
+    const game = new CatchMind(
+      goalScore,
+      players,
+      roundTime,
+      roomId,
+      totalRound
+    );
 
-    this.gameMode = "catchMind";
-    this.currentRound = 1;
-    this.roundTime = roundTime;
-    this.totalRound = 1;
-    this.roomId = roomId;
-
-    this.eventEmitter = new CatchMindEventAdapter(roomId);
-  }
-
-  get turnPlayer(): Player {
-    return this.players[this.turnPlayerIdx];
-  }
-
-  get roundInfo() {
-    return {
-      currentRound: this.currentRound,
-      roundTime: this.roundTime,
-      turnPlayer: this.turnPlayer.peerId,
-    };
-  }
-
-  gameStart(gameMode: string) {
-    this.gameMode = gameMode;
-    this.eventEmitter.gameStart({
-      gameMode,
-      totalRound: this.totalRound,
-      roundInfo: this.roundInfo,
+    const { roundInfo } = game;
+    this.eventEmitter.gameStart(game.roomId, {
+      totalRound,
+      roundInfo,
     });
+
+    this.repository.save(game);
   }
 
-  drawStart(keyword: string) {
-    this.keyword = keyword;
-    this.eventEmitter.drawStart(this.turnPlayer.peerId);
+  drawStart(id: string, keyword: string) {
+    const game = this.repository.findById(id);
+    if (!game) return;
 
-    this.timerId = setTimeout(() => {
-      this.roundEnd(null);
-    }, this.roundTime);
+    game.keyword = keyword;
+    this.eventEmitter.drawStart(game.roomId, game.turnPlayer);
+
+    game.timerId = setTimeout(() => {
+      this.roundEnd(game, null);
+    }, game.roundTime);
+
+    this.repository.save(game);
   }
 
-  roundEnd(winner: string | null) {
-    this.isGameEnded = this.currentRound++ === this.totalRound;
-
-    this.eventEmitter.roundEnd({
-      isLastRound: this.isGameEnded,
-      playerScoreList: this.players.map(({ peerId, score }) => {
-        return { peerId, score };
-      }),
+  roundEnd(game: CatchMind, winner: string | null) {
+    this.eventEmitter.roundEnd(game.roomId, {
+      isLastRound: game.isGameEnded,
+      playerScoreList: game.players,
       roundWinner: winner,
     });
 
-    this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
-
-    return this.isGameEnded;
-  }
-
-  checkAnswer(answer: string, playerId: string) {
-    if (this.keyword === answer && this.keyword.length) {
-      this.roundEnd(playerId);
-      clearTimeout(this.timerId);
+    if (game.isGameEnded) {
+      this.repository.delete(game);
+    } else {
+      this.repository.save(game);
     }
   }
 
-  roundReady(id: string) {
-    this.eventEmitter.roundReady(id);
+  checkAnswer(id: string, answer: string, playerId: string) {
+    const game = this.repository.findById(id);
+    if (!game) return;
 
-    if (++this.readyCount === this.players.length) {
-      this.roundStart();
-      this.readyCount = 0;
+    if (game.isRightAnswer(answer)) {
+      this.roundEnd(game, playerId);
+      clearTimeout(game.timerId);
+      this.repository.save(game);
     }
   }
 
-  roundStart() {
-    this.eventEmitter.roundStart(this.roundInfo);
+  roundReady(id: string, playerId: string) {
+    const game = this.repository.findById(id);
+    if (!game) return;
+
+    const player = game.findPlayer(playerId);
+
+    if (player) this.eventEmitter.roundReady(game.roomId, player);
+    game.ready(playerId);
+
+    if (game.isAllReady) {
+      this.roundStart(game);
+    }
+
+    this.repository.save(game);
+  }
+
+  roundStart(game: CatchMind) {
+    game.nextTurn();
+    this.eventEmitter.roundStart(game.roomId, game.roundInfo);
+    this.repository.save(game);
   }
 }

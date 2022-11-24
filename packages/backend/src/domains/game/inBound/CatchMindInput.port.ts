@@ -1,14 +1,15 @@
-import { Player } from "../entity/game";
+import { CatchMind } from "../entity/catchMind";
+import { Player } from "../entity/catchMind";
 
 export interface CatchMindInputPort {
-  goalScore: number;
-  players: Player[];
-  roundTime: number;
-  roomId: string;
-  gameStart: (gameMode: string) => void;
-  drawStart: (keyword: string) => void;
-  roundEnd: (winner: string | null) => void;
-  checkAnswer: (answer: string, playerId: string) => void;
-  roundReady: (id: string) => void;
-  roundStart: () => void;
+  gameStart: (
+    goalScore: number,
+    players: Player[],
+    roundTime: number,
+    roomId: string,
+    totalRound: number
+  ) => void;
+  drawStart: (roomId: string, keyword: string) => void;
+  checkAnswer: (roomId: string, nswer: string, playerId: string) => void;
+  roundReady: (roomId: string, playerId: string) => void;
 }

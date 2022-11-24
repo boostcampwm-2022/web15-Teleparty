@@ -1,15 +1,18 @@
-import { Game } from "../entity/game";
+import { CatchMind } from "../entity/catchMind";
 
 export class CatchMindRepo {
-  games: Game[] = [];
+  games: CatchMind[] = [];
 
-  save(game: Game) {
-    this.games.push(game);
+  save(game: CatchMind) {
+    const isExist = (roomId: string) =>
+      this.games.some((game) => game.roomId === roomId);
+
+    if (!isExist(game.roomId)) this.games.push(game);
   }
   findById(id: string) {
     return this.games.find((game) => game.roomId === id) || null;
   }
-  delete(id: string) {
-    this.games = this.games.filter((game) => game.roomId !== id);
+  delete(target: CatchMind) {
+    this.games = this.games.filter((game) => game.roomId !== target.roomId);
   }
 }
