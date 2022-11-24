@@ -127,7 +127,22 @@ export class RoomService implements RoomPort {
 
     const players = this.roomApiAdapter.getAllPlayer();
 
-    // this.roomEventEmitter = new RoomEventAdapter(room?.roomId);
+    this.roomEventEmitter = new RoomEventAdapter(room?.roomId as string);
+
+    this.roomEventEmitter.quitPlayer({
+      roomId: room?.roomId as string,
+      players: players.map((player) => {
+        if (room?.players.includes(player.peerId)) {
+          return {
+            peerId: player.peerId,
+            userName: player.userName,
+            avataURL: player.avata,
+            isHost: player.peerId === room?.host,
+            isMicOn: player.isMicOn,
+          };
+        }
+      }) as PlayerInfo[],
+    });
 
     console.log({
       roomId: room?.roomId,
