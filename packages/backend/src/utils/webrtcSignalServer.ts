@@ -1,8 +1,8 @@
-import { Server, Socket } from "socket.io";
+import { Socket } from "socket.io";
 import { SocketRouter } from "./socketMiddlware";
 
 interface Player {
-  peerId: string;
+  id: string;
   userName: string;
   avataURL: string;
   isHost: boolean;
@@ -27,19 +27,19 @@ router.get(
   ) => {
     roomId = roomId || "roomId";
     const player = {
-      peerId: socket.id,
+      id: socket.id,
       userName,
       avataURL: avata,
       isHost: players.length === 0,
       isMicOn: false,
     };
-    if (players.every((player) => player.peerId !== socket.id)) {
+    if (players.every((player) => player.id !== socket.id)) {
       players.push(player);
     }
     socket.join(roomId);
 
     socket.emit("join", { roomId, players });
-    socket.broadcast.to(roomId).emit("new-joinplayer", player);
+    socket.broadcast.to(roomId).emit("player-join", player);
   }
 );
 
