@@ -5,7 +5,7 @@ import { Socket } from "socket.io-client";
 import {
   Player,
   GamePlayer,
-  CatchMineRoundInfo,
+  CatchMindRoundInfo,
   CatchMindRoundEndInfo,
 } from "../types/game";
 
@@ -15,10 +15,10 @@ type GameState = "inputKeyword" | "drawing" | "roundEnd" | "gameEnd";
 export const useCatchMind = (
   socket: Socket,
   playerList: Player[],
-  initialRoundInfo: CatchMineRoundInfo
+  initialRoundInfo: CatchMindRoundInfo
 ) => {
   const [roundInfo, setRoundInfo] =
-    useState<CatchMineRoundInfo>(initialRoundInfo);
+    useState<CatchMindRoundInfo>(initialRoundInfo);
   const [gameState, setGameState] = useState<GameState>("inputKeyword");
   const [gamePlayerList, setGamePlayerList] = useState<GamePlayer[]>(
     playerList.map((player) => {
@@ -39,7 +39,7 @@ export const useCatchMind = (
   const initSocket = () => {
     socket.on(
       "round-start",
-      ({ roundInfo }: { roundInfo: CatchMineRoundInfo }) => {
+      ({ roundInfo }: { roundInfo: CatchMindRoundInfo }) => {
         const { turnPlayer } = roundInfo;
         setGameState("inputKeyword");
         setRoundInfo(roundInfo);
