@@ -32,9 +32,7 @@ const LandingPage = () => {
 
   const onEnterClick = () => {
     if (nickname === "" || nicknameError) return;
-    console.log("click");
     setRoomId(invite);
-    if (roomId === undefined) return;
 
     // avatar 추가 필요
     socket.emit("join", { userName: nickname, avatar: "", roomId });
