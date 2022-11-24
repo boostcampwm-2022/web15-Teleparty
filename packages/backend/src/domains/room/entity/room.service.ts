@@ -162,4 +162,13 @@ export class RoomService implements RoomPort {
 
     return undefined;
   }
+
+  chatting(peerId: string, message: string) {
+    const room = this.roomRepository.findOneByPeerId(peerId);
+    if (room) {
+      this.roomApiAdapter.chatting(peerId, room.roomId, message);
+    }
+
+    return;
+  }
 }
