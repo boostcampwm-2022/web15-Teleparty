@@ -1,7 +1,10 @@
 import { useState } from "react";
 
+import { useSetAtom } from "jotai";
+
 import { NicknameInputLayout, WarningText } from "./NicknameInput.styles";
 
+import { nicknameAtom, nicknameErrorAtom } from "../../store/nickname";
 import {
   isIncludesSpecialCharacter,
   isIncludesDigit,
@@ -23,12 +26,14 @@ const getNicknameLength = (str: string) => {
 };
 
 const NicknameInput = () => {
-  const [input, setInput] = useState("");
+  const setNickname = useSetAtom(nicknameAtom);
+  const setNicknameError = useSetAtom(nicknameErrorAtom);
   const [warningMessage, setWarningMessage] = useState("");
 
   const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { value } = e.target;
-    setInput(value);
+    setNickname(value);
+    setNicknameError(false);
 
     const warningMessageList = [];
 
@@ -43,6 +48,7 @@ const NicknameInput = () => {
     }
 
     setWarningMessage(warningMessageList.join("\n"));
+    if (warningMessageList.length) setNicknameError(true);
   };
 
   return (
@@ -51,7 +57,6 @@ const NicknameInput = () => {
         sizeType="medium"
         placeholder="닉네임을 입력해주세요"
         onChange={onChangeHandler}
-        value={input}
       />
       <WarningText>{warningMessage}</WarningText>
     </NicknameInputLayout>

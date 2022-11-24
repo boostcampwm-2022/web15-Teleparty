@@ -37,11 +37,6 @@ export const colors = {
   background: "linear-gradient(180deg, #373067 0%, #AB6684 100%)",
 };
 
-export const shadows = {
-  small: "0px 1px 2px 0px rgba(0, 0, 0, 0.1)",
-  medium: "0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -2px rgb(0, 0, 0, 0.1)",
-};
-
 export const gradients = {
   // purple tone
   background: "linear-gradient(0deg, #373067, #ab6684)",
