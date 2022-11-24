@@ -12,7 +12,9 @@ const roomSearcher = new SearchRoomController();
 router.get(
   "input-keyword",
   (socket: Socket, { keyword }: { keyword: string }) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
+    const room = roomSearcher.getRoomByPlayerId(socket.id) || {
+      roomId: "hello",
+    };
     if (room) gameService.drawStart(room.roomId, keyword);
   }
 );
@@ -21,20 +23,40 @@ router.get(
   "chatting",
   (
     socket: Socket,
-    { answer, playerId }: { answer: string; playerId: string }
+    { message, peerId }: { message: string; peerId: string }
   ) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
-    if (room) gameService.checkAnswer(room.roomId, answer, playerId);
+    const room = roomSearcher.getRoomByPlayerId(socket.id) || {
+      roomId: "hello",
+    };
+
+    if (room) gameService.checkAnswer(room.roomId, message, peerId);
   }
 );
 
 router.get(
   "round-ready",
   (socket: Socket, { playerId }: { playerId: string }) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
+    const room = roomSearcher.getRoomByPlayerId(socket.id) || {
+      roomId: "hello",
+    };
     if (room) gameService.roundReady(room.roomId, playerId);
   }
 );
+
+// 임시
+router.get(
+  "game-start",
+  (socket: Socket, { goalScore, players, roundTime, roomId, totalRound }) => {
+    const playerList = Array.from(players, (player: string): Player => {
+      return { id: player, score: 0, isReady: false };
+    });
+    gameService.gameStart(goalScore, playerList, roundTime, roomId, totalRound);
+  }
+);
+
+router.get("join", (socket: Socket) => {
+  console.log(socket.id);
+});
 
 export const gameStart = (
   goalScore: number,

@@ -65,7 +65,9 @@ export class CatchMindService implements CatchMindInputPort {
     const game = this.repository.findById(id);
     if (!game) return;
 
-    if (game.isRightAnswer(answer)) {
+    if (game.isRightAnswer(answer, playerId)) {
+      game.addScore(playerId);
+      game.clearKeyword();
       this.roundEnd(game, playerId);
       clearTimeout(game.timerId);
       this.repository.save(game);
