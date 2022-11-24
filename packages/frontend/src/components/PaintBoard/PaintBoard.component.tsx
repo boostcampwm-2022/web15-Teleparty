@@ -1,27 +1,28 @@
+import { ReactNode } from "react";
+
 import {
+  PaintBoardHeader,
+  PaintBoardCenterElementBox,
+  PaintBoardFooter,
   PaintBoardLayout,
-  ToolContainer,
-  StrokeChangerContainer,
 } from "./PaintBoard.styles";
 
-import Canvas from "../Canvas/Canvas.component";
-import Palette from "../Palette/Palette.component";
-import Thickness from "../Thickness/Thickness.component";
-import ToolBox from "../ToolBox/ToolBox.component";
-import Transparency from "../Transparency/Transparency.component";
+interface PaintBoardProps {
+  headerText?: string;
+  centerElement?: ReactNode;
+  footerElement?: ReactNode;
+}
 
-const PaintBoard = () => {
+const PaintBoard = ({
+  headerText,
+  centerElement,
+  footerElement,
+}: PaintBoardProps) => {
   return (
     <PaintBoardLayout>
-      <Canvas />
-      <ToolContainer>
-        <Palette />
-        <ToolBox />
-        <StrokeChangerContainer>
-          <Thickness />
-          <Transparency />
-        </StrokeChangerContainer>
-      </ToolContainer>
+      <PaintBoardHeader>{headerText}</PaintBoardHeader>
+      <PaintBoardCenterElementBox>{centerElement}</PaintBoardCenterElementBox>
+      <PaintBoardFooter>{footerElement}</PaintBoardFooter>
     </PaintBoardLayout>
   );
 };
