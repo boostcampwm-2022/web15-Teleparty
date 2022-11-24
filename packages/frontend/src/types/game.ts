@@ -11,3 +11,15 @@ export interface GamePlayer extends Player {
   isReady?: boolean;
   score?: number;
 }
+
+export interface GameInfo {
+  gameMode: string;
+  totalRound: number;
+  roundInfo: CatchMindRoundInfo;
+}
+
+export interface CatchMindRoundInfo {
+  roundTime: number;
+  currentRound: number;
+  turnPlayer: string;
+}
