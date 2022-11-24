@@ -3,11 +3,24 @@ import { Navigate } from "react-router";
 
 import { useAtomValue } from "jotai";
 
+import {
+  RoomPageButtonBox,
+  RoomPageContentBox,
+  RoomPageLayout,
+  RoomPageRightContentBox,
+} from "./RoomPage.styles";
+
 import { Button } from "../../components/common/Button";
+import { Logo } from "../../components/Logo/Logo.component";
+import PlayerList from "../../components/PlayerList/PlayerList.component";
+import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
+
 
 const RoomPage = () => {
   const roomId = useAtomValue(roomIdAtom);
+  const players = useAtomValue(playersAtom);
+
   if (roomId === undefined) return <Navigate to="/" replace />;
 
   const onInviteClick = () => {
@@ -16,7 +29,6 @@ const RoomPage = () => {
   };
 
   useEffect(() => {
-    console.log(window.location);
     const preventClose = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "";
@@ -28,11 +40,21 @@ const RoomPage = () => {
   }, []);
 
   return (
-    <>
-      <Button variant="medium" onClick={onInviteClick}>
-        초대
-      </Button>
-    </>
+    <RoomPageLayout>
+      <Logo />
+      <RoomPageContentBox>
+        <PlayerList maxPlayer={10} players={players} sizeType="large" />
+        <RoomPageRightContentBox>
+          {/* 게임 모드 선택 컴포넌트 */}
+          <RoomPageButtonBox>
+            <Button variant="medium" onClick={onInviteClick}>
+              초대
+            </Button>
+          </RoomPageButtonBox>
+          {/* 채팅 컴포넌트 */}
+        </RoomPageRightContentBox>
+      </RoomPageContentBox>
+    </RoomPageLayout>
   );
 };
 
