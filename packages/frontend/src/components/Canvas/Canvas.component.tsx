@@ -25,6 +25,7 @@ const CANVAS_PROPS = {
 
 const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
   const [tool] = useAtom(toolAtom);
@@ -39,12 +40,36 @@ const Canvas = () => {
     ctx.lineJoin = "round";
   }, []);
 
+  const captureCanvas = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    canvasImageData.current = imageData;
+  };
+
   const drawAllShapes = debounceByFrame(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    ctx?.clearRect(0, 0, canvas?.width ?? 0, canvas?.height ?? 0);
-    for (const shape of shapeList.current) {
-      ctx && shape.draw(ctx);
+    if (!canvas || !ctx) return;
+
+    // clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw saved image to canvas
+    if (canvasImageData.current) {
+      ctx.putImageData(canvasImageData.current, 0, 0);
+    } else {
+      // draw all shapes
+      for (const shape of shapeList.current) {
+        shape.draw(ctx);
+      }
+    }
+
+    // draw drawing shape to canvas
+    if (canvasImageData.current && isDrawing) {
+      shapeList.current.at(-1)?.draw(ctx);
     }
   });
 
@@ -81,6 +106,7 @@ const Canvas = () => {
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
+    captureCanvas();
   };
 
   const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
@@ -116,6 +142,7 @@ const Canvas = () => {
       const ctx = canvasRef.current?.getContext("2d");
       shapeList.current.pop();
       ctx?.clearRect(0, 0, CANVAS_PROPS.WIDTH, CANVAS_PROPS.HEIGHT);
+      canvasImageData.current = null;
       drawAllShapes();
     }
   };
