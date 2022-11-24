@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 
 import { SocketEmitter } from "./utils/socketEmitter";
 import { catchMindRouter } from "./domains/game/inBound/catchMindInput.controller";
+import { ChatRouter } from "./domains/chat/inbound/chatIn.controller";
 
 const app = express();
 
@@ -52,8 +53,8 @@ const io = new Server(server, { cors: { origin: "*" } });
 SocketEmitter.setServer(io);
 
 io.on("connection", (socket) => {
-  socket.join("/hello");
-  console.log("h");
+  socket.join("hello");
 });
 
 io.use(catchMindRouter);
+io.use(ChatRouter);
