@@ -1,5 +1,5 @@
 import { CatchMind } from "../entity/catchMind";
-import { CatchMindRepositoryDataPort } from "./catchMind.Ropository.port";
+import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
 
 export class CatchMindRepository implements CatchMindRepositoryDataPort {
   games: CatchMind[] = [];
