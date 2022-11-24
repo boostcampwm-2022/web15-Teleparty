@@ -54,7 +54,7 @@ const Chat = ({ variant }: ChatProps) => {
   }, [chats]);
 
   return (
-    <>
+    <div>
       <ChatLayout variant={variant}>
         {chats.map(({ peerId, message }, index, messages) => (
           <ChatBubble
@@ -79,7 +79,7 @@ const Chat = ({ variant }: ChatProps) => {
           <Icon size={24} icon="paper-plane" />
         </Button>
       </ChatInputForm>
-    </>
+    </div>
   );
 };
 
