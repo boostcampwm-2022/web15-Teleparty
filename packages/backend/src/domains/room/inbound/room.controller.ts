@@ -32,4 +32,11 @@ export class RoomController {
 
     return;
   }
+
+  sendChatting(data: { peerId: string; message: string }) {
+    const { peerId, message } = data;
+    this.roomService.chatting(peerId, message);
+
+    return;
+  }
 }
