@@ -29,10 +29,28 @@ export class RoomRepositoryImpl implements RoomRepository {
     return [...RoomRepositoryImpl.rooms];
   }
 
-  updateRoomHostByRoomId(roomId: string, peerId: string) {
+  updateHostByRoomId(roomId: string, peerId: string) {
     RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
       if (room.roomId === roomId) {
         room.host = peerId;
+      }
+      return room;
+    });
+  }
+
+  updateStateByRoomId(roomId: string, state: boolean) {
+    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+      if (room.roomId === roomId) {
+        room.state = state;
+      }
+      return room;
+    });
+  }
+
+  updateGameModeByRoomId(roomId: string, gameMode: string) {
+    RoomRepositoryImpl.rooms = RoomRepositoryImpl.rooms.map((room) => {
+      if (room.roomId === roomId) {
+        room.gameMode = gameMode;
       }
       return room;
     });

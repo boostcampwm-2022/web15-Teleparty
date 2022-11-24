@@ -10,22 +10,26 @@ export class RoomController {
 
   joinRoom(data: { roomId: string; peerId: string }) {
     const { peerId, roomId } = data;
-
     this.roomService.join(peerId, roomId);
 
     return;
   }
   leaveRoom(data: { peerId: string }) {
     const { peerId } = data;
-
     this.roomService.leave(peerId);
 
     return;
   }
-  gameStart() {
+  gameStart(data: { peerId: string; gameMode: string }) {
+    const { peerId, gameMode } = data;
+    this.roomService.gameStart(peerId, gameMode);
+
     return;
   }
-  chooseMode() {
+  chooseMode(data: { peerId: string; gameMode: string }) {
+    const { peerId, gameMode } = data;
+    this.roomService.chooseMode(peerId, gameMode);
+
     return;
   }
 }
