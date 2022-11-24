@@ -14,10 +14,11 @@ export class SocketRouter {
   }
 
   get router() {
-    return (socket: Socket) => {
+    return (socket: Socket, next: (err?: any) => void) => {
       this.#APIs.forEach((api) =>
         socket.on(api.apiName, (data) => api.fn(socket, data))
       );
+      next();
     };
   }
 }

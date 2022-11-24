@@ -1,5 +1,5 @@
 import { CatchMind, Player } from "./catchMind";
-import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
+import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.adapter";
 import { CatchMindEvent } from "../outBound/catchMindEvent.port";
 import { CatchMindRepositoryDataPort } from "../outBound/catchMind.repository.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
