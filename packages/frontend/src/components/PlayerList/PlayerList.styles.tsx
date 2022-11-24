@@ -26,7 +26,7 @@ export const PlayerListLayout = styled.div<PlayerListLayoutProps>`
   width: fit-content;
   padding: 12px 24px 24px 24px;
   background-color: ${(props) => props.theme.colors.primaryLightTransparent};
-
+  border-radius: 15px;
   /* size */
   ${(props) =>
     props.sizeType === "medium" &&
