@@ -1,12 +1,13 @@
 import { ChatService } from "../entity/chat.service";
-import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
 import { SocketRouter } from "../../../utils/socketMiddlware";
-import { Socket } from "socket.io";
+// import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
+// import { Socket } from "socket.io";
 
 const router = new SocketRouter();
-const chat = new ChatService();
-const roomSearcher = new SearchRoomController();
+
+// const chat = new ChatService();
+// const roomSearcher = new SearchRoomController();
 
 // router.get(
 //   "chatting",
