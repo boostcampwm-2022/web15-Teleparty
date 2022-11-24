@@ -10,7 +10,9 @@ import {
   RoomPageRightContentBox,
 } from "./RoomPage.styles";
 
+import Chat from "../../components/Chat/Chat.component";
 import { Button } from "../../components/common/Button";
+import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { gameInfoAtom } from "../../store/game";
@@ -70,7 +72,7 @@ const RoomPage = () => {
       <RoomPageContentBox>
         <PlayerList maxPlayer={10} players={players} sizeType="large" />
         <RoomPageRightContentBox>
-          {/* 게임 모드 선택 컴포넌트 */}
+          <GameModeSegmentedControl />
           <RoomPageButtonBox>
             <Button variant="medium" onClick={onInviteClick}>
               초대
@@ -83,7 +85,7 @@ const RoomPage = () => {
               게임시작
             </Button>
           </RoomPageButtonBox>
-          {/* 채팅 컴포넌트 */}
+          <Chat variant="horizontal" />
         </RoomPageRightContentBox>
       </RoomPageContentBox>
     </RoomPageLayout>
