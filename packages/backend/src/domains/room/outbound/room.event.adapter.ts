@@ -33,4 +33,8 @@ export class RoomEventAdapter implements RoomEvent {
     this.emitter.broadcastRoom(this.roomId, "mode-change", data);
     // socket.emit('mode-change', data);
   }
+
+  quitPlayer(data: JoinPlayerTotalInfo) {
+    this.emitter.broadcastRoom(this.roomId, "player-quit", data);
+  }
 }
