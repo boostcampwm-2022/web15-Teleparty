@@ -37,7 +37,7 @@ export const PlayerListLayout = styled.div<PlayerListLayoutProps>`
   ${(props) =>
     props.sizeType === "large" &&
     css`
-      width: 744px;
+      height: 744px;
     `}
 
   ${PersonnelCountParagraph} {
