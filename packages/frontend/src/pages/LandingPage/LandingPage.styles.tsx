@@ -1,9 +1,11 @@
 import styled from "styled-components";
 
-export const CanvasPageLayout = styled.div`
-  height: 100vh;
+export const LandingPageLayout = styled.main`
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 100px;
+  height: 100vh;
   ${(props) => props.theme.backgrounds.nightCity}
 `;
