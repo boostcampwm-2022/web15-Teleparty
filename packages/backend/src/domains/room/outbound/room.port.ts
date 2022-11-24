@@ -10,6 +10,7 @@ export type PlayerInfo = {
 };
 
 export type GameMode = {
+  roomId: string;
   gameMode: string;
 };
 export interface JoinPlayerTotalInfo {
@@ -18,8 +19,8 @@ export interface JoinPlayerTotalInfo {
 }
 
 export interface RoomEvent {
-  join: (data: JoinPlayerTotalInfo) => void;
-  newJoin: (data: JoinPlayerTotalInfo) => void;
+  join: (data: JoinPlayerTotalInfo, peerId: string) => void;
+  newJoin: (data: PlayerInfo, roomId: string) => void;
   modeChange: (data: GameMode) => void;
 }
 

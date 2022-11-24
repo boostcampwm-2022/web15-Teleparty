@@ -41,7 +41,7 @@ router.get("player-quit", (socket: Socket) => {
   playerService.leavePlayer(socket.id);
 });
 
-export class PlayerController {
+export class PlayerApiController {
   playerService: PlayerPort;
 
   constructor() {
@@ -52,3 +52,5 @@ export class PlayerController {
     return this.playerService.getAllPlayer();
   }
 }
+
+export const PlayerController = router.router;

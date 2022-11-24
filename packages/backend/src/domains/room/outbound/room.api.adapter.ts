@@ -1,12 +1,12 @@
 import { RoomApiPort } from "./room.port";
 import { ChatInController } from "../../chat/inbound/chatIn.controller";
-import { PlayerController } from "../../player/inbound/player.controller";
+import { PlayerApiController } from "../../player/inbound/player.controller";
 import { gameStart } from "../../game/inBound/catchMindInput.controller";
 
 export class RoomApiAdapter implements RoomApiPort {
   chatController: ChatInController = new ChatInController();
 
-  playerController: PlayerController = new PlayerController();
+  playerController: PlayerApiController = new PlayerApiController();
 
   chatting(peerId: string, roomId: string, message: string) {
     this.chatController.send(message, peerId, roomId);

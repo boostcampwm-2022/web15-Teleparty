@@ -1,5 +1,10 @@
 import { SocketEmitter } from "../../../utils/socketEmitter";
-import { GameMode, JoinPlayerTotalInfo, RoomEvent } from "./room.port";
+import {
+  GameMode,
+  JoinPlayerTotalInfo,
+  RoomEvent,
+  PlayerInfo,
+} from "./room.port";
 
 export class RoomEventAdapter implements RoomEvent {
   roomId: string;
@@ -10,14 +15,16 @@ export class RoomEventAdapter implements RoomEvent {
     this.emitter = new SocketEmitter();
   }
 
-  join(data: JoinPlayerTotalInfo) {
+  join(data: JoinPlayerTotalInfo, peerId: string) {
     // 나한테 보내기 socket.emit('join', data);
+    this.emitter.emit(peerId, "join", data);
+
     return;
   }
 
-  newJoin(data: JoinPlayerTotalInfo) {
+  newJoin(data: PlayerInfo, roomId: string) {
     // 원래 방에 있던 사람한테만 보내기(나 제외)
-    this.emitter.broadcastRoom(this.roomId, "new-join", data);
+    this.emitter.broadcastRoomNotMe(roomId, data.peerId, "new-join", data);
     return;
   }
 

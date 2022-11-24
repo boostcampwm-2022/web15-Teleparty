@@ -5,6 +5,7 @@ import {
   RoomApiPort,
   RoomRepositoryDataPort,
   RoomEvent,
+  PlayerInfo,
 } from "../outbound/room.port";
 import { RoomRepository } from "../outbound/room.repository";
 import { Room } from "./room.entity";
@@ -17,6 +18,7 @@ export class RoomService implements RoomPort {
   constructor() {
     this.roomRepository = new RoomRepository();
     this.roomApiAdapter = new RoomApiAdapter();
+    this.roomEventEmitter = new RoomEventAdapter("123123");
   }
 
   join(peerId: string, roomId?: string) {
@@ -41,20 +43,23 @@ export class RoomService implements RoomPort {
       newRoom.players.push(peerId);
       this.roomEventEmitter = new RoomEventAdapter(newRoom.roomId);
 
-      this.roomEventEmitter.newJoin({
-        roomId: newRoom.roomId,
-        players: players.map((player) => {
-          if (newRoom.players.includes(player.peerId)) {
-            return {
-              peerId: player.peerId,
-              userName: player.userName,
-              avataURL: player.avata,
-              isHost: player.peerId === newRoom.host,
-              isMicOn: player.isMicOn,
-            };
-          }
-        }),
-      });
+      this.roomEventEmitter.join(
+        {
+          roomId: newRoom.roomId,
+          players: players.map((player) => {
+            if (newRoom.players.includes(player.peerId)) {
+              return {
+                peerId: player.peerId,
+                userName: player.userName,
+                avataURL: player.avata,
+                isHost: player.peerId === newRoom.host,
+                isMicOn: player.isMicOn,
+              };
+            }
+          }) as PlayerInfo[],
+        },
+        peerId
+      );
 
       return;
     }
@@ -66,22 +71,42 @@ export class RoomService implements RoomPort {
 
     room.players.push(peerId);
 
-    this.roomEventEmitter = new RoomEventAdapter(newRoom.roomId);
+    this.roomEventEmitter = new RoomEventAdapter(room.roomId);
 
-    this.roomEventEmitter.newJoin({
-      roomId: room.roomId,
-      players: players.map((player) => {
-        if (room.players.includes(player.peerId)) {
-          return {
-            peerId: player.peerId,
-            userName: player.userName,
-            avataURL: player.avata,
-            isHost: player.peerId === room.host,
-            isMicOn: player.isMicOn,
-          };
-        }
-      }),
+    this.roomEventEmitter.join(
+      {
+        roomId: room.roomId,
+        players: players.map((player) => {
+          if (room.players.includes(player.peerId)) {
+            return {
+              peerId: player.peerId,
+              userName: player.userName,
+              avataURL: player.avata,
+              isHost: player.peerId === room.host,
+              isMicOn: player.isMicOn,
+            };
+          }
+        }) as PlayerInfo[],
+      },
+      peerId
+    );
+
+    const playerInfo = players.find((player) => {
+      return player.peerId === peerId;
     });
+
+    if (playerInfo) {
+      this.roomEventEmitter.newJoin(
+        {
+          peerId: playerInfo.peerId,
+          userName: playerInfo.userName,
+          avataURL: playerInfo.avata,
+          isHost: playerInfo.peerId === room.host,
+          isMicOn: playerInfo.isMicOn,
+        },
+        room.roomId
+      );
+    }
 
     return;
   }
@@ -101,6 +126,8 @@ export class RoomService implements RoomPort {
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
 
     const players = this.roomApiAdapter.getAllPlayer();
+
+    // this.roomEventEmitter = new RoomEventAdapter(room?.roomId);
 
     console.log({
       roomId: room?.roomId,
@@ -151,12 +178,13 @@ export class RoomService implements RoomPort {
     if (room) {
       this.roomRepository.updateGameModeByRoomId(room.roomId, gameMode);
 
+      this.roomEventEmitter = new RoomEventAdapter(room.roomId);
+
       // 방에 있는 모든 사람에게 게임 모드 알려주기
-      console.log({
+      this.roomEventEmitter.modeChange({
         roomId: room.roomId,
-        gameMode,
+        gameMode: gameMode,
       });
-      console.log(room);
     }
     return;
   }

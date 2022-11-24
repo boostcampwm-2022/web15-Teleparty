@@ -1,16 +1,12 @@
-import { RoomController } from "../../room/inbound/room.controller";
+import { RoomApiController } from "../../room/inbound/room.controller";
 
 import { PlayerApiPort } from "./player.port";
 
 export class PlayerApiAdapter implements PlayerApiPort {
-  roomController: RoomController;
-
-  constructor() {
-    this.roomController = new RoomController();
-  }
+  roomController = RoomApiController;
 
   joinPlayer(peerId: string, roomId: string) {
-    this.roomController.joinRoom({
+    RoomApiController.joinRoom({
       peerId,
       roomId,
     });
@@ -18,7 +14,7 @@ export class PlayerApiAdapter implements PlayerApiPort {
   }
 
   leavePlayer(peerId: string) {
-    this.roomController.leaveRoom({ peerId });
+    RoomApiController.leaveRoom({ peerId });
     return;
   }
 }
