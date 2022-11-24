@@ -1,6 +1,6 @@
 import { SocketEmitter } from "../../../utils/socketEmitter";
 
-export class Chat {
+export class ChatService {
   emitter: SocketEmitter;
   constructor() {
     this.emitter = new SocketEmitter();
