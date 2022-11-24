@@ -1,11 +1,10 @@
-import { SocketEmitter } from "../../../utils/socketEmitter";
+import { ChatOutAdapter } from "../outbound/chatOut.adapter";
+import { ChatOutPort } from "../outbound/chatOut.port";
 
 export class ChatService {
-  emitter: SocketEmitter;
-  constructor() {
-    this.emitter = new SocketEmitter();
-  }
+  out: ChatOutPort = new ChatOutAdapter();
+
   chatToRoom(chat: { message: string; id: string }, roomId: string) {
-    this.emitter.broadcastRoom(roomId, "chatting", chat);
+    this.out.broadcast(roomId, chat);
   }
 }
