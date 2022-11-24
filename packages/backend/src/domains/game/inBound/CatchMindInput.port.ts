@@ -1,4 +1,3 @@
-import { CatchMind } from "../entity/catchMind";
 import { Player } from "../entity/catchMind";
 
 export interface CatchMindInputPort {
@@ -10,6 +9,6 @@ export interface CatchMindInputPort {
     totalRound: number
   ) => void;
   drawStart: (roomId: string, keyword: string) => void;
-  checkAnswer: (roomId: string, nswer: string, playerId: string) => void;
+  checkAnswer: (roomId: string, answer: string, playerId: string) => void;
   roundReady: (roomId: string, playerId: string) => void;
 }

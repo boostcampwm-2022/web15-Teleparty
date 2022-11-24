@@ -1,12 +1,13 @@
 import { CatchMind, Player } from "./catchMind";
 import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
 import { CatchMindEvent } from "../outBound/catchMindEvent.port";
+import { CatchMindRepositoryDataPort } from "../outBound/catchMind.Ropository.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
-import { CatchMindRepo } from "../outBound/catchMindRepository";
+import { CatchMindRepository } from "../outBound/catchMindRepository";
 
 export class CatchMindService implements CatchMindInputPort {
   eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
-  repository: CatchMindRepo = new CatchMindRepo();
+  repository: CatchMindRepositoryDataPort = new CatchMindRepository();
 
   gameStart(
     goalScore: number,
@@ -54,7 +55,7 @@ export class CatchMindService implements CatchMindInputPort {
     });
 
     if (game.isGameEnded) {
-      this.repository.delete(game);
+      this.repository.delete(game.roomId);
     } else {
       this.repository.save(game);
     }
