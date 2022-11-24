@@ -34,6 +34,12 @@ export const colors = {
   blue: "#339AF0",
   indigo: "#5C7CFA",
   violet: "#845EF7",
+  background: "linear-gradient(180deg, #373067 0%, #AB6684 100%)",
+};
+
+export const shadows = {
+  small: "0px 1px 2px 0px rgba(0, 0, 0, 0.1)",
+  medium: "0 4px 6px -1px rgb(0, 0, 0, 0.1), 0 2px 4px -2px rgb(0, 0, 0, 0.1)",
 };
 
 export const gradients = {
