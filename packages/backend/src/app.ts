@@ -3,7 +3,8 @@ import morgan from "morgan";
 
 import { Server } from "socket.io";
 
-import { roomController } from "./domains/room/room.controller";
+import { SocketEmitter } from "./utils/socketEmitter";
+import { catchMindRouter } from "./domains/game/inBound/catchMindInput.controller";
 
 const app = express();
 
@@ -47,6 +48,12 @@ const server = app.listen("8000", () => {
 `);
 });
 
-export const io = new Server(server, { cors: { origin: "*" } });
+const io = new Server(server, { cors: { origin: "*" } });
+SocketEmitter.setServer(io);
 
-io.on("connection", roomController);
+io.on("connection", (socket) => {
+  socket.join("/hello");
+  console.log("h");
+});
+
+io.use(catchMindRouter);

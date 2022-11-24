@@ -8,6 +8,10 @@ export class SocketEmitter {
     SocketEmitter.server.to(roomId).emit(event, data);
   }
 
+  emit(socketId: string, event: string, data: unknown) {
+    SocketEmitter.server.to(socketId).emit(event, data);
+  }
+
   static setServer(server: Server) {
     this.server = server;
   }

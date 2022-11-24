@@ -1,15 +1,18 @@
 import { PlayerPort } from "../inbound/player.port";
-import { PlayerApiPort, PlayerRepository } from "../outbound/player.port";
+import {
+  PlayerApiPort,
+  PlayerRepositoryDataPort,
+} from "../outbound/player.port";
 import { PlayerApiAdapter } from "../outbound/player.api.adapter";
-import { PlayerRepositoryImpl } from "../outbound/player.repositoryImpl";
+import { PlayerRepository } from "../outbound/player.repository";
 
 export class PlayerService implements PlayerPort {
   playerApiAdapter: PlayerApiPort;
-  playerRepository: PlayerRepository;
+  playerRepository: PlayerRepositoryDataPort;
 
   constructor() {
     this.playerApiAdapter = new PlayerApiAdapter();
-    this.playerRepository = new PlayerRepositoryImpl();
+    this.playerRepository = new PlayerRepository();
   }
 
   createPlayer(
@@ -32,5 +35,9 @@ export class PlayerService implements PlayerPort {
     // roomController로 leave 실행
     this.playerApiAdapter.leavePlayer(peerId);
     return;
+  }
+
+  getAllPlayer() {
+    return this.playerRepository.findAll();
   }
 }
