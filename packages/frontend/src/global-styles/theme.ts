@@ -34,7 +34,9 @@ export const colors = {
   blue: "#339AF0",
   indigo: "#5C7CFA",
   violet: "#845EF7",
-  background: "linear-gradient(180deg, #373067 0%, #AB6684 100%)",
+  gold: "#FFCE22",
+  silver: "#B8B8B8",
+  bronze: "#C6892D",
 };
 
 export const gradients = {
