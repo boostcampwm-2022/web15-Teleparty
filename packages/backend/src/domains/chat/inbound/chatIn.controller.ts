@@ -8,16 +8,16 @@ const router = new SocketRouter();
 const chat = new ChatService();
 const roomSearcher = new SearchRoomController();
 
-router.get(
-  "chatting",
-  (
-    socket: Socket,
-    { message, peerId }: { message: string; peerId: string }
-  ) => {
-    const room = roomSearcher.getRoomByPlayerId(socket.id);
-    if (room) chat.chatToRoom({ message, id: peerId }, room.roomId);
-  }
-);
+// router.get(
+//   "chatting",
+//   (
+//     socket: Socket,
+//     { message, peerId }: { message: string; peerId: string }
+//   ) => {
+//     const room = roomSearcher.getRoomByPlayerId(socket.id);
+//     if (room) chat.chatToRoom({ message, id: peerId }, room.roomId);
+//   }
+// );
 
 export const ChatRouter = router.router;
 
