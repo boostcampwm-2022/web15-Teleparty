@@ -24,6 +24,7 @@ export interface RoomEvent {
 
 export interface RoomApiPort {
   gameStart: (roomId: string, gameMode: string) => void;
+  chatting: (peerId: string, roomId: string, message: string) => void;
 }
 
 export interface RoomRepository {
