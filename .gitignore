@@ -1,6 +1,3 @@
 node_modules
-<<<<<<< HEAD:.gitignore
-=======
 dist
 .env
->>>>>>> 63fd93c70dab0fc8a2492ea4ab408e0a62cef5c4:backend/.gitignore
