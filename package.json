@@ -1,0 +1,31 @@
+{
+  "name": "web15-teleparty",
+  "version": "1.0.0",
+  "description": "내 마음을 읽어봐! ( ु⁎ᴗ_ᴗ⁎)ु.｡oO 다같이 모여서 노는 그림 퀴즈 게임",
+  "main": "index.js",
+  "scripts": {
+    "lint-staged": "lint-staged -q",
+    "prepare": "husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boostcampwm-2022/web15-Teleparty.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/boostcampwm-2022/web15-Teleparty/issues"
+  },
+  "homepage": "https://github.com/boostcampwm-2022/web15-Teleparty#readme",
+  "workspaces": [
+    "packages/frontend",
+    "packages/backend",
+    "packages/shared"
+  ],
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1"
+  }
+}
