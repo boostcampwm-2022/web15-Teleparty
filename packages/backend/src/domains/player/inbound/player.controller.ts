@@ -3,12 +3,14 @@ import { PlayerPort } from "./player.port";
 import { PlayerService } from "../entity/palyer.service";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Room } from "../../room/entity/room.entity";
-import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
+// import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
 const router = new SocketRouter();
-const playerService = new PlayerService();
+const playerService: PlayerPort = new PlayerService();
+
+const connecter = DomainConnecter.getInstance();
 
 router.get(
   "join",
@@ -20,12 +22,14 @@ router.get(
       roomId,
     }: { userName: string; avata: string; roomId: string | null }
   ) => {
-    const searchRoomController: SearchRoomController =
-      new SearchRoomController();
+    // const searchRoomController: SearchRoomController =
+    //   new SearchRoomController();
 
     if (roomId) {
-      const room: Room | undefined =
-        searchRoomController.getRoomByRoomId(roomId);
+      const room: Room | undefined = connecter.call("room/get-by-roomId", {
+        roomId,
+      });
+
       if (room) {
         socket.join(room.roomId);
       } else {
@@ -48,22 +52,8 @@ router.get("player-quit", (socket: Socket) => {
   playerService.leavePlayer(socket.id);
 });
 
-// export class PlayerApiController {
-//   playerService: PlayerPort;
-
-//   constructor() {
-//     this.playerService = new PlayerService();
-//   }
-
-//   getAllPlayer() {
-//     return this.playerService.getAllPlayer();
-//   }
-// }
-
 export const PlayerController = router.router;
 
-const connecter = DomainConnecter.getInstance();
-
-connecter.register("player/get-all-player", () => {
+connecter.register("player/get-all-players", () => {
   return playerService.getAllPlayer();
 });
