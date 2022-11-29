@@ -45,7 +45,6 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     ctx.ellipse(radius, radius, Math.abs(halfWidth), radius, 0, 0, 2 * Math.PI);
     ctx.fill();
     ctx.globalCompositeOperation = "source-over";
-
     if (progress >= 1) return;
     requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
       moonAnimation(ctx)
@@ -55,6 +54,7 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
   const startMoonAnimation = () => {
     const ctx = getCanvasContext();
     if (!ctx) return;
+    startTimeRef.current = new Date();
     requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
       moonAnimation(ctx)
     );
@@ -69,7 +69,7 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     startMoonAnimation();
 
     return stopMoonAnimation;
-  }, []);
+  });
 
   return (
     <MoonTimerLayout ref={canvasRef} width={radius * 2} height={radius * 2} />
