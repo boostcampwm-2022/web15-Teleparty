@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import Peer from "peerjs";
 
 import { LandingPageLayout } from "./LandingPage.styles";
 
@@ -9,6 +10,7 @@ import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
 import { nicknameAtom, nicknameErrorAtom } from "../../store/nickname";
+import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -27,6 +29,7 @@ const LandingPage = () => {
   const nickname = useAtomValue(nicknameAtom);
   const nicknameError = useAtomValue(nicknameErrorAtom);
   const setPlayers = useSetAtom(playersAtom);
+  const [peer, setPeer] = useAtom(peerAtom);
 
   const invite = new URLSearchParams(window.location.search).get("invite");
 
@@ -39,6 +42,8 @@ const LandingPage = () => {
   };
 
   useEffect(() => {
+    setPeer(new Peer(socket.id));
+
     const joinListener = (joinResponse: JoinResponse) => {
       const { roomId, players } = joinResponse;
       setRoomId(roomId);
@@ -47,6 +52,11 @@ const LandingPage = () => {
     };
     socket.on("join", joinListener);
     return () => {
+      if (peer) {
+        peer.destroy();
+        setPeer(null);
+      }
+
       socket.off("join", joinListener);
     };
   }, []);
