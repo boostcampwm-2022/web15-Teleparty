@@ -1,35 +1,24 @@
 import { ChatService } from "../entity/chat.service";
+import { DomainConnecter } from "../../../utils/domainConnecter";
 
-import { SocketRouter } from "../../../utils/socketRouter";
-// import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
-// import { Socket } from "socket.io";
+// export class ChatInController {
+//   chat: ChatService;
 
-const router = new SocketRouter();
-
-// const chat = new ChatService();
-// const roomSearcher = new SearchRoomController();
-
-// router.get(
-//   "chatting",
-//   (
-//     socket: Socket,
-//     { message, peerId }: { message: string; peerId: string }
-//   ) => {
-//     const room = roomSearcher.getRoomByPlayerId(socket.id);
-//     if (room) chat.chatToRoom({ message, id: peerId }, room.roomId);
+//   constructor() {
+//     this.chat = new ChatService();
 //   }
-// );
 
-export const ChatRouter = router.router;
+//   send(message: string, senderId: string, roomId: string) {
+//     this.chat.chatToRoom({ message, id: senderId }, roomId);
+//   }
+// }
 
-export class ChatInController {
-  chat: ChatService;
+const connecter = DomainConnecter.getInstance();
+const chatService = new ChatService();
 
-  constructor() {
-    this.chat = new ChatService();
+connecter.register(
+  "send-chat",
+  (message: string, senderId: string, roomId: string) => {
+    chatService.chatToRoom({ message, id: senderId }, roomId);
   }
-
-  send(message: string, senderId: string, roomId: string) {
-    this.chat.chatToRoom({ message, id: senderId }, roomId);
-  }
-}
+);

@@ -5,7 +5,6 @@ import { Server } from "socket.io";
 
 import { SocketEmitter } from "./utils/socketEmitter";
 import { catchMindRouter } from "./domains/game/inBound/catchMindInput.controller";
-import { ChatRouter } from "./domains/chat/inbound/chatIn.controller";
 import { RoomController } from "./domains/room/inbound/room.controller";
 import { PlayerController } from "./domains/player/inbound/player.controller";
 const app = express();
@@ -58,6 +57,5 @@ io.on("connection", (socket) => {
 });
 
 io.use(catchMindRouter);
-io.use(ChatRouter);
 io.use(RoomController);
 io.use(PlayerController);
