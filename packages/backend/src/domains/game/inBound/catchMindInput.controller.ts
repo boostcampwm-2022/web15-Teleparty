@@ -28,33 +28,4 @@ router.get("round-ready", (socket: Socket) => {
   if (room) gameService.roundReady(room.roomId, socket.id);
 });
 
-// 임시
-// router.get(
-//   "game-start",
-//   (socket: Socket, { goalScore, players, roundTime, roomId, totalRound }) => {
-//     const playerList = Array.from(players, (player: string): Player => {
-//       return { id: player, score: 0, isReady: false };
-//     });
-//     gameService.gameStart(goalScore, playerList, roundTime, roomId, totalRound);
-//   }
-// );
-
-// router.get("join", (socket: Socket) => {
-//   console.log(socket.id);
-// });
-
-export const gameStart = (
-  goalScore: number,
-  players: string[],
-  roundTime: number,
-  roomId: string,
-  totalRound: number
-) => {
-  const playerList = Array.from(players, (player: string): Player => {
-    return { id: player, score: 0, isReady: false };
-  });
-
-  gameService.gameStart(goalScore, playerList, roundTime, roomId, totalRound);
-};
-
 export const catchMindRouter = router.router;
