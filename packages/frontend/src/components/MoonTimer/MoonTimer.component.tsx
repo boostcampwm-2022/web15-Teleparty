@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 
 import { MoonTimerLayout } from "./MoonTimer.styles";
 
+import { colors } from "../../global-styles/theme";
+
 interface MoonTimerProps {
   secondTime: number;
   radius: number;
@@ -19,7 +21,7 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
   const initCanvas = () => {
     const ctx = getCanvasContext();
     if (!ctx) return;
-    ctx.fillStyle = "rgb(255, 236, 180)";
+    ctx.fillStyle = colors.yellow;
   };
 
   // progress: 0 ~ 1
@@ -36,15 +38,18 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
 
     // draw ellipse to center
     const progress = calculateProgress();
+
+    // halfWidth: -radius ~ radius
     const halfWidth = radius - radius * progress * 2;
 
-    // clear center by ellipse when progress < 0.5
+    // progress가 0.5 미만인 경우, 가운데를 투명화, progress가 0.5 이상인 경우, 가운데를 칠한다.
     if (halfWidth > 0) ctx.globalCompositeOperation = "destination-out";
-
     ctx.beginPath();
     ctx.ellipse(radius, radius, Math.abs(halfWidth), radius, 0, 0, 2 * Math.PI);
     ctx.fill();
+
     ctx.globalCompositeOperation = "source-over";
+
     if (progress >= 1) return;
     requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
       moonAnimation(ctx)
@@ -66,6 +71,9 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
 
   useEffect(() => {
     initCanvas();
+  }, []);
+
+  useEffect(() => {
     startMoonAnimation();
 
     return stopMoonAnimation;
