@@ -9,7 +9,6 @@ on:
 
 jobs:
   deploy:
-    needs: [frontend_test, backend_tests]
     name: client, server Deploy
     runs-on: ubuntu-latest
     steps:
