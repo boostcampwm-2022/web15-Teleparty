@@ -54,6 +54,7 @@ const server = app.listen("8000", () => {
   🛡️  Server listening on port: 8000
   ################################################
 `);
+  console.log("테스트");
 });
 
 const io = new Server(server, { cors: { origin: "*" } });
