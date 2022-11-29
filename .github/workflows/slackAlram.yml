@@ -19,7 +19,7 @@ jobs:
                 pullRequests(last: 100, states: OPEN) {
                   edges {
                     node {
-                      headRefName
+                      title
                     }
                   }
                 }
@@ -33,7 +33,7 @@ jobs:
 
             const {repository:{pullRequests:{edges: list}}} = await github.graphql(query, variables)
             const title = `총 ${list.length}개의 PR이 당신의 리뷰를 기다리고 있습니다.`
-            const message = list.map(pr=>pr.node.headRefName).join('\n')
+            const message = list.map(pr=>pr.node.title).join('\n')
             core.exportVariable('SLACK_ALRAM_TITLE', title);
             core.exportVariable('SLACK_MESSAGE', message);
 
