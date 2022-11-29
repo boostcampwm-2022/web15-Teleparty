@@ -1,6 +1,6 @@
 import { RoomService } from "../entity/room.service";
 import { RoomPort } from "./room.port";
-import { SocketRouter } from "../../../utils/socketMiddlware";
+import { SocketRouter } from "../../../utils/socketRouter";
 import { Socket } from "socket.io";
 
 const router = new SocketRouter();

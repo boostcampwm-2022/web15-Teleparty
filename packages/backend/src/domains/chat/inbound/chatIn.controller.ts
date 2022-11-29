@@ -1,6 +1,6 @@
 import { ChatService } from "../entity/chat.service";
 
-import { SocketRouter } from "../../../utils/socketMiddlware";
+import { SocketRouter } from "../../../utils/socketRouter";
 // import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 // import { Socket } from "socket.io";
 

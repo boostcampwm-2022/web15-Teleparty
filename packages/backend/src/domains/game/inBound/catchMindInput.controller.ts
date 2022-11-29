@@ -2,7 +2,7 @@ import { Player } from "../entity/catchMind";
 import { CatchMindInputPort } from "./CatchMindInput.port";
 import { CatchMindService } from "../entity/catchMind.service";
 import { Socket } from "socket.io";
-import { SocketRouter } from "../../../utils/socketMiddlware";
+import { SocketRouter } from "../../../utils/socketRouter";
 import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
 const gameService: CatchMindInputPort = new CatchMindService();
