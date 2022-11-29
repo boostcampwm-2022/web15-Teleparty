@@ -1,18 +1,22 @@
 import { PlayerPort } from "../inbound/player.port";
 import {
   PlayerApiPort,
+  PlayerEvent,
   PlayerRepositoryDataPort,
 } from "../outbound/player.port";
 import { PlayerApiAdapter } from "../outbound/player.api.adapter";
 import { PlayerRepository } from "../outbound/player.repository";
+import { PlayerEventAdapter } from "../outbound/player.event.adapter";
 
 export class PlayerService implements PlayerPort {
   playerApiAdapter: PlayerApiPort;
   playerRepository: PlayerRepositoryDataPort;
+  playerEventAdapter: PlayerEvent;
 
   constructor() {
     this.playerApiAdapter = new PlayerApiAdapter();
     this.playerRepository = new PlayerRepository();
+    this.playerEventAdapter = new PlayerEventAdapter();
   }
 
   createPlayer(
@@ -25,6 +29,10 @@ export class PlayerService implements PlayerPort {
 
     // 중복 입장 체크
     if (checkPlayer) {
+      this.playerEventAdapter.error(peerId, {
+        message: "이미 입장하였습니다.",
+      });
+
       return;
     }
 
