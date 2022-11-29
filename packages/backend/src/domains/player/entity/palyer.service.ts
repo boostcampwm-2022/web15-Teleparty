@@ -21,6 +21,13 @@ export class PlayerService implements PlayerPort {
     avata: string,
     roomId: string
   ) {
+    const checkPlayer = this.playerRepository.findOneByPeerId(peerId);
+
+    // 중복 입장 체크
+    if (checkPlayer) {
+      return;
+    }
+
     const player = this.playerRepository.create(peerId, userName, avata);
 
     // roomController로 join 실행
