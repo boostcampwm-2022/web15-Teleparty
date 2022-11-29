@@ -2,12 +2,12 @@ name: CI test
 
 on:
   push:
-    branches: [dev, feature/#104/ci-improving]
+    branches: [dev]
   pull_request:
     branches: [dev]
 
 jobs:
-  backend_tests:
+  backend_test:
     runs-on: ubuntu-latest
 
     steps:
