@@ -32,7 +32,7 @@ import { socketAtom } from "../../store/socket";
 
 const GamePage = () => {
   const [players, setPlayers] = useAtom(playersAtom);
-  const [gameInfo, setGameInfo] = useAtom(gameInfoAtom);
+  const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
@@ -95,10 +95,10 @@ const GamePage = () => {
         return (
           <Rank
             rankList={gamePlayerList
-              .sort((a, b) => b!.score! - a!.score!)
+              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
               .map(({ userName, score }) => ({
                 userName,
-                score: score!,
+                score: score ?? 0,
               }))}
           />
         );
