@@ -60,7 +60,7 @@ const LandingPage = () => {
         onClick={onEnterClick}
         disabled={nickname === "" || nicknameError}
       >
-        입장 버튼
+        입장
       </Button>
     </LandingPageLayout>
   );
