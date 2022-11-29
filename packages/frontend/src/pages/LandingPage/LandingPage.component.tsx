@@ -41,8 +41,23 @@ const LandingPage = () => {
     socket.emit("join", { userName: nickname, avatar: "", roomId });
   };
 
+  const runAfterSocketConnected = (callback: () => void) => {
+    if (socket.connected) callback();
+    else {
+      socket.on("connect", () => {
+        callback();
+      });
+    }
+  };
+
   useEffect(() => {
-    setPeer(new Peer(socket.id));
+    runAfterSocketConnected(() => {
+      setPeer(
+        new Peer(socket.id, {
+          debug: 0,
+        })
+      );
+    });
 
     const joinListener = (joinResponse: JoinResponse) => {
       const { roomId, players } = joinResponse;
@@ -51,6 +66,7 @@ const LandingPage = () => {
       navigate(`/room`, { replace: true });
     };
     socket.on("join", joinListener);
+
     return () => {
       if (peer) {
         peer.destroy();
