@@ -1,5 +1,5 @@
 import {
-  CatchMindEvent,
+  CatchMindEventPort,
   CatchMindInfo,
   RoundEndData,
   StartGameData,
@@ -8,7 +8,7 @@ import {
 import { SocketEmitter } from "../../../utils/socketEmitter";
 import { Player } from "../entity/catchMind";
 
-export class CatchMindEventAdapter implements CatchMindEvent {
+export class CatchMindEventAdapter implements CatchMindEventPort {
   emitter: SocketEmitter;
   constructor() {
     this.emitter = new SocketEmitter();

@@ -1,9 +1,10 @@
 import { CatchMindToRoom } from "./catchMindToRoom.port";
-import { RoomApiController } from "../../room/inbound/room.controller";
+import { DomainConnecter } from "../../../utils/domainConnecter";
 
 export class CatchMindToRoomAdapter implements CatchMindToRoom {
-  // roomController: RoomApiController = new RoomApiController();
+  connecter = DomainConnecter.getInstance();
+
   gameEnded(roomId: string) {
-    RoomApiController.endGame(roomId);
+    this.connecter.call("game-end", roomId);
   }
 }
