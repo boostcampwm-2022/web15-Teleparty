@@ -19,15 +19,14 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
-      - name: Cache Backend Code
-        uses: actions/cache@v3
-        id: backend_cache
+      - name: Get Backend File Change
+        id: changed-files-backend
+        uses: tj-actions/changed-files@v34
         with:
-          path: ./packages/backend
-          key: backend-code-${{ hashFiles('**/**') }}
+          files: |
+            ./packages/backend/**
 
       - name: Cache node modules
-        if: steps.backend_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         id: dependency_cache
         with:
@@ -35,15 +34,15 @@ jobs:
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Dependencies
-        if: steps.backend_cache.outputs.cache-hit != 'true' && steps.dependency_cache.outputs.outputs.cache-hit != 'true'
+        if: steps.changed-files-backend.outputs.any_changed == 'true' && steps.dependency_cache.outputs.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Backend Lint Verification
-        if: steps.backend_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-backend.outputs.any_changed == 'true'
         run: cd ./packages/backend && npm run lint
 
       - name: Run Backend Test
-        if: steps.backend_cache.outputs.outputs.cache-hit != 'true'
+        if: steps.changed-files-backend.outputs.any_changed == 'true'
         run: cd ./packages/backend && npm run test
 
   frontend_test:
@@ -57,12 +56,12 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
-      - name: Cache Frontend Code
-        uses: actions/cache@v3
-        id: frontend_cache
+      - name: Get Frontend File Change
+        id: changed-files-frontend
+        uses: tj-actions/changed-files@v34
         with:
-          path: ./packages/frontend
-          key: frontend-code-${{ hashFiles('**/**') }}
+          files: |
+            ./packages/frontend/**
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -72,17 +71,17 @@ jobs:
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Dependencies
-        if: steps.frontend_cache.outputs.cache-hit != 'true' && steps.dependency_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-frontend.outputs.any_changed == 'true' && steps.dependency_cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Frontend Lint Verification
-        if: steps.frontend_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run lint
 
       - name: Run Frontend Test
-        if: steps.frontend_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run test
 
       - name: Frontend Build Test
-        if: steps.frontend_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run build
