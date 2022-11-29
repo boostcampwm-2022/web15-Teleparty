@@ -12,6 +12,16 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
   const startTimeRef = useRef(new Date());
   const requestAnimationFrameIdRef = useRef(0);
 
+  const getCanvasContext = () => {
+    return canvasRef.current?.getContext("2d");
+  };
+
+  const initCanvas = () => {
+    const ctx = getCanvasContext();
+    if (!ctx) return;
+    ctx.fillStyle = "rgb(255, 236, 180)";
+  };
+
   // progress: 0 ~ 1
   const calculateProgress = () => {
     const elapsedSecond =
@@ -42,19 +52,23 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     );
   };
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
-    ctx.fillStyle = "rgb(255, 236, 180)";
-
+  const startMoonAnimation = () => {
+    const ctx = getCanvasContext();
+    if (!ctx) return;
     requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
       moonAnimation(ctx)
     );
+  };
 
-    return () => {
-      cancelAnimationFrame(requestAnimationFrameIdRef.current);
-    };
+  const stopMoonAnimation = () => {
+    cancelAnimationFrame(requestAnimationFrameIdRef.current);
+  };
+
+  useEffect(() => {
+    initCanvas();
+    startMoonAnimation();
+
+    return stopMoonAnimation;
   }, []);
 
   return (
