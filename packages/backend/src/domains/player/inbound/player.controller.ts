@@ -5,8 +5,11 @@ import { SocketRouter } from "../../../utils/socketRouter";
 import { Room } from "../../room/entity/room.entity";
 import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
+import { DomainConnecter } from "../../../utils/domainConnecter";
+
 const router = new SocketRouter();
 const playerService = new PlayerService();
+
 router.get(
   "join",
   (
@@ -45,16 +48,22 @@ router.get("player-quit", (socket: Socket) => {
   playerService.leavePlayer(socket.id);
 });
 
-export class PlayerApiController {
-  playerService: PlayerPort;
+// export class PlayerApiController {
+//   playerService: PlayerPort;
 
-  constructor() {
-    this.playerService = new PlayerService();
-  }
+//   constructor() {
+//     this.playerService = new PlayerService();
+//   }
 
-  getAllPlayer() {
-    return this.playerService.getAllPlayer();
-  }
-}
+//   getAllPlayer() {
+//     return this.playerService.getAllPlayer();
+//   }
+// }
 
 export const PlayerController = router.router;
+
+const connecter = DomainConnecter.getInstance();
+
+connecter.register("player/get-all-player", () => {
+  return playerService.getAllPlayer();
+});
