@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { MediaConnection } from "peerjs";
 
 import {
   RoomPageButtonBox,
@@ -18,6 +17,7 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import usePreventClose from "../../hooks/usePreventClose";
+import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
@@ -31,6 +31,10 @@ const RoomPage = () => {
   const socket = useAtomValue(socketAtom);
   const peer = useAtomValue(peerAtom);
   const [players, setPlayers] = useAtom(playersAtom);
+  useAudioCommunication(
+    peer,
+    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id)
+  );
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
