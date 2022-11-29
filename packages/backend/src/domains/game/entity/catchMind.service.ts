@@ -1,6 +1,6 @@
 import { CatchMind, Player } from "./catchMind";
 import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
-import { CatchMindEvent } from "../outBound/catchMindEvent.port";
+import { CatchMindEventPort } from "../outBound/catchMindEvent.port";
 import { CatchMindRepositoryDataPort } from "../outBound/catchMind.repository.port";
 import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
 import { CatchMindRepository } from "../outBound/catchMind.repository";
@@ -8,7 +8,7 @@ import { CatchMindToRoomAdapter } from "../outBound/catchMindToRoom.adapter";
 import { CatchMindToRoom } from "../outBound/catchMindToRoom.port";
 
 export class CatchMindService implements CatchMindInputPort {
-  eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
+  eventEmitter: CatchMindEventPort = new CatchMindEventAdapter();
   repository: CatchMindRepositoryDataPort = new CatchMindRepository();
   roomAPI: CatchMindToRoom = new CatchMindToRoomAdapter();
 
