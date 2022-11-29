@@ -113,4 +113,7 @@ export class CatchMind {
       return false;
     }
   }
+  removePlayer(playerId: string) {
+    this.players = this.players.filter((player) => player.id !== playerId);
+  }
 }
