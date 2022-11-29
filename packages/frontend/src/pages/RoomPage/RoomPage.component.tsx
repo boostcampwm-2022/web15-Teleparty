@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { MediaConnection } from "peerjs";
 
 import {
   RoomPageButtonBox,
@@ -16,6 +15,7 @@ import { Button } from "../../components/common/Button";
 import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
+import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
@@ -29,6 +29,10 @@ const RoomPage = () => {
   const socket = useAtomValue(socketAtom);
   const peer = useAtomValue(peerAtom);
   const [players, setPlayers] = useAtom(playersAtom);
+  useAudioCommunication(
+    peer,
+    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id)
+  );
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
 
@@ -77,60 +81,6 @@ const RoomPage = () => {
     return () => {
       socket.off("new-join", newJoinListener);
     };
-  }, []);
-
-  // handling WebRTC connection
-  const initMediaConnection = (mediaConnection: MediaConnection) => {
-    // mediaConnection.on
-    mediaConnection.on("stream", (stream) => {
-      const audio = new Audio();
-      audio.autoplay = true;
-      audio.srcObject = stream;
-    });
-
-    mediaConnection.on("close", () => {
-      console.log("call closed");
-    });
-
-    mediaConnection.on("error", (error) => {
-      console.error(error);
-    });
-  };
-
-  const initPeer = async () => {
-    if (!peer) return;
-
-    const audioStream = await navigator.mediaDevices.getUserMedia({
-      video: false,
-      audio: true,
-    });
-
-    peer.on("call", (mediaConnection) => {
-      mediaConnection.answer(audioStream);
-      initMediaConnection(mediaConnection);
-    });
-  };
-
-  const connectRtcToRoomPlayers = async () => {
-    if (!peer) return;
-
-    for (const { peerId } of players) {
-      if (peerId === socket.id) continue;
-
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: false,
-        audio: true,
-      });
-
-      const mediaConnection = peer.call(peerId, mediaStream);
-      initMediaConnection(mediaConnection);
-    }
-  };
-
-  useEffect(() => {
-    if (!peer) return;
-    initPeer();
-    connectRtcToRoomPlayers();
   }, []);
 
   return (
