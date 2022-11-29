@@ -10,6 +10,7 @@ interface MoonTimerProps {
 const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const startTimeRef = useRef(new Date());
+  const requestAnimationFrameIdRef = useRef(0);
 
   // progress: 0 ~ 1
   const calculateProgress = () => {
@@ -36,7 +37,9 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     ctx.globalCompositeOperation = "source-over";
 
     if (progress >= 1) return;
-    requestAnimationFrame(() => moonAnimation(ctx));
+    requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
+      moonAnimation(ctx)
+    );
   };
 
   useEffect(() => {
@@ -45,7 +48,13 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     if (!canvas || !ctx) return;
     ctx.fillStyle = "rgb(255, 236, 180)";
 
-    moonAnimation(ctx);
+    requestAnimationFrameIdRef.current = requestAnimationFrame(() =>
+      moonAnimation(ctx)
+    );
+
+    return () => {
+      cancelAnimationFrame(requestAnimationFrameIdRef.current);
+    };
   }, []);
 
   return (
