@@ -1,11 +1,9 @@
 name: deployment CI/CD
 
 on:
-  push:
-    branches: [main, fix/#83/cicd-flow]
   pull_request:
     types: [closed]
-    branches: [main, fix/#83/cicd-flow]
+    branches: [main]
 
 jobs:
   deploy:
