@@ -19,16 +19,7 @@ jobs:
                 pullRequests(last: 100, states: OPEN) {
                   edges {
                     node {
-                      number
                       headRefName
-                      baseRefName
-                      author {
-                        login
-                      }
-                      repository {
-                        name
-                      }
-                      mergeable
                     }
                   }
                 }
