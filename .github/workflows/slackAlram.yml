@@ -2,7 +2,7 @@ name: SLACK 7PM ALRAM
 
 on:
   schedule:
-    - cron: "0 19 * * 1-5"
+    - cron: "0 10 * * 1-5"
 
 jobs:
   slack-alram:
@@ -42,7 +42,6 @@ jobs:
         with:
           status: custom
           author_name: Github Action Test
-          fields: pullRequest,workflow,job,commit,repo,ref,author,took
           custom_payload: |
             {
               text: `${process.env.SLACK_ALRAM_TITLE}`,
