@@ -5,6 +5,6 @@ export class CatchMindToRoomAdapter implements CatchMindToRoom {
   connecter = DomainConnecter.getInstance();
 
   gameEnded(roomId: string) {
-    this.connecter.call("game-end", roomId);
+    this.connecter.call("room/game-end", { roomId });
   }
 }

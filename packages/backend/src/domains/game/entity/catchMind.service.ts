@@ -32,6 +32,7 @@ export class CatchMindService implements CatchMindInputPort {
       totalRound,
       roundInfo,
     });
+
     this.repository.save(game);
   }
 
