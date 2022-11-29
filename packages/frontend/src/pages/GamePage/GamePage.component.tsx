@@ -76,9 +76,11 @@ const GamePage = () => {
           ? `제시어: ${keyword}`
           : "그림을 보고 제시어를 맞춰 주세요";
       case "roundEnd":
-        return `${getUserNameById(
-          roundEndInfo?.roundWinner
-        )}님이 정답을 맞추셨습니다. 정답: ${roundEndInfo?.suggestedWord}`;
+        return roundEndInfo?.roundWinner
+          ? `${getUserNameById(
+              roundEndInfo.roundWinner
+            )}님이 정답을 맞추셨습니다. 정답: ${roundEndInfo.suggestedWord}`
+          : `아무도 정답을 맞추지 못했습니다. 정답: ${roundEndInfo?.suggestedWord}`;
       case "gameEnd":
         return "최종 랭킹";
       default:
