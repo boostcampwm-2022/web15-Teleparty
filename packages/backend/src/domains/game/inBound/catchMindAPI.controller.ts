@@ -1,6 +1,5 @@
 import { CatchMindInputPort } from "./CatchMindInput.port";
 import { CatchMindService } from "../entity/catchMind.service";
-import { Player } from "../entity/catchMind";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
@@ -18,10 +17,6 @@ const gameService: CatchMindInputPort = new CatchMindService();
 connecter.register(
   "catchMind/game-start",
   ({ goalScore, players, roundTime, roomId, totalRound }: StartData) => {
-    const playerList = Array.from(players, (player: string): Player => {
-      return { id: player, score: 0, isReady: false };
-    });
-
-    gameService.gameStart(goalScore, playerList, roundTime, roomId, totalRound);
+    gameService.gameStart(goalScore, players, roundTime, roomId, totalRound);
   }
 );
