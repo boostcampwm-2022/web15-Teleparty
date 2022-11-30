@@ -120,7 +120,11 @@ export class RoomService implements RoomPort {
         return;
       }
 
-      this.roomRepository.updateHostByRoomId(room.roomId, room.players[1]);
+      const newHostPeerId = room.players.find((playerId) => {
+        return playerId != peerId;
+      }) as string;
+
+      this.roomRepository.updateHostByRoomId(room.roomId, newHostPeerId);
     }
 
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
