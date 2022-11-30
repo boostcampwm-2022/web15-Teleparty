@@ -114,6 +114,10 @@ export class RoomService implements RoomPort {
   leave(peerId: string) {
     const room = this.roomRepository.findOneByPeerId(peerId);
 
+    if (room && !room.state) {
+      this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
+    }
+
     if (room?.host === peerId) {
       if (room?.players.length < 2) {
         this.roomRepository.deleteByRoomId(room.roomId);

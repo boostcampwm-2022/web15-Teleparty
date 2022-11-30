@@ -32,6 +32,11 @@ export class RoomApiAdapter implements RoomApiPort {
     return;
   }
 
+  playerQuit(gameMode: string, roomId: string, playerId: string) {
+    // 여기서 게임 모드로 분기
+    this.connecter.call("catchMind/player-quit", { roomId, playerId });
+  }
+
   getAllPlayer() {
     return this.connecter.call("player/get-all-players");
   }
