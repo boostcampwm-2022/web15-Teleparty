@@ -170,7 +170,7 @@ const GamePage = () => {
         </GamePageContentBox>
         <GamePageContentBox>
           {gameState === "drawing" ? (
-            <MoonTimer radius={50} secondTime={roundTime} />
+            <MoonTimer radius={50} secondTime={roundTime / 1000} />
           ) : (
             <MoonTimer radius={50} secondTime={Infinity} />
           )}
