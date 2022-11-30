@@ -64,6 +64,13 @@ export class Garticphone {
     return this.players.every((player) => player.isInputEnded);
   }
 
+  get roundData() {
+    return {
+      roundTime: this.roundTime,
+      currentRound: this.currentRound,
+    };
+  }
+
   cancelAlbumData(playerId: string) {
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
 
@@ -92,7 +99,7 @@ export class Garticphone {
     return this.players[currentIdx];
   }
 
-  getAlbum(playerId: string) {
+  getAlbum(playerId: string): AlbumData[] | undefined {
     const player = this.players.find((player) => player.id === playerId);
 
     if (!player) return;

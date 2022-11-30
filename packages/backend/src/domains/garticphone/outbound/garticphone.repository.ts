@@ -1,5 +1,5 @@
 import { Garticphone } from "../entity/garticphone";
-import { GarticphoneRepositoryDataPort } from "./garitc.port";
+import { GarticphoneRepositoryDataPort } from "./garitcphone.repository.port";
 
 export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
   static games: Map<string, Garticphone> = new Map();

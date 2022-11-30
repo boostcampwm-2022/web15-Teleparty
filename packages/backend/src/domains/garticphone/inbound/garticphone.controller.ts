@@ -24,4 +24,19 @@ router.get("keyword-cancel", (socket: Socket) => {
   if (room) service.cancelAlbumData(room.roomId, socket.id);
 });
 
+connecter.register(
+  "garticphone/game-start",
+  ({
+    roomId,
+    roundTime,
+    players,
+  }: {
+    roomId: string;
+    roundTime: number;
+    players: string[];
+  }) => {
+    service.startGame(roomId, roundTime, players);
+  }
+);
+
 export const garticRouter = router.router;
