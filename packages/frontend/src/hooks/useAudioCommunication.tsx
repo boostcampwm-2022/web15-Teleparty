@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 
 import Peer, { MediaConnection } from "peerjs";
 
-import { voiceInputMediaStreamAtom } from "../store/voiceInputMediaStream";
 import { audioStreamManager } from "../utils/audioStreamMap";
 
 const getAudioMediaStream = () => {
@@ -11,6 +10,8 @@ const getAudioMediaStream = () => {
     audio: true,
   });
 };
+
+export let voiceInputMediaStream: MediaStream | null = null;
 
 export const useAudioCommunication = (
   peer: Peer | null,
@@ -45,13 +46,13 @@ export const useAudioCommunication = (
   };
 
   // answer to call and handle new MediaConnection
-  const handleCall = async (mediaConnection: MediaConnection) => {
-    const audioStream = await getAudioMediaStream();
-    mediaConnection.answer(audioStream);
+  const handleCall = (mediaConnection: MediaConnection) => {
+    if (!voiceInputMediaStream) return;
+    mediaConnection.answer(voiceInputMediaStream);
     initMediaConnection(mediaConnection.peer, mediaConnection);
   };
 
-  const initPeer = async () => {
+  const initPeer = () => {
     if (!peer) return;
     peer.on("call", handleCall);
   };
@@ -62,13 +63,13 @@ export const useAudioCommunication = (
   };
 
   // call to all peers and handle each new MediaConnection
-  const connectAudioWithPeers = async () => {
+  const connectAudioWithPeers = () => {
     if (!peer) return;
 
-    const audioStream = await getAudioMediaStream();
+    if (!voiceInputMediaStream) return;
 
     for (const peerId of peerIdList) {
-      const mediaConnection = peer.call(peerId, audioStream);
+      const mediaConnection = peer.call(peerId, voiceInputMediaStream);
       initMediaConnection(peerId, mediaConnection);
     }
   };
@@ -85,8 +86,13 @@ export const useAudioCommunication = (
   // 1. init peer(WebRTC) to accept incoming audio connection
   // 2. connect audio channel with all peers
   useEffect(() => {
-    initPeer();
-    connectAudioWithPeers();
+    const initAudioConnection = async () => {
+      if (!voiceInputMediaStream)
+        voiceInputMediaStream = await getAudioMediaStream();
+      initPeer();
+      connectAudioWithPeers();
+    };
+    initAudioConnection();
 
     return () => {
       clearPeer();
