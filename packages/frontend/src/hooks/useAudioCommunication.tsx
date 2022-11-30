@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 import Peer, { MediaConnection } from "peerjs";
 
-import { audioMediaStreamAtom } from "../store/audioMediaStream";
+import { voiceInputMediaStreamAtom } from "../store/voiceInputMediaStream";
 import { audioStreamManager } from "../utils/audioStreamMap";
 
 const getAudioMediaStream = () => {
