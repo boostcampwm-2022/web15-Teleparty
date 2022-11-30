@@ -7,6 +7,7 @@ import {
 import { PlayerApiAdapter } from "../outbound/player.api.adapter";
 import { PlayerRepository } from "../outbound/player.repository";
 import { PlayerEventAdapter } from "../outbound/player.event.adapter";
+import { Socket } from "socket.io";
 
 export class PlayerService implements PlayerPort {
   playerApiAdapter: PlayerApiPort;
@@ -20,6 +21,7 @@ export class PlayerService implements PlayerPort {
   }
 
   createPlayer(
+    socket: Socket,
     peerId: string,
     userName: string,
     avata: string,
@@ -29,12 +31,12 @@ export class PlayerService implements PlayerPort {
 
     // 중복 입장 체크
     if (checkPlayer) {
-      this.playerEventAdapter.error(peerId, {
-        message: "이미 입장하였습니다.",
-      });
-
+      this.sendError(peerId, "이미 입장하였습니다.");
       return;
     }
+
+    // socket room 입장 처리
+    socket.join(roomId);
 
     const player = this.playerRepository.create(peerId, userName, avata);
 
@@ -54,5 +56,11 @@ export class PlayerService implements PlayerPort {
 
   getAllPlayer() {
     return this.playerRepository.findAll();
+  }
+
+  sendError(peerId: string, message: string) {
+    this.playerEventAdapter.error(peerId, {
+      message: message,
+    });
   }
 }
