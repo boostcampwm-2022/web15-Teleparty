@@ -25,3 +25,10 @@ connecter.register(
     gameService.gameStart(goalScore, playerList, roundTime, roomId, totalRound);
   }
 );
+
+connecter.register(
+  "catchMind/player-quit",
+  ({ roomId, playerId }: { roomId: string; playerId: string }) => {
+    gameService.quitDuringGame(roomId, playerId);
+  }
+);

@@ -11,4 +11,5 @@ export interface CatchMindInputPort {
   drawStart: (roomId: string, keyword: string) => void;
   checkAnswer: (roomId: string, answer: string, playerId: string) => void;
   roundReady: (roomId: string, playerId: string) => void;
+  quitDuringGame: (roomId: string, playerId: string) => void;
 }

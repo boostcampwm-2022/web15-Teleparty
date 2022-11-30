@@ -109,11 +109,10 @@ export class CatchMindService implements CatchMindInputPort {
     this.repository.save(game);
   }
 
-  quitGame(roomId: string, playerId: string) {
+  quitDuringGame(roomId: string, playerId: string) {
     const game = this.repository.findById(roomId);
     if (!game) return;
 
-    // 여기서 신호
     if (game.turnPlayer.id === playerId) {
       clearTimeout(game.timerId);
       this.roundEnd(game, null);
