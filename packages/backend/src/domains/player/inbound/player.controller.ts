@@ -3,6 +3,7 @@ import { PlayerPort } from "./player.port";
 import { PlayerService } from "../entity/palyer.service";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Room } from "../../room/entity/room.entity";
+import { randomUUID } from "crypto";
 // import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
@@ -64,16 +65,16 @@ connecter.register("player/get-all-players", () => {
 });
 
 const createUUID = () => {
-  let uuid = self.crypto.randomUUID();
+  let uuid = randomUUID();
 
   // 혹시 roomId가 중복될 수도 있기 때문에
   // 새로운 UUID가 나올때까지 반복
   while (
-    !connecter.call("room/get-by-roomId", {
+    connecter.call("room/get-by-roomId", {
       uuid,
     })
   ) {
-    uuid = self.crypto.randomUUID();
+    uuid = randomUUID();
   }
 
   return uuid;
