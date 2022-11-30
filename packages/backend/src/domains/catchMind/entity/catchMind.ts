@@ -106,6 +106,11 @@ export class CatchMind {
   exitGame(id: string) {
     const player = this.players.find((player) => player.id === id);
 
-    if (player) player.isExit = true;
+    if (player && !player.isExit) {
+      player.isExit = true;
+      return true;
+    } else {
+      return false;
+    }
   }
 }

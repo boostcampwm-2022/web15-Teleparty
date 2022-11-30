@@ -24,4 +24,5 @@ export interface CatchMindEventPort {
   roundEnd: (roomId: string, data: RoundEndData) => void;
   roundReady: (roomId: string, player: Player) => void;
   roundStart: (roomId: string, data: CatchMindInfo) => void;
+  playerExit: (roomId: string, playerId: string) => void;
 }

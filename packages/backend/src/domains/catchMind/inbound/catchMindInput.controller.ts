@@ -29,7 +29,7 @@ router.get("round-ready", (socket: Socket) => {
   if (room) gameService.roundReady(room.roomId, socket.id);
 });
 
-router.get("player-quit", (socket: Socket) => {
+router.get("quit-game", (socket: Socket) => {
   const room = connecter.call("room/get-by-playerId", { id: socket.id });
 
   if (room) gameService.exitGame(room.roomId, socket.id);
