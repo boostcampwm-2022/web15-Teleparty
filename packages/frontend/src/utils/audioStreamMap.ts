@@ -43,7 +43,7 @@ class AudioStreamManager {
 
     stream.getAudioTracks()[0].enabled = false;
 
-    return false;
+    return true;
   }
 
   unMute(id: string) {
@@ -53,7 +53,7 @@ class AudioStreamManager {
 
     stream.getAudioTracks()[0].enabled = true;
 
-    return false;
+    return true;
   }
 }
 
