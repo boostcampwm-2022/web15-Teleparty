@@ -29,8 +29,6 @@ const RoomPage = () => {
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
 
-  if (roomId === undefined) return <Navigate to="/" replace />;
-
   const onInviteClick = () => {
     const inviteUrl = `${window.location.origin}/?invite=${roomId}`;
     navigator.clipboard.writeText(inviteUrl);
@@ -64,7 +62,7 @@ const RoomPage = () => {
     return () => {
       socket.off("game-start", gameStartListener);
     };
-  }, []);
+  }, [socket, navigate, setGameInfo]);
 
   useEffect(() => {
     const newJoinListener = (player: Player) => {
@@ -74,9 +72,11 @@ const RoomPage = () => {
     return () => {
       socket.off("new-join", newJoinListener);
     };
-  }, []);
+  }, [socket, setPlayers]);
 
-  return (
+  return roomId === undefined ? (
+    <Navigate to="/" replace />
+  ) : (
     <RoomPageLayout>
       <Logo />
       <RoomPageContentBox>
