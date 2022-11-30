@@ -18,7 +18,7 @@ export type IconType =
   | "check-circled"
   | "link"
   | "volume-medium"
-  | "mute2";
+  | "volume-mute2";
 
 interface IconProps {
   className?: string;

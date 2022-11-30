@@ -1,3 +1,5 @@
+import { useAtomValue } from "jotai";
+
 import {
   PlayerListLayout,
   PersonnelCountParagraph,
@@ -5,6 +7,7 @@ import {
 } from "./PlayerList.styles";
 import PlayerListItem from "./PlayerListItem/PlayerListItem.component";
 
+import { socketAtom } from "../../store/socket";
 import { GamePlayer } from "../../types/game";
 
 interface PlayerListProps {
@@ -14,6 +17,8 @@ interface PlayerListProps {
 }
 
 const PlayerList = ({ sizeType, players, maxPlayer }: PlayerListProps) => {
+  const socket = useAtomValue(socketAtom);
+
   return (
     <PlayerListLayout sizeType={sizeType}>
       <PersonnelCountParagraph>{`${players.length}/${maxPlayer}`}</PersonnelCountParagraph>
@@ -23,6 +28,7 @@ const PlayerList = ({ sizeType, players, maxPlayer }: PlayerListProps) => {
             key={player.peerId}
             sizeType={sizeType}
             player={player}
+            isMine={player.peerId === socket.id}
           />
         ))}
       </PlayerItemList>

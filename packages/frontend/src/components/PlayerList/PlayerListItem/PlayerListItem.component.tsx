@@ -6,20 +6,21 @@ import {
   Avatar,
   Name,
   Score,
-  IconConatiner,
+  AudioToggleButton,
 } from "./PlayerListItem.styles";
 
+import { colors } from "../../../global-styles/theme";
 import { GamePlayer } from "../../../types/game";
 import Icon from "../../Icon/Icon";
 
 interface PlayerListItemProps {
   sizeType: "medium" | "large";
   player: GamePlayer;
+  isMine: boolean;
 }
 
-const PlayerListItem = ({ sizeType, player }: PlayerListItemProps) => {
+const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
   const {
-    peerId,
     userName,
     avatarURL,
     isHost,
@@ -41,9 +42,20 @@ const PlayerListItem = ({ sizeType, player }: PlayerListItemProps) => {
       </RightSection>
       <LeftSection>
         {score !== undefined && <Score>{score}점</Score>}
-        <IconConatiner>
-          <Icon icon="mic-off" size={20} />
-        </IconConatiner>
+        <AudioToggleButton>
+          {isMine &&
+            (isMicOn ? (
+              <Icon icon="mic" size={20} color={colors.primary} />
+            ) : (
+              <Icon icon="mic-off" size={20} color={colors.primary} />
+            ))}
+          {!isMine &&
+            (isMicOn ? (
+              <Icon icon="volume-medium" size={20} color={colors.primary} />
+            ) : (
+              <Icon icon="volume-mute2" size={20} color={colors.primary} />
+            ))}
+        </AudioToggleButton>
       </LeftSection>
     </PlayerListItemLayout>
   );
