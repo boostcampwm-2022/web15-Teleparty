@@ -38,6 +38,7 @@ router.get(
         // 접속이 불가능한 방일 때 ex) 게임 하고 있을 땐 못들어감
         if (!room.state) {
           playerService.sendError(socket.id, "이미 게임을 시작한 방입니다.");
+          return;
         }
       }
     } else {
