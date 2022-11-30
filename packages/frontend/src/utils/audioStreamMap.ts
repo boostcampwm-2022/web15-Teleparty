@@ -66,7 +66,7 @@ class AudioStreamManager {
     return true;
   }
 
-  isMute(id: string) {
+  getMute(id: string) {
     const realTimeAudio = this.map.get(id);
     if (!realTimeAudio) return false;
     const { stream } = realTimeAudio;

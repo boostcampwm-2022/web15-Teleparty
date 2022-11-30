@@ -1,3 +1,5 @@
+import { useSetAtom } from "jotai";
+
 import {
   PlayerListItemLayout,
   RightSection,
@@ -11,6 +13,7 @@ import {
 
 import { colors } from "../../../global-styles/theme";
 import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
+import { playersAtom } from "../../../store/players";
 import { GamePlayer } from "../../../types/game";
 import { audioStreamManager } from "../../../utils/audioStreamMap";
 import Icon from "../../Icon/Icon";
@@ -22,6 +25,7 @@ interface PlayerListItemProps {
 }
 
 const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
+  const setPlayers = useSetAtom(playersAtom);
   const {
     peerId,
     userName,
@@ -35,16 +39,35 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
   const playerState = isReady ? "ready" : isCurrentTurn ? "turn" : "normal";
 
   const toggleAudio = () => {
+    const setAudioStateChangedPlayer = (
+      playerId: string,
+      audioState: boolean
+    ) => {
+      setPlayers((players) =>
+        players.map((player) => {
+          return {
+            ...player,
+            isMicOn: playerId === player.peerId ? audioState : player.isMicOn,
+          };
+        })
+      );
+    };
+
     // toggle my mic
     if (isMine) {
       if (!voiceInputMediaStream) return;
       voiceInputMediaStream.getAudioTracks()[0].enabled =
         !voiceInputMediaStream.getAudioTracks()[0].enabled;
+      setAudioStateChangedPlayer(
+        peerId,
+        voiceInputMediaStream.getAudioTracks()[0].enabled
+      );
       return;
     }
 
     // toggle peer's audio
     audioStreamManager.toggleMute(peerId);
+    setAudioStateChangedPlayer(peerId, audioStreamManager.getMute(peerId));
   };
 
   return (

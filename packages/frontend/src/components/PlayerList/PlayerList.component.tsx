@@ -7,17 +7,17 @@ import {
 } from "./PlayerList.styles";
 import PlayerListItem from "./PlayerListItem/PlayerListItem.component";
 
+import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
-import { GamePlayer } from "../../types/game";
 
 interface PlayerListProps {
   sizeType: "medium" | "large";
-  players: GamePlayer[];
   maxPlayer: number;
 }
 
-const PlayerList = ({ sizeType, players, maxPlayer }: PlayerListProps) => {
+const PlayerList = ({ sizeType, maxPlayer }: PlayerListProps) => {
   const socket = useAtomValue(socketAtom);
+  const players = useAtomValue(playersAtom);
 
   return (
     <PlayerListLayout sizeType={sizeType}>
