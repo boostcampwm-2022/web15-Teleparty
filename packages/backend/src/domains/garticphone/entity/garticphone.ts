@@ -46,11 +46,13 @@ export class Garticphone {
   players: Player[];
   timerId: NodeJS.Timer | undefined;
   roundTime: number;
+  roomId: string;
 
-  constructor(players: string[], roundTime: number) {
+  constructor(players: string[], roundTime: number, roomId: string) {
     this.players = players.map((playerId) => new Player(playerId));
     this.totalRound = players.length;
     this.roundTime = roundTime;
+    this.roomId = roomId;
     this.currentRound = 1;
   }
 
