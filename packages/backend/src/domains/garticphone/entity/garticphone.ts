@@ -14,14 +14,25 @@ class AlbumData {
 
 class Player {
   id: string;
+  isInputEnded: boolean;
   album: AlbumData[] = [];
 
   constructor(id: string) {
     this.id = id;
+    this.isInputEnded = false;
   }
 
   setAlbumData(index: number, data: AlbumData) {
     this.album[index] = data;
+    this.isInputEnded = true;
+  }
+
+  cancelAlbumData(index: number) {
+    if (this.album[index]) {
+      this.album.pop();
+    }
+
+    this.isInputEnded = false;
   }
 
   getAlbum() {
@@ -45,6 +56,18 @@ export class Garticphone {
 
   get currentRoundType() {
     return this.currentRound % 2 === 0 ? "painting" : "keyword";
+  }
+
+  get isAllInputed() {
+    return this.players.every((player) => player.isInputEnded);
+  }
+
+  cancelAlbumData(playerId: string) {
+    const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
+
+    if (!ownerPlayer) return;
+
+    ownerPlayer.cancelAlbumData(this.currentRound);
   }
 
   setAlbumData(data: string, playerId: string) {
