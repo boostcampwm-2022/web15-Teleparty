@@ -22,15 +22,13 @@ router.get(
   }
 );
 
-router.get(
-  "chatting",
-  (
-    socket: Socket,
-    { peerId, message }: { peerId: string; message: string }
-  ) => {
-    roomService.chatting(socket.id, message);
-  }
-);
+router.get("chatting", (socket: Socket, { message }: { message: string }) => {
+  roomService.chatting(socket.id, message);
+});
+
+router.get("disconnect", (socket: Socket) => {
+  roomService.leave(socket.id);
+});
 
 export const RoomController = router.router;
 
