@@ -52,9 +52,9 @@ router.get("disconnect", (socket: Socket) => {
   playerService.leavePlayer(socket.id);
 });
 
-router.get("player-quit", (socket: Socket) => {
-  playerService.leavePlayer(socket.id);
-});
+// router.get("player-quit", (socket: Socket) => {
+//   playerService.leavePlayer(socket.id);
+// });
 
 export const PlayerController = router.router;
 
