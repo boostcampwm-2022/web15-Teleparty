@@ -2,6 +2,9 @@ import { useEffect, useRef } from "react";
 
 import Peer, { MediaConnection } from "peerjs";
 
+import { audioMediaStreamAtom } from "../store/audioMediaStream";
+import { audioStreamManager } from "../utils/audioStreamMap";
+
 const getAudioMediaStream = () => {
   return navigator.mediaDevices.getUserMedia({
     video: false,
@@ -14,22 +17,29 @@ export const useAudioCommunication = (
   peerIdList: string[]
 ) => {
   const mediaConnectionSet = useRef<Set<MediaConnection>>(new Set());
+  const connectedPeerIdSet = useRef<Set<string>>(new Set());
 
-  const initMediaConnection = (mediaConnection: MediaConnection) => {
+  const initMediaConnection = (
+    id: string,
+    mediaConnection: MediaConnection
+  ) => {
     mediaConnectionSet.current.add(mediaConnection);
 
     mediaConnection.on("stream", (stream) => {
-      const audio = new Audio();
-      audio.autoplay = true;
-      audio.srcObject = stream;
+      audioStreamManager.add(id, stream);
+      connectedPeerIdSet.current.add(id);
     });
 
     mediaConnection.on("close", () => {
       mediaConnectionSet.current.delete(mediaConnection);
+      audioStreamManager.remove(id);
+      connectedPeerIdSet.current.delete(id);
     });
 
     mediaConnection.on("error", (error) => {
       mediaConnectionSet.current.delete(mediaConnection);
+      audioStreamManager.remove(id);
+      connectedPeerIdSet.current.delete(id);
       console.error(error);
     });
   };
@@ -38,7 +48,7 @@ export const useAudioCommunication = (
   const handleCall = async (mediaConnection: MediaConnection) => {
     const audioStream = await getAudioMediaStream();
     mediaConnection.answer(audioStream);
-    initMediaConnection(mediaConnection);
+    initMediaConnection(mediaConnection.peer, mediaConnection);
   };
 
   const initPeer = async () => {
@@ -59,13 +69,16 @@ export const useAudioCommunication = (
 
     for (const peerId of peerIdList) {
       const mediaConnection = peer.call(peerId, audioStream);
-      initMediaConnection(mediaConnection);
+      initMediaConnection(peerId, mediaConnection);
     }
   };
 
   const closeAllMediaConnections = () => {
     for (const mediaConnection of mediaConnectionSet.current) {
       mediaConnection.close();
+    }
+    for (const connectedPeerId of connectedPeerIdSet.current) {
+      audioStreamManager.remove(connectedPeerId);
     }
   };
 
