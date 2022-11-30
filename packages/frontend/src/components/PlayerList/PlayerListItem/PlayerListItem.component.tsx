@@ -10,7 +10,9 @@ import {
 } from "./PlayerListItem.styles";
 
 import { colors } from "../../../global-styles/theme";
+import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
 import { GamePlayer } from "../../../types/game";
+import { audioStreamManager } from "../../../utils/audioStreamMap";
 import Icon from "../../Icon/Icon";
 
 interface PlayerListItemProps {
@@ -21,6 +23,7 @@ interface PlayerListItemProps {
 
 const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
   const {
+    peerId,
     userName,
     avatarURL,
     isHost,
@@ -30,6 +33,16 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     score,
   } = player;
   const playerState = isReady ? "ready" : isCurrentTurn ? "turn" : "normal";
+
+  const toggleAudio = () => {
+    // toggle my mic
+    if (isMine) {
+      if (!voiceInputMediaStream) return;
+      voiceInputMediaStream.getAudioTracks()[0].enabled =
+        !voiceInputMediaStream.getAudioTracks()[0].enabled;
+      return;
+    }
+  };
 
   return (
     <PlayerListItemLayout sizeType={sizeType} state={playerState}>
@@ -42,7 +55,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
       </RightSection>
       <LeftSection>
         {score !== undefined && <Score>{score}점</Score>}
-        <AudioToggleButton>
+        <AudioToggleButton onClick={toggleAudio}>
           {isMine &&
             (isMicOn ? (
               <Icon icon="mic" size={20} color={colors.primary} />
