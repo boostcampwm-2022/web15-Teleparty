@@ -42,6 +42,9 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
         !voiceInputMediaStream.getAudioTracks()[0].enabled;
       return;
     }
+
+    // toggle peer's audio
+    audioStreamManager.toggleMute(peerId);
   };
 
   return (
