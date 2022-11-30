@@ -112,7 +112,11 @@ export class CatchMindService implements CatchMindInputPort {
     const game = this.repository.findById(roomId);
     if (!game) return;
 
-    game.exitGame(playerId);
+    const result = game.exitGame(playerId);
+
+    if (result) {
+      this.eventEmitter.playerExit(game.roomId, playerId);
+    }
 
     if (game.isAllExit) {
       this.roomAPI.gameEnded(game.roomId);
