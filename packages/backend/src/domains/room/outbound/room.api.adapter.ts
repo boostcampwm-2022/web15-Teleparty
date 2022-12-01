@@ -33,8 +33,8 @@ const gameModeMap = {
 };
 
 export class RoomApiAdapter implements RoomApiPort {
-  chatting(peerId: string, roomId: string, message: string) {
-    connecter.call("chat/send", { message, peerId, roomId });
+  chatting(senderId: string, roomId: string, message: string) {
+    connecter.call("chat/send", { message, senderId, roomId });
   }
 
   gameStart(
@@ -58,7 +58,6 @@ export class RoomApiAdapter implements RoomApiPort {
       roundTime,
       goalScore,
     });
-
 
     return;
   }
