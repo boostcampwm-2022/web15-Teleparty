@@ -108,4 +108,17 @@ export class CatchMindService implements CatchMindInputPort {
     this.eventEmitter.roundStart(game.roomId, game.roundInfo);
     this.repository.save(game);
   }
+
+  quitDuringGame(roomId: string, playerId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    if (game.turnPlayer.id === playerId) {
+      clearTimeout(game.timerId);
+      this.roundEnd(game, null);
+    }
+    game.removePlayer(playerId);
+
+    this.repository.save(game);
+  }
 }

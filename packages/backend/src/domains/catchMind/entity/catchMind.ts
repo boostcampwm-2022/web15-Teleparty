@@ -95,4 +95,8 @@ export class CatchMind {
 
     if (player) player.isReady = true;
   }
+
+  removePlayer(playerId: string) {
+    this.players = this.players.filter((player) => player.id !== playerId);
+  }
 }
