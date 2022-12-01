@@ -8,6 +8,7 @@ import { DomainConnecter } from "../../../utils/domainConnecter";
 const gameService: CatchMindInputPort = new CatchMindService();
 const router = new SocketRouter();
 const connecter = DomainConnecter.getInstance();
+
 router.get(
   "input-keyword",
   (socket: Socket, { keyword }: { keyword: string }) => {
@@ -26,6 +27,12 @@ router.get("chatting", (socket: Socket, { message }: { message: string }) => {
 router.get("round-ready", (socket: Socket) => {
   const room = connecter.call("room/get-by-playerId", { id: socket.id });
   if (room) gameService.roundReady(room.roomId, socket.id);
+});
+
+router.get("quit-game", (socket: Socket) => {
+  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+
+  if (room) gameService.exitGame(room.roomId, socket.id);
 });
 
 export const catchMindRouter = router.router;
