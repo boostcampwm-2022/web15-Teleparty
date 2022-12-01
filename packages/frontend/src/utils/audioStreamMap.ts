@@ -7,7 +7,10 @@ interface RealTimeAudio {
   audioDetected: boolean;
 }
 
-type audioDetectListener = (isAudioDetected: boolean) => void;
+export type AudioDetectListener = (
+  id: string,
+  isAudioDetected: boolean
+) => void;
 
 const MIN_DECIBEL = -100;
 const MAX_DECIBEL = 0;
@@ -16,7 +19,7 @@ const AUDIO_DETECTION_INTERVAL = 250;
 
 class AudioStreamManager {
   private realTimeAudioMap = new Map<string, RealTimeAudio>();
-  private audioDetectionListenerMap = new Map<string, audioDetectListener>();
+  private audioDetectionListenerMap = new Map<string, AudioDetectListener>();
   private audioDetectionTimerId: NodeJS.Timer | number = 0;
 
   add(id: string, stream: MediaStream) {
@@ -58,6 +61,7 @@ class AudioStreamManager {
     const { audio } = realTimeAudio;
 
     this.realTimeAudioMap.delete(id);
+    this.audioDetectionListenerMap.delete(id);
 
     // 가비지 콜렉션의 대상 되게 하기
     audio.pause();
@@ -103,7 +107,7 @@ class AudioStreamManager {
     return !stream.getAudioTracks()[0].enabled;
   }
 
-  addAudioDetectListener(id: string, listener: audioDetectListener) {
+  addAudioDetectListener(id: string, listener: AudioDetectListener) {
     if (this.audioDetectionListenerMap.size === 0)
       this.startListeningAudioDetection();
     this.audioDetectionListenerMap.set(id, listener);
@@ -133,7 +137,7 @@ class AudioStreamManager {
       if (audioDetected === realTimeAudio.audioDetected) continue;
 
       realTimeAudio.audioDetected = audioDetected;
-      listener(audioDetected);
+      listener(id, audioDetected);
     }
   }
 

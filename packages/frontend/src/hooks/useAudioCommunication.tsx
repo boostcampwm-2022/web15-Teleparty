@@ -2,7 +2,10 @@ import { useEffect, useRef } from "react";
 
 import Peer, { MediaConnection } from "peerjs";
 
-import { audioStreamManager } from "../utils/audioStreamMap";
+import {
+  AudioDetectListener,
+  audioStreamManager,
+} from "../utils/audioStreamMap";
 
 const getAudioMediaStream = () => {
   return navigator.mediaDevices.getUserMedia({
@@ -15,7 +18,8 @@ export let voiceInputMediaStream: MediaStream | null = null;
 
 export const useAudioCommunication = (
   peer: Peer | null,
-  peerIdList: string[]
+  peerIdList: string[],
+  audioDetectListener?: AudioDetectListener
 ) => {
   const mediaConnectionSet = useRef<Set<MediaConnection>>(new Set());
   const connectedPeerIdSet = useRef<Set<string>>(new Set());
@@ -28,6 +32,9 @@ export const useAudioCommunication = (
 
     mediaConnection.on("stream", (stream) => {
       audioStreamManager.add(id, stream);
+      if (audioDetectListener) {
+        audioStreamManager.addAudioDetectListener(id, audioDetectListener);
+      }
       connectedPeerIdSet.current.add(id);
     });
 
