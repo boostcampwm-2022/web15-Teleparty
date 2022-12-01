@@ -19,7 +19,12 @@ import type { AlbumType } from "../../types/game";
 
 const ALBUM_DELAY = 1000 * 2.5;
 
-const Album = ({ album }: { album: AlbumType[] }) => {
+interface AlbumProps {
+  album: AlbumType[];
+  isLastAlbum: boolean;
+}
+
+const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const [renderedAlbum, setRenderedAlbum] = useState<AlbumType[]>([]);
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
@@ -73,7 +78,11 @@ const Album = ({ album }: { album: AlbumType[] }) => {
             <Button variant="icon">
               <Icon icon="download" size={36} />
             </Button>
-            {isHost && <Button variant="large">다음</Button>}
+            {isLastAlbum ? (
+              <Button variant="large">방으로 이동</Button>
+            ) : (
+              isHost && <Button variant="large">다음</Button>
+            )}
           </AlbumNextButtonBox>
         </AlbumNextLayout>
       )}
