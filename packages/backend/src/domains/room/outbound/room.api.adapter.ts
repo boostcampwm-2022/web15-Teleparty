@@ -59,6 +59,7 @@ export class RoomApiAdapter implements RoomApiPort {
       goalScore,
     });
 
+
     return;
   }
 

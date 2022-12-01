@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { SetStateAction, useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
@@ -21,9 +21,10 @@ import { debounceByFrame } from "../../utils/debounce";
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
+  setOutgoingCanvasStream?: React.Dispatch<SetStateAction<MediaStream | null>>;
 }
 
-const Canvas = ({ canvasRef }: CanvasProps) => {
+const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -33,10 +34,24 @@ const Canvas = ({ canvasRef }: CanvasProps) => {
   const thickness = useAtomValue(thicknessAtom);
 
   useEffect(() => {
+    if (!canvasRef.current || !setOutgoingCanvasStream) return;
+    setOutgoingCanvasStream(canvasRef.current.captureStream());
+
+    return () => {
+      setOutgoingCanvasStream(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
     const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
+    if (!canvas || !ctx) return;
+
+    const { width, height } = canvas;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width, height);
   }, [canvasRef]);
 
   const captureCanvas = () => {

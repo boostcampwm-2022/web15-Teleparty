@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
@@ -15,6 +15,7 @@ import PaintBoard from "../../components/PaintBoard/PaintBoard.component";
 import {
   KeywordInputLayout,
   PaintBoardButtonLayout,
+  PaintBoardEmptyCenterElement,
 } from "../../components/PaintBoard/PaintBoard.styles";
 import PaintToolBox from "../../components/PaintToolBox/PaintToolBox.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
@@ -27,6 +28,7 @@ import {
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
+import Video from "../Video/Video.component";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -35,10 +37,18 @@ const CatchMind = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [outgoingCanvasStream, setOutgoingCanvasStream] =
+    useState<MediaStream | null>(null);
 
-  const { gamePlayerList, gameState, isMyTurn, roundEndInfo, roundInfo } =
-    useCatchMind(socket, players, gameInfo.roundInfo);
-
+  const {
+    gamePlayerList,
+    gameState,
+    isMyTurn,
+    roundEndInfo,
+    roundInfo,
+    incomingCanvasStream,
+  } = useCatchMind(socket, players, gameInfo.roundInfo, outgoingCanvasStream);
+  console.log(incomingCanvasStream);
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
@@ -90,8 +100,14 @@ const CatchMind = () => {
   const getCenterElement = () => {
     switch (gameState) {
       case "drawing":
-        if (isMyTurn) return <Canvas canvasRef={canvasRef} />;
-        return <CanvasLayout />;
+        if (isMyTurn)
+          return (
+            <Canvas
+              canvasRef={canvasRef}
+              setOutgoingCanvasStream={setOutgoingCanvasStream}
+            />
+          );
+        return <Video srcObject={incomingCanvasStream} />;
       case "gameEnd":
         return (
           <Rank
@@ -104,9 +120,16 @@ const CatchMind = () => {
           />
         );
       case "inputKeyword":
-        return <CanvasLayout />;
+        return <PaintBoardEmptyCenterElement />;
       case "roundEnd":
-        return <CanvasLayout />;
+        return isMyTurn ? (
+          <Canvas
+            canvasRef={canvasRef}
+            setOutgoingCanvasStream={setOutgoingCanvasStream}
+          />
+        ) : (
+          <Video srcObject={incomingCanvasStream} />
+        );
       default:
         return null;
     }
