@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -16,6 +16,8 @@ import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { useAudioCommunication } from "../../hooks/useAudioCommunication";
+import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
+import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
@@ -35,8 +37,8 @@ const RoomPage = () => {
   );
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
-
-  if (roomId === undefined) return <Navigate to="/" replace />;
+  const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  usePreventClose();
 
   const onInviteClick = () => {
     const inviteUrl = `${window.location.origin}/?invite=${roomId}`;
@@ -48,19 +50,8 @@ const RoomPage = () => {
 
   const onGameStartClick = () => {
     if (!isHost) return;
-    socket.emit("game-start", { gameMode: "catchMind" });
+    socket.emit("game-start", { gameMode });
   };
-
-  useEffect(() => {
-    const preventClose = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    window.addEventListener("beforeunload", preventClose);
-    return () => {
-      window.removeEventListener("beforeunload", preventClose);
-    };
-  }, []);
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
@@ -71,7 +62,7 @@ const RoomPage = () => {
     return () => {
       socket.off("game-start", gameStartListener);
     };
-  }, []);
+  }, [socket, navigate, setGameInfo]);
 
   useEffect(() => {
     const newJoinListener = (player: Player) => {
@@ -81,15 +72,20 @@ const RoomPage = () => {
     return () => {
       socket.off("new-join", newJoinListener);
     };
-  }, []);
+  }, [socket, setPlayers]);
 
-  return (
+  return roomId === undefined ? (
+    <Navigate to="/" replace />
+  ) : (
     <RoomPageLayout>
       <Logo />
       <RoomPageContentBox>
         <PlayerList maxPlayer={10} sizeType="large" />
         <RoomPageRightContentBox>
-          <GameModeSegmentedControl />
+          <GameModeSegmentedControl
+            selectedGameMode={gameMode}
+            setSelectedGameMode={setGameMode}
+          />
           <RoomPageButtonBox>
             <Button variant="medium" onClick={onInviteClick}>
               초대

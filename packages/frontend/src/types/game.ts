@@ -15,13 +15,18 @@ export interface GamePlayer extends Player {
 export interface GameInfo {
   gameMode: string;
   totalRound: number;
-  roundInfo: CatchMindRoundInfo;
+  roundInfo: CatchMindRoundInfo & GarticRoundInfo;
 }
 
 export interface CatchMindRoundInfo {
   roundTime: number;
   currentRound: number;
   turnPlayer: string;
+}
+
+export interface GarticRoundInfo {
+  roundTime: number;
+  currentRound: number;
 }
 
 type PlayerScoreMap = {
@@ -33,4 +38,9 @@ export interface CatchMindRoundEndInfo {
   suggestedWord: string;
   playerScoreMap: PlayerScoreMap;
   isLastRound: boolean;
+}
+
+export interface GarticPlayer extends Player {
+  isDone: boolean;
+  isMyResult: boolean;
 }

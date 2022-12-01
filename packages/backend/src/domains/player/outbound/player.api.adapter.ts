@@ -1,12 +1,13 @@
-import { RoomApiController } from "../../room/inbound/room.controller";
+// import { RoomApiController } from "../../room/inbound/room.controller";
+import { DomainConnecter } from "../../../utils/domainConnecter";
 
 import { PlayerApiPort } from "./player.port";
 
 export class PlayerApiAdapter implements PlayerApiPort {
-  roomController = RoomApiController;
+  connecter = DomainConnecter.getInstance();
 
   joinPlayer(peerId: string, roomId: string) {
-    RoomApiController.joinRoom({
+    this.connecter.call("room/join", {
       peerId,
       roomId,
     });
@@ -14,7 +15,7 @@ export class PlayerApiAdapter implements PlayerApiPort {
   }
 
   leavePlayer(peerId: string) {
-    RoomApiController.leaveRoom({ peerId });
+    this.connecter.call("room/leave", { peerId });
     return;
   }
 }

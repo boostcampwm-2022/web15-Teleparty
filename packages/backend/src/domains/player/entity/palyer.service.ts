@@ -1,26 +1,43 @@
 import { PlayerPort } from "../inbound/player.port";
 import {
   PlayerApiPort,
+  PlayerEvent,
   PlayerRepositoryDataPort,
 } from "../outbound/player.port";
 import { PlayerApiAdapter } from "../outbound/player.api.adapter";
 import { PlayerRepository } from "../outbound/player.repository";
+import { PlayerEventAdapter } from "../outbound/player.event.adapter";
+import { Socket } from "socket.io";
 
 export class PlayerService implements PlayerPort {
   playerApiAdapter: PlayerApiPort;
   playerRepository: PlayerRepositoryDataPort;
+  playerEventAdapter: PlayerEvent;
 
   constructor() {
     this.playerApiAdapter = new PlayerApiAdapter();
     this.playerRepository = new PlayerRepository();
+    this.playerEventAdapter = new PlayerEventAdapter();
   }
 
   createPlayer(
+    socket: Socket,
     peerId: string,
     userName: string,
     avata: string,
     roomId: string
   ) {
+    const checkPlayer = this.playerRepository.findOneByPeerId(peerId);
+
+    // 중복 입장 체크
+    if (checkPlayer) {
+      this.sendError(peerId, "이미 입장하였습니다.");
+      return;
+    }
+
+    // socket room 입장 처리
+    socket.join(roomId);
+
     const player = this.playerRepository.create(peerId, userName, avata);
 
     // roomController로 join 실행
@@ -39,5 +56,11 @@ export class PlayerService implements PlayerPort {
 
   getAllPlayer() {
     return this.playerRepository.findAll();
+  }
+
+  sendError(peerId: string, message: string) {
+    this.playerEventAdapter.error(peerId, {
+      message: message,
+    });
   }
 }

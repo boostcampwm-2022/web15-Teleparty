@@ -1,13 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
-import { Socket } from "socket.io-client";
-
-import {
+import type {
   Player,
   GamePlayer,
   CatchMindRoundInfo,
   CatchMindRoundEndInfo,
 } from "../types/game";
+import type { Socket } from "socket.io-client";
 
 type GameState = "inputKeyword" | "drawing" | "roundEnd" | "gameEnd";
 
@@ -21,14 +20,12 @@ export const useCatchMind = (
     useState<CatchMindRoundInfo>(initialRoundInfo);
   const [gameState, setGameState] = useState<GameState>("inputKeyword");
   const [gamePlayerList, setGamePlayerList] = useState<GamePlayer[]>(
-    playerList.map((player) => {
-      return {
-        ...player,
-        isCurrentTurn: player.peerId === initialRoundInfo.turnPlayer,
-        isReady: false,
-        score: 0,
-      } as GamePlayer;
-    })
+    playerList.map((player) => ({
+      ...player,
+      isCurrentTurn: player.peerId === initialRoundInfo.turnPlayer,
+      isReady: false,
+      score: 0,
+    }))
   );
   const [roundEndInfo, setRoundEndInfo] =
     useState<CatchMindRoundEndInfo | null>(null);
@@ -36,8 +33,8 @@ export const useCatchMind = (
     initialRoundInfo.turnPlayer === socket.id
   );
 
-  const initSocket = useCallback(() => {
-    socket.on("round-start", (roundInfo: CatchMindRoundInfo) => {
+  useEffect(() => {
+    const roundStartListener = (roundInfo: CatchMindRoundInfo) => {
       console.log("round start!!: ", roundInfo);
       const { turnPlayer } = roundInfo;
       setGameState("inputKeyword");
@@ -52,13 +49,11 @@ export const useCatchMind = (
           };
         })
       );
-    });
-
-    socket.on("draw-start", () => {
+    };
+    const drawStartListener = () => {
       setGameState("drawing");
-    });
-
-    socket.on("round-end", (roundEndInfo: CatchMindRoundEndInfo) => {
+    };
+    const roundEndListener = (roundEndInfo: CatchMindRoundEndInfo) => {
       const { playerScoreMap, isLastRound } = roundEndInfo;
       setGameState(isLastRound ? "gameEnd" : "roundEnd");
       setRoundEndInfo(roundEndInfo);
@@ -70,19 +65,24 @@ export const useCatchMind = (
           };
         })
       );
-    });
-
-    socket.on("round-ready", ({ peerId }: { peerId: string }) => {
+    };
+    const roundReadyListener = ({ peerId }: { peerId: string }) => {
       const player = gamePlayerList.find((player) => player.peerId === peerId);
       if (!player) return;
       player.isReady = !player.isReady;
       setGamePlayerList([...gamePlayerList]);
-    });
+    };
+    socket.on("round-start", roundStartListener);
+    socket.on("draw-start", drawStartListener);
+    socket.on("round-end", roundEndListener);
+    socket.on("round-ready", roundReadyListener);
+    return () => {
+      socket.off("round-start", roundStartListener);
+      socket.off("draw-start", drawStartListener);
+      socket.off("round-end", roundEndListener);
+      socket.off("round-ready", roundReadyListener);
+    };
   }, [gamePlayerList, socket]);
-
-  useEffect(() => {
-    initSocket();
-  }, [initSocket]);
 
   return { roundInfo, gameState, gamePlayerList, roundEndInfo, isMyTurn };
 };

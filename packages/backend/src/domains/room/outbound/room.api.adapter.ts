@@ -1,15 +1,11 @@
 import { RoomApiPort } from "./room.port";
-import { ChatInController } from "../../chat/inbound/chatIn.controller";
-import { PlayerApiController } from "../../player/inbound/player.controller";
-import { gameStart } from "../../game/inBound/catchMindInput.controller";
+import { DomainConnecter } from "../../../utils/domainConnecter";
 
 export class RoomApiAdapter implements RoomApiPort {
-  chatController: ChatInController = new ChatInController();
-
-  playerController: PlayerApiController = new PlayerApiController();
+  connecter = DomainConnecter.getInstance();
 
   chatting(peerId: string, roomId: string, message: string) {
-    this.chatController.send(message, peerId, roomId);
+    this.connecter.call("chat/send", { message, peerId, roomId });
   }
 
   gameStart(
@@ -24,7 +20,28 @@ export class RoomApiAdapter implements RoomApiPort {
 
     // if or switch로 거르기 -> game Mode;
 
-    gameStart(goalScore, players, roundTime, roomId, totalRound);
+    switch (gameMode) {
+      case "Garticphone":
+        this.connecter.call("garticphone/game-start", {
+          roomId,
+          roundTime,
+          players,
+        });
+        break;
+
+      case "CatchMind":
+        this.connecter.call("catchMind/game-start", {
+          goalScore,
+          players,
+          roundTime,
+          roomId,
+          totalRound,
+        });
+        break;
+
+      default:
+        break;
+    }
 
     // console.log(roomId, gameMode, "gameStart");
 
@@ -32,6 +49,6 @@ export class RoomApiAdapter implements RoomApiPort {
   }
 
   getAllPlayer() {
-    return this.playerController.getAllPlayer();
+    return this.connecter.call("player/get-all-players");
   }
 }
