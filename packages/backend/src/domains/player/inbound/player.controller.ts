@@ -32,17 +32,26 @@ router.get(
         roomId,
       });
 
+      console.log("player.controller", roomId);
+
       // 유효하지 않는 방 번호일 떄
       if (!room) {
+        console.log("player.controller", "유효하지 않음!!");
         roomId = createUUID();
       } else {
+        if (room.players.length === room.maxPlayer) {
+          playerService.sendError(socket.id, "방이 가득 찼습니다");
+        }
+
         // 접속이 불가능한 방일 때 ex) 게임 하고 있을 땐 못들어감
         if (!room.state) {
+          console.log("player.controller", "이미시작한방");
           playerService.sendError(socket.id, "이미 게임을 시작한 방입니다.");
           return;
         }
       }
     } else {
+      console.log("player.controller", "파라미터에 roomId  없음");
       roomId = createUUID();
     }
 
@@ -51,6 +60,8 @@ router.get(
 );
 
 router.get("disconnect", (socket: Socket) => {
+  console.log("disconnect", socket.id);
+
   playerService.leavePlayer(socket.id);
 });
 
