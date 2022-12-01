@@ -37,9 +37,6 @@ const Gartic = () => {
     garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
     false;
   const [keywordInput, setKeywordInput] = useState("");
-  const onButtonClick = () => {
-    buttonClickMap[gameState]();
-  };
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const keywordButtonClick = () => {
@@ -54,11 +51,19 @@ const Gartic = () => {
     setKeywordInput(e.target.value);
   };
 
+  const drawingButtonClick = () => {
+    if (isDone) {
+      socket.emit("draw-cancel");
+      return;
+    }
+    if (!canvasRef.current) return;
+    const img = canvasRef.current.toDataURL();
+    socket.emit("draw-input", { img });
+  };
+
   const buttonClickMap = {
     gameStart: keywordButtonClick,
-    drawing: () => {
-      return;
-    },
+    drawing: drawingButtonClick,
     inputKeyword: () => {
       return;
     },
@@ -115,7 +120,7 @@ const Gartic = () => {
         <Chat />
         <Button
           variant="large"
-          onClick={onButtonClick}
+          onClick={buttonClickMap[gameState]}
           disabled={
             (gameState === "gameStart" || gameState === "inputKeyword") &&
             !keywordInput
