@@ -80,7 +80,7 @@ const RoomPage = () => {
     <RoomPageLayout>
       <Logo />
       <RoomPageContentBox>
-        <PlayerList maxPlayer={10} players={players} sizeType="large" />
+        <PlayerList maxPlayer={10} sizeType="large" />
         <RoomPageRightContentBox>
           <GameModeSegmentedControl
             selectedGameMode={gameMode}
