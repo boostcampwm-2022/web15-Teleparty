@@ -27,6 +27,7 @@ import {
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
+import Video from "../Video/Video.component";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -105,7 +106,7 @@ const CatchMind = () => {
               setOutgoingCanvasStream={setOutgoingCanvasStream}
             />
           );
-        return <CanvasLayout />;
+        return <Video srcObject={incomingCanvasStream} />;
       case "gameEnd":
         return (
           <Rank
@@ -118,9 +119,9 @@ const CatchMind = () => {
           />
         );
       case "inputKeyword":
-        return <CanvasLayout />;
+        return <Video srcObject={incomingCanvasStream} />;
       case "roundEnd":
-        return <CanvasLayout />;
+        return <Video srcObject={incomingCanvasStream} />;
       default:
         return null;
     }
