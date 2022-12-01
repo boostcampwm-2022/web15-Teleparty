@@ -84,15 +84,19 @@ export class GarticphoneService implements GarticphonePort {
       const target = game.getAlbumOwner(player.id, game.currentRound);
       if (!target) return;
 
-      const lastData = target.getLastAlbumData();
-      const type = game.currentRoundType;
-      const data = {
-        keyword: type === "keyword" ? lastData : null,
-        img: type === "painting" ? lastData : null,
-        roundInfo,
-      };
+      if (target.isExit) {
+        this.setAlbumData(game.roomId, player.id, "");
+      } else {
+        const lastData = target.getLastAlbumData();
+        const type = game.currentRoundType;
+        const data = {
+          keyword: type === "keyword" ? lastData : null,
+          img: type === "painting" ? lastData : null,
+          roundInfo,
+        };
 
-      this.eventEmitter.roundstart(player.id, type, data);
+        this.eventEmitter.roundstart(player.id, type, data);
+      }
     });
 
     const timerId = setTimeout(() => this.timeOut(game.roomId), game.roundTime);

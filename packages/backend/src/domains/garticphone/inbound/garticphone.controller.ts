@@ -66,4 +66,11 @@ connecter.register(
   }
 );
 
+connecter.register(
+  "garticphone/player-quit",
+  ({ roomId, playerId }: { roomId: string; playerId: string }) => {
+    service.exitGame(roomId, playerId);
+  }
+);
+
 export const garticRouter = router.router;
