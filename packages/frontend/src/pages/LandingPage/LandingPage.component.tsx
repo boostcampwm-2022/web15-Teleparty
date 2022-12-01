@@ -63,7 +63,14 @@ const LandingPage = () => {
     const joinListener = (joinResponse: JoinResponse) => {
       const { roomId, players } = joinResponse;
       setRoomId(roomId);
-      setPlayers((prev) => [...prev, ...players]);
+      setPlayers((prev) => [
+        ...prev,
+        ...players.map((player) => ({
+          ...player,
+          isMicOn: true,
+          isAudioDetected: false,
+        })),
+      ]);
       navigate(`/room`, { replace: true });
     };
     socket.on("join", joinListener);
