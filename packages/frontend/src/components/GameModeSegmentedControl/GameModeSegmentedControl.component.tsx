@@ -14,10 +14,8 @@ import {
 } from "../../constants/game-mode";
 
 interface GameModeSegmentedControlProps {
-  selectedGameMode: "catchMind" | "garticPhone";
-  setSelectedGameMode: React.Dispatch<
-    React.SetStateAction<"catchMind" | "garticPhone">
-  >;
+  selectedGameMode: GameMode;
+  setSelectedGameMode: React.Dispatch<React.SetStateAction<GameMode>>;
 }
 
 const GameModeSegmentedControl = ({
