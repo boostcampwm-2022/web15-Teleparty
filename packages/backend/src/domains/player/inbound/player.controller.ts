@@ -36,6 +36,12 @@ router.get(
       if (!room) {
         roomId = createUUID();
       } else {
+        // 이미 방이 최대 인원인 경우
+        if (room.players.length === room.maxPlayer) {
+          playerService.sendError(socket.id, "방이 가득 찼습니다.");
+          return;
+        }
+
         // 접속이 불가능한 방일 때 ex) 게임 하고 있을 땐 못들어감
         if (!room.state) {
           playerService.sendError(socket.id, "이미 게임을 시작한 방입니다.");
