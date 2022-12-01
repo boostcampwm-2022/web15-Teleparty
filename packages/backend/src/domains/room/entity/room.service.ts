@@ -21,24 +21,15 @@ export class RoomService implements RoomPort {
     this.roomEventEmitter = new RoomEventAdapter("123123");
   }
 
-  join(peerId: string, roomId?: string) {
+  // roomId는 playerController에서 처리하기 때문에 무조건 넘어옴
+  join(peerId: string, roomId: string) {
     const room = this.roomRepository.findOneByRoomId(roomId);
     const players = this.roomApiAdapter.getAllPlayer();
 
+    // 생성된 방이 없는 경우
     if (!room) {
-      const rooms = this.roomRepository.findAll();
-      let newRoom: Room;
-
-      if (rooms.length === 0) {
-        newRoom = this.roomRepository.create("123123"); // 추후 uuid 같은 걸로 바꾸기
-        newRoom.host = peerId;
-      } else {
-        newRoom = rooms[0];
-        if (!newRoom.state) {
-          // 입장 불가 상태 일 때
-          return;
-        }
-      }
+      const newRoom: Room = this.roomRepository.create(roomId);
+      newRoom.host = peerId;
 
       newRoom.players.push(peerId);
       this.roomEventEmitter = new RoomEventAdapter(newRoom.roomId);
@@ -61,11 +52,6 @@ export class RoomService implements RoomPort {
         peerId
       );
 
-      return;
-    }
-
-    if (!room.state) {
-      // 입장 불가 상태 일 때
       return;
     }
 

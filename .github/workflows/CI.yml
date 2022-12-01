@@ -7,7 +7,7 @@ on:
     branches: [dev]
 
 jobs:
-  backend_tests:
+  backend_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +19,13 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
+      - name: Get Backend File Change
+        id: changed-files-backend
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ./packages/backend/**
+
       - name: Cache node modules
         uses: actions/cache@v3
         id: dependency_cache
@@ -27,13 +34,15 @@ jobs:
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Dependencies
-        if: steps.dependency_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-backend.outputs.any_changed == 'true' && steps.dependency_cache.outputs.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Backend Lint Verification
+        if: steps.changed-files-backend.outputs.any_changed == 'true'
         run: cd ./packages/backend && npm run lint
 
       - name: Run Backend Test
+        if: steps.changed-files-backend.outputs.any_changed == 'true'
         run: cd ./packages/backend && npm run test
 
   frontend_test:
@@ -47,6 +56,13 @@ jobs:
         with:
           node-version: ${{ secrets.NODE_VERSION }}
 
+      - name: Get Frontend File Change
+        id: changed-files-frontend
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ./packages/frontend/**
+
       - name: Cache node modules
         uses: actions/cache@v3
         id: dependency_cache
@@ -55,14 +71,17 @@ jobs:
           key: npm-packages-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Dependencies
-        if: steps.dependency_cache.outputs.cache-hit != 'true'
+        if: steps.changed-files-frontend.outputs.any_changed == 'true' && steps.dependency_cache.outputs.cache-hit != 'true'
         run: npm install
 
       - name: Frontend Lint Verification
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run lint
 
       - name: Run Frontend Test
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run test
 
       - name: Frontend Build Test
+        if: steps.changed-files-frontend.outputs.any_changed == 'true'
         run: cd ./packages/frontend && npm run build

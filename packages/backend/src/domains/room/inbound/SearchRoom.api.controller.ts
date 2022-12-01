@@ -1,16 +1,19 @@
 import { SearchRoomApiPort } from "./searchRoom.api.port";
 import { SerchRoomApiService } from "../entity/searchRoom.service";
 
-export class SearchRoomController {
-  roomAPI: SearchRoomApiPort = new SerchRoomApiService();
-  getRoomByPlayerId(id: string) {
-    return this.roomAPI.searchById(id);
-  }
-  getRoomByRoomId(roomId: string) {
-    if (roomId) {
-      return this.roomAPI.getRoomByRoomId(roomId);
-    }
+import { DomainConnecter } from "../../../utils/domainConnecter";
 
-    return undefined;
+const connecter = DomainConnecter.getInstance();
+const roomAPI: SearchRoomApiPort = new SerchRoomApiService();
+
+connecter.register("room/get-by-playerId", ({ id }: { id: string }) => {
+  return roomAPI.searchById(id);
+});
+
+connecter.register("room/get-by-roomId", ({ roomId }: { roomId: string }) => {
+  if (roomId) {
+    return roomAPI.getRoomByRoomId(roomId);
   }
-}
+
+  return undefined;
+});
