@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 interface ChatRowProps {
-  isMine?: boolean;
+  isRightSide?: boolean;
 }
 
 interface ChatVariant {
@@ -38,9 +38,14 @@ const ChatLayout = styled.div<ChatVariant>`
 const ChatRow = styled.div<ChatRowProps>`
   display: flex;
   width: 100%;
-  justify-content: ${({ isMine }) => (isMine ? "right" : "left")};
+  justify-content: ${({ isRightSide }) => (isRightSide ? "right" : "left")};
   align-items: flex-start;
   gap: 0.25rem;
+  ${({ isRightSide }) =>
+    isRightSide &&
+    css`
+      flex-direction: row-reverse;
+    `}
 `;
 
 const ChatTextLayout = styled.div<{ isFirst?: boolean }>`
@@ -52,15 +57,15 @@ const ChatTextLayout = styled.div<{ isFirst?: boolean }>`
 
 const ChatText = styled.span<ChatTextProps>`
   width: fit-content;
-  max-width: ${({ isMine }) => (isMine ? "15rem" : "13rem")};
+  max-width: ${({ isRightSide }) => (isRightSide ? "15rem" : "13rem")};
   box-shadow: ${({ theme: { shadows } }) => shadows.medium};
   padding: 1rem;
-  border-radius: ${({ isFirst, isMine }) =>
-    isFirst ? (isMine ? "20px 0 20px 20px" : "0 20px 20px 20px") : "20px"};
-  background-color: ${({ theme: { colors }, isMine }) =>
-    isMine ? colors.primaryDark : colors.primaryLight};
-  color: ${({ isMine, theme: { colors } }) =>
-    isMine ? colors.white : colors.primaryDark};
+  border-radius: ${({ isFirst, isRightSide }) =>
+    isFirst ? (isRightSide ? "20px 0 20px 20px" : "0 20px 20px 20px") : "20px"};
+  background-color: ${({ theme: { colors }, isRightSide }) =>
+    isRightSide ? colors.primaryDark : colors.primaryLight};
+  color: ${({ isRightSide, theme: { colors } }) =>
+    isRightSide ? colors.white : colors.primaryDark};
   word-break: break-all;
   line-height: 22px;
 

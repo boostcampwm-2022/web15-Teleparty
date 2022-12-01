@@ -1,7 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useAtomValue } from "jotai";
 
+import { GarticResultContentLayout, GarticResultLayout } from "./Gartic.styles";
+
+import { CANVAS_SIZE } from "../../constants/canvas";
 import useGartic from "../../hooks/useGartic";
 import {
   GamePageContentBox,
@@ -9,6 +12,7 @@ import {
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { socketAtom } from "../../store/socket";
+import Album from "../Album/Album.component";
 import Canvas from "../Canvas/Canvas.component";
 import { CanvasLayout } from "../Canvas/Canvas.styles";
 import Chat from "../Chat/Chat.component";
@@ -64,9 +68,7 @@ const Gartic = () => {
   const buttonClickMap = {
     gameStart: keywordButtonClick,
     drawing: drawingButtonClick,
-    inputKeyword: () => {
-      return;
-    },
+    inputKeyword: keywordButtonClick,
     gameEnd: () => {
       return;
     },
@@ -74,14 +76,12 @@ const Gartic = () => {
   const headerElementMap = {
     gameStart: "제시어를 입력해주세요",
     drawing: `제시어: ${keyword}`,
-    inputKeyword: "",
-    gameEnd: "",
+    inputKeyword: "그림을 보고 제시어를 입력해주세요.",
   };
   const centerElementMap = {
     gameStart: <CanvasLayout />,
     drawing: <Canvas canvasRef={canvasRef} />,
-    inputKeyword: null,
-    gameEnd: null,
+    inputKeyword: <CanvasLayout ref={canvasRef} />,
   };
   const footerElementMap = {
     gameStart: (
@@ -95,9 +95,36 @@ const Gartic = () => {
       </KeywordInputLayout>
     ),
     drawing: <PaintToolBox />,
-    inputKeyword: null,
-    gameEnd: null,
+    inputKeyword: (
+      <KeywordInputLayout>
+        <Input
+          disabled={isDone}
+          variant="medium"
+          placeholder="제시어를 입력하세요."
+          onChange={onKeywordInputChange}
+        />
+      </KeywordInputLayout>
+    ),
   };
+
+  useEffect(() => {
+    setKeywordInput("");
+  }, [gameState]);
+
+  useEffect(() => {
+    const context = canvasRef.current?.getContext("2d");
+    const convertedImage = new Image();
+    convertedImage.src = image;
+    convertedImage.onload = () => {
+      context?.drawImage(
+        convertedImage,
+        0,
+        0,
+        CANVAS_SIZE.WIDTH,
+        CANVAS_SIZE.HEIGHT
+      );
+    };
+  }, [image]);
 
   return gameState !== "gameEnd" ? (
     <>
@@ -130,7 +157,20 @@ const Gartic = () => {
         </Button>
       </GamePageContentBox>
     </>
-  ) : null;
+  ) : (
+    <GarticResultLayout>
+      <Logo height={80} />
+      <GarticResultContentLayout>
+        <GamePageContentBox>
+          <PlayerList maxPlayer={10} sizeType="large" />
+        </GamePageContentBox>
+        <GamePageContentBox>
+          <Album album={album} isLastAlbum={isLastAlbum} />
+          <Chat variant="horizontal" />
+        </GamePageContentBox>
+      </GarticResultContentLayout>
+    </GarticResultLayout>
+  );
 };
 
 export default Gartic;

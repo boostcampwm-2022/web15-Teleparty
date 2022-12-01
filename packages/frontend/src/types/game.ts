@@ -4,6 +4,7 @@ export interface Player {
   avatarURL: string;
   isHost: boolean;
   isMicOn: boolean;
+  isAudioDetected: boolean;
 }
 
 export interface GamePlayer extends Player {
@@ -43,4 +44,10 @@ export interface CatchMindRoundEndInfo {
 export interface GarticPlayer extends Player {
   isDone: boolean;
   isMyResult: boolean;
+}
+
+export interface AlbumType {
+  peerId: string;
+  keyword?: string;
+  img?: string;
 }

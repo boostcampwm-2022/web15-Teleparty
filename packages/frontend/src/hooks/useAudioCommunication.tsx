@@ -2,7 +2,10 @@ import { useEffect, useRef } from "react";
 
 import Peer, { MediaConnection } from "peerjs";
 
-import { audioStreamManager } from "../utils/audioStreamMap";
+import {
+  AudioDetectListener,
+  audioStreamManager,
+} from "../utils/audioStreamMap";
 
 const getAudioMediaStream = () => {
   return navigator.mediaDevices.getUserMedia({
@@ -15,7 +18,8 @@ export let voiceInputMediaStream: MediaStream | null = null;
 
 export const useAudioCommunication = (
   peer: Peer | null,
-  peerIdList: string[]
+  peerIdList: string[],
+  audioDetectListener?: AudioDetectListener
 ) => {
   const mediaConnectionSet = useRef<Set<MediaConnection>>(new Set());
   const connectedPeerIdSet = useRef<Set<string>>(new Set());
@@ -27,19 +31,22 @@ export const useAudioCommunication = (
     mediaConnectionSet.current.add(mediaConnection);
 
     mediaConnection.on("stream", (stream) => {
-      audioStreamManager.add(id, stream);
+      audioStreamManager.addStream(id, stream);
+      if (audioDetectListener) {
+        audioStreamManager.addAudioDetectListener(id, audioDetectListener);
+      }
       connectedPeerIdSet.current.add(id);
     });
 
     mediaConnection.on("close", () => {
       mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.remove(id);
+      audioStreamManager.removeStream(id);
       connectedPeerIdSet.current.delete(id);
     });
 
     mediaConnection.on("error", (error) => {
       mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.remove(id);
+      audioStreamManager.removeStream(id);
       connectedPeerIdSet.current.delete(id);
       console.error(error);
     });
@@ -79,7 +86,7 @@ export const useAudioCommunication = (
       mediaConnection.close();
     }
     for (const connectedPeerId of connectedPeerIdSet.current) {
-      audioStreamManager.remove(connectedPeerId);
+      audioStreamManager.removeStream(connectedPeerId);
     }
   };
 
@@ -87,8 +94,17 @@ export const useAudioCommunication = (
   // 2. connect audio channel with all peers
   useEffect(() => {
     const initAudioConnection = async () => {
+      if (!peer) return;
       if (!voiceInputMediaStream)
         voiceInputMediaStream = await getAudioMediaStream();
+
+      audioStreamManager.addStream(peer.id, voiceInputMediaStream, {
+        autoPlay: false,
+      });
+      if (audioDetectListener) {
+        audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
+      }
+
       initPeer();
       connectAudioWithPeers();
     };

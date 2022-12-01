@@ -16,17 +16,17 @@ interface ChatBubbleProps extends ChatTextProps {
 const ChatBubble = ({
   children,
   isFirst,
-  isMine,
+  isRightSide,
   username,
   variant,
 }: ChatBubbleProps) => {
-  const isNotMyFirstChat = !isMine && isFirst;
+  const isNotMyFirstChat = !isRightSide && isFirst;
   return (
-    <ChatRow isMine={isMine}>
+    <ChatRow isRightSide={isRightSide}>
       {isNotMyFirstChat && <Avatar variant="small" />}
       <ChatTextLayout isFirst={isFirst}>
         {isNotMyFirstChat && <ChatUsernameText>{username}</ChatUsernameText>}
-        <ChatText variant={variant} isMine={isMine} isFirst={isFirst}>
+        <ChatText variant={variant} isRightSide={isRightSide} isFirst={isFirst}>
           {children}
         </ChatText>
       </ChatTextLayout>

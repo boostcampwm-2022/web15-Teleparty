@@ -12,16 +12,12 @@ import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
 import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
-
-const CANVAS_SIZE = {
-  WIDTH: 1036,
-  HEIGHT: 644,
-};
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
