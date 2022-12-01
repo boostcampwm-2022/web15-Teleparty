@@ -20,13 +20,29 @@ export class RoomApiAdapter implements RoomApiPort {
 
     // if or switch로 거르기 -> game Mode;
 
-    this.connecter.call("catchMind/game-start", {
-      goalScore,
-      players,
-      roundTime,
-      roomId,
-      totalRound,
-    });
+    switch (gameMode) {
+      case "Garticphone":
+        this.connecter.call("garticphone/game-start", {
+          roomId,
+          roundTime,
+          players,
+        });
+        break;
+
+      case "CatchMind":
+        this.connecter.call("catchMind/game-start", {
+          goalScore,
+          players,
+          roundTime,
+          roomId,
+          totalRound,
+        });
+        break;
+
+      default:
+        break;
+    }
+
     // console.log(roomId, gameMode, "gameStart");
 
     return;

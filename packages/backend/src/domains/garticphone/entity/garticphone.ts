@@ -46,11 +46,13 @@ export class Garticphone {
   players: Player[];
   timerId: NodeJS.Timer | undefined;
   roundTime: number;
+  roomId: string;
 
-  constructor(players: string[], roundTime: number) {
+  constructor(players: string[], roundTime: number, roomId: string) {
     this.players = players.map((playerId) => new Player(playerId));
     this.totalRound = players.length;
     this.roundTime = roundTime;
+    this.roomId = roomId;
     this.currentRound = 1;
   }
 
@@ -60,6 +62,13 @@ export class Garticphone {
 
   get isAllInputed() {
     return this.players.every((player) => player.isInputEnded);
+  }
+
+  get roundData() {
+    return {
+      roundTime: this.roundTime,
+      currentRound: this.currentRound,
+    };
   }
 
   cancelAlbumData(playerId: string) {
@@ -90,7 +99,7 @@ export class Garticphone {
     return this.players[currentIdx];
   }
 
-  getAlbum(playerId: string) {
+  getAlbum(playerId: string): AlbumData[] | undefined {
     const player = this.players.find((player) => player.id === playerId);
 
     if (!player) return;
