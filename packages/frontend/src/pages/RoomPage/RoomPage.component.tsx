@@ -42,7 +42,7 @@ const RoomPage = () => {
     id,
     isAudioDetected
   ) => {
-    setPlayers(
+    setPlayers((players) =>
       players.map((player) => ({
         ...player,
         isAudioDetected:
