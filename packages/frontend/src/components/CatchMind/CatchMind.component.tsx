@@ -153,7 +153,7 @@ const CatchMind = () => {
         <GamePageRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
         </GamePageRoundParagraph>
-        <PlayerList maxPlayer={10} players={gamePlayerList} sizeType="medium" />
+        <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
       <GamePageContentBox>
         <Logo height={80} />

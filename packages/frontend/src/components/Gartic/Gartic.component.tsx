@@ -98,11 +98,7 @@ const Gartic = () => {
         <GamePageRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
         </GamePageRoundParagraph>
-        <PlayerList
-          maxPlayer={10}
-          players={garticPlayerList}
-          sizeType="medium"
-        />
+        <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
       <GamePageContentBox>
         <Logo height={80} />

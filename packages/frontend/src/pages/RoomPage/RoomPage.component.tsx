@@ -16,6 +16,7 @@ import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
+import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import usePreventClose from "../../hooks/usePreventClose";
 import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { gameInfoAtom } from "../../store/game";
