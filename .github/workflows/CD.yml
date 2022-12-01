@@ -1,75 +1,12 @@
 name: deployment CI/CD
 
 on:
-  push:
-    branches: [main]
   pull_request:
     types: [closed]
     branches: [main]
 
 jobs:
-  backend_tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ secrets.NODE_VERSION }}
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: dependency_cache
-        with:
-          path: ./node_modules
-          key: npm-packages-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install Dependencies
-        if: steps.dependency_cache.outputs.cache-hit != 'true'
-        run: npm install
-
-      - name: Backend Lint Verification
-        run: cd ./packages/backend && npm run lint
-
-      - name: Run Backend Test
-        run: cd ./packages/backend && npm run test
-
-  frontend_test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
-
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ secrets.NODE_VERSION }}
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        id: dependency_cache
-        with:
-          path: ./node_modules
-          key: npm-packages-${{ hashFiles('**/package-lock.json') }}
-
-      - name: Install Dependencies
-        if: steps.dependency_cache.outputs.cache-hit != 'true'
-        run: npm install
-
-      - name: Frontend Lint Verification
-        run: cd ./packages/frontend && npm run lint
-
-      - name: Run Frontend Test
-        run: cd ./packages/frontend && npm run test
-
-      - name: Frontend Build Test
-        run: cd ./packages/frontend && npm run build
-
   deploy:
-    needs: [frontend_test, backend_tests]
     name: client, server Deploy
     runs-on: ubuntu-latest
     steps:
@@ -88,7 +25,7 @@ jobs:
             git pull
             npm install
             cd packages/frontend
-            npm run build && mv -f dist/* ../backend/public
+            npm run build
 
             cd ../backend
             pm2 kill
