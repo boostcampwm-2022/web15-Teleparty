@@ -33,7 +33,7 @@ export class GarticphoneService implements GarticphonePort {
 
     const player = game.nextPlayer();
     if (!player) return;
-
+    console.log(player);
     const AlbumData = {
       peerId: player.id,
       isLast: game.isLastAlbum,

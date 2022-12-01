@@ -28,7 +28,6 @@ export class Player {
 
   setAlbumData(index: number, data: AlbumData) {
     this.album[index] = data;
-    this.isInputEnded = true;
   }
 
   cancelAlbumData(index: number) {
@@ -108,17 +107,20 @@ export class Garticphone {
   setAlbumData(data: string, playerId: string) {
     const albumData = new AlbumData(this.currentRoundType, playerId, data);
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
+    const player = this.players.find((player) => player.id === playerId);
 
-    if (!ownerPlayer) return;
+    if (!ownerPlayer || !player) return;
 
-    ownerPlayer.setAlbumData(this.currentRound, albumData);
+    ownerPlayer.setAlbumData(this.currentRound - 1, albumData);
+    player.isInputEnded = true;
   }
 
   getAlbumOwner(playerId: string, round: number): Player | undefined {
     const initailIdx = this.players.findIndex(
       (player) => player.id === playerId
     );
-    if (!initailIdx) return;
+
+    if (initailIdx === -1) return;
 
     const currentIdx = (initailIdx + round - 1) % this.players.length;
 

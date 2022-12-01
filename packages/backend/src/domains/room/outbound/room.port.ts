@@ -46,7 +46,7 @@ export interface RoomRepositoryDataPort {
   findAll: () => Room[];
   updateHostByRoomId: (roomId: string, peerId: string) => void;
   updateStateByRoomId: (roomId: string, state: boolean) => void;
-  updateGameModeByRoomId: (roomId: string, gameMode: string) => void;
+  updateGameModeByRoomId: (roomId: string, gameMode: GAME_MODE) => void;
   deleteByRoomId: (roomId: string) => void;
   deletePlayerofRoomByPeerId: (peerId: string) => void;
 }
