@@ -9,7 +9,8 @@ import {
   PlayerInfo,
 } from "../outbound/room.port";
 import { RoomRepository } from "../outbound/room.repository";
-import { Room } from "./room.entity";
+import { Room, GAME_MODE } from "./room.entity";
+import { Player } from "../../player/entity/player.entitiy";
 
 export class RoomService implements RoomPort {
   roomRepository: RoomRepositoryDataPort;
@@ -105,12 +106,16 @@ export class RoomService implements RoomPort {
   leave(peerId: string) {
     const room = this.roomRepository.findOneByPeerId(peerId);
 
+    if (!room) {
+      return;
+    }
+
     if (room && !room.state) {
       this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
     }
 
-    if (room?.host === peerId) {
-      if (room?.players.length < 2) {
+    if (room.host === peerId) {
+      if (room.players.length < 2) {
         this.roomRepository.deleteByRoomId(room.roomId);
         return;
       }
@@ -125,18 +130,20 @@ export class RoomService implements RoomPort {
     this.roomEventEmitter = new RoomEventAdapter(room?.roomId as string);
 
     this.roomEventEmitter.quitPlayer({
-      roomId: room?.roomId as string,
-      players: players.map((player) => {
-        if (room?.players.includes(player.peerId)) {
-          return {
-            peerId: player.peerId,
-            userName: player.userName,
-            avataURL: player.avata,
-            isHost: player.peerId === room?.host,
-            isMicOn: player.isMicOn,
-          };
-        }
-      }) as PlayerInfo[],
+      roomId: room.roomId as string,
+      players: room.players.map((peerId) => {
+        const player = players.find((player) => {
+          return player.peerId === peerId;
+        }) as Player;
+
+        return {
+          peerId: player.peerId,
+          userName: player.userName,
+          avataURL: player.avata,
+          isHost: player.peerId === room.host,
+          isMicOn: player.isMicOn,
+        };
+      }),
     });
 
     // console.log({
@@ -156,7 +163,7 @@ export class RoomService implements RoomPort {
 
     return;
   }
-  gameStart(peerId: string, gameMode: string) {
+  gameStart(peerId: string, gameMode: GAME_MODE) {
     const room = this.checkHostByPeerId(peerId);
     if (room) {
       this.roomRepository.updateGameModeByRoomId(room.roomId, gameMode);
@@ -183,7 +190,7 @@ export class RoomService implements RoomPort {
 
     return;
   }
-  chooseMode(peerId: string, gameMode: string) {
+  chooseMode(peerId: string, gameMode: GAME_MODE) {
     const room = this.checkHostByPeerId(peerId);
     if (room) {
       this.roomRepository.updateGameModeByRoomId(room.roomId, gameMode);

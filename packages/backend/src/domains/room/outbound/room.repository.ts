@@ -1,4 +1,4 @@
-import { Room } from "../entity/room.entity";
+import { GAME_MODE, Room } from "../entity/room.entity";
 import { RoomRepositoryDataPort } from "./room.port";
 
 export class RoomRepository implements RoomRepositoryDataPort {
@@ -45,7 +45,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
     });
   }
 
-  updateGameModeByRoomId(roomId: string, gameMode: string) {
+  updateGameModeByRoomId(roomId: string, gameMode: GAME_MODE) {
     RoomRepository.rooms = RoomRepository.rooms.map((room) => {
       if (room.roomId === roomId) {
         room.gameMode = gameMode;

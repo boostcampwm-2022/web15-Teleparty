@@ -9,19 +9,32 @@ export interface GarticStartData {
   roundInfo: GarticRoundInfo;
 }
 
+export interface GarticAlbum {
+  peerId: string;
+  isLast: boolean;
+  result: { peerId: string; keyword?: string | null; img?: string | null }[];
+}
+
+export interface GarticRoundData {
+  keyword: string | null;
+  img: string | null;
+  roundInfo: GarticRoundInfo;
+}
+
 export interface GarticphoneEventPort {
   gameStart: (roomId: string, data: GarticStartData) => void;
   keywordInput: (roomId: string, playerId: string) => void;
   keywordCancel: (roomId: string, playerId: string) => void;
+  drawInput: (roomId: string, playerId: string) => void;
+  drawCancel: (roomId: string, playerId: string) => void;
   timeOut: (roomId: string) => void;
-  drawStart: (
+
+  roundstart: (
     playerId: string,
-    keyword: string,
-    roundInfo: GarticRoundInfo
+    roundType: "painting" | "keyword",
+    data: GarticRoundData
   ) => void;
-  keywordInputStart: (
-    playerId: string,
-    img: string,
-    roundInfo: GarticRoundInfo
-  ) => void;
+  gameEnd: (roomId: string) => void;
+  sendAlbum: (roomId: string, data: GarticAlbum) => void;
+  playerExit: (roomId: string, playerId: string) => void;
 }

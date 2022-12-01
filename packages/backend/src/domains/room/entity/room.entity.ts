@@ -1,9 +1,11 @@
+export type GAME_MODE = "CatchMind" | "Garticphone" | "";
+
 export class Room {
   roomId: string;
   players: string[];
   host: string;
   state: boolean;
-  gameMode: string;
+  gameMode: GAME_MODE;
   totalRound: number;
   roundTime: number;
   goalScore: number;
