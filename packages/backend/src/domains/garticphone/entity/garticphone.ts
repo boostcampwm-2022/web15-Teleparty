@@ -1,3 +1,5 @@
+import Crypto from "crypto";
+
 type DataType = "keyword" | "painting";
 
 class AlbumData {
@@ -33,6 +35,10 @@ class Player {
     }
 
     this.isInputEnded = false;
+  }
+
+  getLastAlbumData() {
+    return this.album.at(-1)?.data || "";
   }
 
   getAlbum() {
@@ -71,6 +77,10 @@ export class Garticphone {
     };
   }
 
+  get isGameEnded() {
+    return this.totalRound === this.currentRound;
+  }
+
   cancelAlbumData(playerId: string) {
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
 
@@ -105,6 +115,10 @@ export class Garticphone {
     if (!player) return;
 
     return player.album;
+  }
+
+  getPlayerList() {
+    return this.players;
   }
 
   roundEnd() {
