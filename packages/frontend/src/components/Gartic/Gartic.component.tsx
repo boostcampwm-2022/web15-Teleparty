@@ -2,9 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useAtomValue } from "jotai";
 
-import { GarticResultContentLayout, GarticResultLayout } from "./Gartic.styles";
+import {
+  GarticDrawImage,
+  GarticResultContentLayout,
+  GarticResultLayout,
+} from "./Gartic.styles";
 
-import { CANVAS_SIZE } from "../../constants/canvas";
 import useGartic from "../../hooks/useGartic";
 import {
   GamePageContentBox,
@@ -41,6 +44,7 @@ const Gartic = () => {
     garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
     false;
   const [keywordInput, setKeywordInput] = useState("");
+  const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const keywordButtonClick = () => {
@@ -53,6 +57,7 @@ const Gartic = () => {
 
   const onKeywordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeywordInput(e.target.value);
+    keywordInputRef.current = e.target.value;
   };
 
   const drawingButtonClick = () => {
@@ -69,9 +74,6 @@ const Gartic = () => {
     gameStart: keywordButtonClick,
     drawing: drawingButtonClick,
     inputKeyword: keywordButtonClick,
-    gameEnd: () => {
-      return;
-    },
   };
   const headerElementMap = {
     gameStart: "제시어를 입력해주세요",
@@ -81,7 +83,7 @@ const Gartic = () => {
   const centerElementMap = {
     gameStart: <CanvasLayout />,
     drawing: <Canvas canvasRef={canvasRef} />,
-    inputKeyword: <CanvasLayout ref={canvasRef} />,
+    inputKeyword: <GarticDrawImage src={image} alt="draw" width={1036} />,
   };
   const footerElementMap = {
     gameStart: (
@@ -112,19 +114,20 @@ const Gartic = () => {
   }, [gameState]);
 
   useEffect(() => {
-    const context = canvasRef.current?.getContext("2d");
-    const convertedImage = new Image();
-    convertedImage.src = image;
-    convertedImage.onload = () => {
-      context?.drawImage(
-        convertedImage,
-        0,
-        0,
-        CANVAS_SIZE.WIDTH,
-        CANVAS_SIZE.HEIGHT
-      );
+    const timeOutListener = () => {
+      if (gameState === "gameStart" || gameState === "inputKeyword")
+        socket.emit("input-keyword", { keyword: keywordInputRef.current });
+      if (gameState === "drawing") {
+        if (!canvasRef.current) return;
+        const img = canvasRef.current.toDataURL();
+        socket.emit("draw-input", { img });
+      }
     };
-  }, [image]);
+    socket.on("time-out", timeOutListener);
+    return () => {
+      socket.off("time-out", timeOutListener);
+    };
+  }, [socket, gameState]);
 
   return gameState !== "gameEnd" ? (
     <>
@@ -143,7 +146,7 @@ const Gartic = () => {
         />
       </GamePageContentBox>
       <GamePageContentBox>
-        <MoonTimer radius={50} secondTime={roundTime} />
+        <MoonTimer radius={60} secondTime={roundTime} />
         <Chat />
         <Button
           variant="large"
