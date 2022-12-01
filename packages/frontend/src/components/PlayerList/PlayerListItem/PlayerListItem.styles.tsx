@@ -5,11 +5,17 @@ interface PlayerListItemLayoutProps {
   state: "normal" | "ready" | "turn";
 }
 
-export const AvatarContainer = styled.div`
+interface AvatarContainerProps {
+  spotlight?: boolean;
+}
+
+export const AvatarContainer = styled.div<AvatarContainerProps>`
   position: relative;
   width: 40px;
   height: 40px;
-  border: 2px solid ${(props) => props.theme.colors.primary};
+  border: 2px solid
+    ${(props) =>
+      props.spotlight ? props.theme.colors.green : props.theme.colors.primary};
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.5);
 
@@ -38,7 +44,7 @@ export const Score = styled.p`
   color: ${(props) => props.theme.colors.primary};
 `;
 
-export const IconConatiner = styled.div`
+export const AudioToggleButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,6 +52,14 @@ export const IconConatiner = styled.div`
   height: 36px;
   border: 3px solid ${(props) => props.theme.colors.primary};
   border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  opacity: 0.75;
+  transition: opacity 300ms ease;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 1;
+  }
 `;
 
 export const RightSection = styled.div`

@@ -1,4 +1,16 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+
+export const PaintBoardCenterElementMixin = css`
+  width: 1036px;
+  height: 644px;
+  border: 2px solid ${(props) => props.theme.colors.primary};
+  border-radius: 10px;
+  background-color: ${(props) => props.theme.colors.white};
+`;
+
+export const PaintBoardEmptyCenterElement = styled.div`
+  ${PaintBoardCenterElementMixin}
+`;
 
 export const PaintBoardHeader = styled.header`
   padding: 12px;

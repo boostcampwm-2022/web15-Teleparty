@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { SetStateAction, useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
@@ -12,19 +12,19 @@ import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
 import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
-const CANVAS_PROPS = {
-  WIDTH: 1036,
-  HEIGHT: 644,
-};
+interface CanvasProps {
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  setOutgoingCanvasStream?: React.Dispatch<SetStateAction<MediaStream | null>>;
+}
 
-const Canvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -34,11 +34,25 @@ const Canvas = () => {
   const thickness = useAtomValue(thicknessAtom);
 
   useEffect(() => {
+    if (!canvasRef.current || !setOutgoingCanvasStream) return;
+    setOutgoingCanvasStream(canvasRef.current.captureStream());
+
+    return () => {
+      setOutgoingCanvasStream(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
     const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
+    if (!canvas || !ctx) return;
+
+    const { width, height } = canvas;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-  }, []);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width, height);
+  }, [canvasRef]);
 
   const captureCanvas = () => {
     const canvas = canvasRef.current;
@@ -55,7 +69,7 @@ const Canvas = () => {
     if (!canvas || !ctx) return;
 
     // clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw saved image to canvas
     if (canvasImageData.current) {
@@ -139,9 +153,12 @@ const Canvas = () => {
 
   const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+      const canvas = canvasRef.current;
       const ctx = canvasRef.current?.getContext("2d");
+      if (!canvas || !ctx) return;
+
+      const { width, height } = canvas;
       shapeList.current.pop();
-      ctx?.clearRect(0, 0, CANVAS_PROPS.WIDTH, CANVAS_PROPS.HEIGHT);
       canvasImageData.current = null;
       drawAllShapes();
     }
@@ -149,8 +166,8 @@ const Canvas = () => {
 
   return (
     <CanvasLayout
-      width={CANVAS_PROPS.WIDTH}
-      height={CANVAS_PROPS.HEIGHT}
+      width={CANVAS_SIZE.WIDTH}
+      height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
       onMouseDown={drawStart}
       onMouseMove={draw}

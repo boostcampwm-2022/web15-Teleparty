@@ -11,3 +11,11 @@ export interface PlayerRepositoryDataPort {
   findOneByPeerId: (peerId: string) => Player | undefined;
   findAll: () => Player[];
 }
+
+export interface ErrorMsg {
+  message: string;
+}
+
+export interface PlayerEvent {
+  error: (peerId: string, msg: ErrorMsg) => void;
+}

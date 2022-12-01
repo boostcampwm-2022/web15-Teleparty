@@ -1,20 +1,22 @@
 import { CatchMind, Player } from "./catchMind";
-import { CatchMindEventAdapter } from "../outBound/CatchMindEvent.Adapter";
-import { CatchMindEvent } from "../outBound/catchMindEvent.port";
-import { CatchMindRepositoryDataPort } from "../outBound/catchMind.repository.port";
-import { CatchMindInputPort } from "../inBound/CatchMindInput.port";
-import { CatchMindRepository } from "../outBound/catchMind.repository";
-import { CatchMindToRoomAdapter } from "../outBound/catchMindToRoom.adapter";
-import { CatchMindToRoom } from "../outBound/catchMindToRoom.port";
+import { CatchMindEventAdapter } from "../outbound/CatchMindEvent.Adapter";
+import { CatchMindEventPort } from "../outbound/catchMindEvent.port";
+import { CatchMindRepositoryDataPort } from "../outbound/catchMind.repository.port";
+import { CatchMindInputPort } from "../inbound/CatchMindInput.port";
+import { CatchMindRepository } from "../outbound/catchMind.repository";
+import { CatchMindToRoomAdapter } from "../outbound/catchMindToRoom.adapter";
+import { CatchMindToRoom } from "../outbound/catchMindToRoom.port";
+
+const MSEC_PER_SEC = 1000;
 
 export class CatchMindService implements CatchMindInputPort {
-  eventEmitter: CatchMindEvent = new CatchMindEventAdapter();
+  eventEmitter: CatchMindEventPort = new CatchMindEventAdapter();
   repository: CatchMindRepositoryDataPort = new CatchMindRepository();
   roomAPI: CatchMindToRoom = new CatchMindToRoomAdapter();
 
   gameStart(
     goalScore: number,
-    players: Player[],
+    players: string[],
     roundTime: number,
     roomId: string,
     totalRound: number
@@ -32,6 +34,7 @@ export class CatchMindService implements CatchMindInputPort {
       totalRound,
       roundInfo,
     });
+
     this.repository.save(game);
   }
 
@@ -44,7 +47,7 @@ export class CatchMindService implements CatchMindInputPort {
 
     game.timerId = setTimeout(() => {
       this.roundEnd(game, null);
-    }, game.roundTime);
+    }, game.roundTime * MSEC_PER_SEC);
 
     this.repository.save(game);
   }
@@ -63,7 +66,6 @@ export class CatchMindService implements CatchMindInputPort {
     });
 
     if (game.isGameEnded) {
-      this.repository.delete(game.roomId);
       this.roomAPI.gameEnded(game.roomId);
     } else {
       this.repository.save(game);
@@ -105,6 +107,36 @@ export class CatchMindService implements CatchMindInputPort {
   roundStart(game: CatchMind) {
     game.nextTurn();
     this.eventEmitter.roundStart(game.roomId, game.roundInfo);
+    this.repository.save(game);
+  }
+
+  exitGame(roomId: string, playerId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    const result = game.exitGame(playerId);
+
+    if (result) {
+      this.eventEmitter.playerExit(game.roomId, playerId);
+    }
+
+    if (game.isAllExit) {
+      this.roomAPI.gameEnded(game.roomId);
+      this.repository.delete(game.roomId);
+    } else {
+      this.repository.save(game);
+    }
+  }
+  quitDuringGame(roomId: string, playerId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    if (game.turnPlayer.id === playerId) {
+      clearTimeout(game.timerId);
+      this.roundEnd(game, null);
+    }
+    game.removePlayer(playerId);
+
     this.repository.save(game);
   }
 }

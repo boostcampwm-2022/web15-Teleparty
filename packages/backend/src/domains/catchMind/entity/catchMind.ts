@@ -2,6 +2,7 @@ export interface Player {
   id: string;
   score: number;
   isReady: boolean;
+  isExit: boolean;
 }
 
 export class CatchMind {
@@ -20,12 +21,14 @@ export class CatchMind {
 
   constructor(
     goalScore: number,
-    players: Player[],
+    players: string[],
     roundTime: number,
     roomId: string,
     totalRound: number
   ) {
-    this.players = players;
+    this.players = players.map((playerId) => {
+      return { id: playerId, score: 0, isReady: false, isExit: false };
+    });
     this.goalScore = goalScore;
     this.keyword = "";
     this.timerId = undefined;
@@ -60,6 +63,10 @@ export class CatchMind {
     return this.players.every((player) => player.isReady);
   }
 
+  get isAllExit() {
+    return this.players.every((player) => player.isExit);
+  }
+
   nextTurn() {
     this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
     this.currentRound++;
@@ -91,8 +98,22 @@ export class CatchMind {
   }
 
   ready(id: string) {
-    const player = this.players.find((player) => player.id == id);
+    const player = this.players.find((player) => player.id === id);
 
     if (player) player.isReady = true;
+  }
+
+  exitGame(id: string) {
+    const player = this.players.find((player) => player.id === id);
+
+    if (player && !player.isExit) {
+      player.isExit = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+  removePlayer(playerId: string) {
+    this.players = this.players.filter((player) => player.id !== playerId);
   }
 }

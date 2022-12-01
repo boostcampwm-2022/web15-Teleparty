@@ -7,11 +7,9 @@ import {
 } from "./room.port";
 
 export class RoomEventAdapter implements RoomEvent {
-  roomId: string;
   emitter: SocketEmitter;
 
-  constructor(roomId: string) {
-    this.roomId = roomId;
+  constructor() {
     this.emitter = new SocketEmitter();
   }
 
@@ -28,13 +26,13 @@ export class RoomEventAdapter implements RoomEvent {
     return;
   }
 
-  modeChange(data: GameMode) {
+  modeChange(data: GameMode, roomId: string) {
     // 방에 있는 모든 사람에게 보내기
-    this.emitter.broadcastRoom(this.roomId, "mode-change", data);
+    this.emitter.broadcastRoom(roomId, "mode-change", data);
     // socket.emit('mode-change', data);
   }
 
-  quitPlayer(data: JoinPlayerTotalInfo) {
-    this.emitter.broadcastRoom(this.roomId, "player-quit", data);
+  quitPlayer(data: JoinPlayerTotalInfo, roomId: string) {
+    this.emitter.broadcastRoom(roomId, "player-quit", data);
   }
 }
