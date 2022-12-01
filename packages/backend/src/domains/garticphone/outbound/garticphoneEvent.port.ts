@@ -24,4 +24,5 @@ export interface GarticphoneEventPort {
     img: string,
     roundInfo: GarticRoundInfo
   ) => void;
+  gameEnd: (roomId: string) => void;
 }

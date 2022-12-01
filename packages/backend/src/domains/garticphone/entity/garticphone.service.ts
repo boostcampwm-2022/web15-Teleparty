@@ -39,7 +39,7 @@ export class GarticphoneService implements GarticphonePort {
       clearTimeout(game.timerId);
 
       if (game.isGameEnded) {
-        return;
+        this.eventEmitter.gameEnd(roomId);
       } else {
         game.roundEnd();
         this.roundStart(game);

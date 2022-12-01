@@ -37,4 +37,8 @@ export class GarticphoneEventAdapter implements GarticphoneEventPort {
       roundInfo,
     });
   }
+
+  gameEnd(roomId: string) {
+    this.emitter.broadcastRoom(roomId, "game-end");
+  }
 }
