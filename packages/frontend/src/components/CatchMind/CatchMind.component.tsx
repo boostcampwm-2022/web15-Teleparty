@@ -15,6 +15,7 @@ import PaintBoard from "../../components/PaintBoard/PaintBoard.component";
 import {
   KeywordInputLayout,
   PaintBoardButtonLayout,
+  PaintBoardEmptyCenterElement,
 } from "../../components/PaintBoard/PaintBoard.styles";
 import PaintToolBox from "../../components/PaintToolBox/PaintToolBox.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
@@ -119,7 +120,7 @@ const CatchMind = () => {
           />
         );
       case "inputKeyword":
-        return <Video srcObject={incomingCanvasStream} />;
+        return <PaintBoardEmptyCenterElement />;
       case "roundEnd":
         return isMyTurn ? (
           <Canvas

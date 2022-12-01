@@ -8,6 +8,10 @@ export const PaintBoardCenterElementMixin = css`
   background-color: ${(props) => props.theme.colors.white};
 `;
 
+export const PaintBoardEmptyCenterElement = styled.div`
+  ${PaintBoardCenterElementMixin}
+`;
+
 export const PaintBoardHeader = styled.header`
   padding: 12px;
   border-radius: 10px;
