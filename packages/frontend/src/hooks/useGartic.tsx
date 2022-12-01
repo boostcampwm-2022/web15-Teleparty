@@ -5,20 +5,22 @@ import { useAtomValue } from "jotai";
 import { gameInfoAtom } from "../store/game";
 import { playersAtom } from "../store/players";
 import { socketAtom } from "../store/socket";
-import { GameInfo, GarticPlayer, GarticRoundInfo } from "../types/game";
+
+import type {
+  AlbumType,
+  GameInfo,
+  GarticPlayer,
+  GarticRoundInfo,
+} from "../types/game";
 
 type GarticGameState = "gameStart" | "drawing" | "inputKeyword" | "gameEnd";
 
 interface AlbumResponse {
   peerId: string;
   isLast: boolean;
-  result: Album[];
+  result: AlbumType[];
 }
-interface Album {
-  peerId: string;
-  keyword?: string;
-  img?: string;
-}
+
 interface DrawStartResponse {
   keyword: string;
   roundInfo: GarticRoundInfo;
@@ -34,7 +36,7 @@ const useGartic = () => {
   const gameInfo = useAtomValue(gameInfoAtom);
   const [keyword, setKeyword] = useState("");
   const [image, setImage] = useState("");
-  const [album, setAlbum] = useState<Album[]>([]);
+  const [album, setAlbum] = useState<AlbumType[]>([]);
   const [roundInfo, setRoundInfo] = useState<GarticRoundInfo>(
     gameInfo.roundInfo
   );
