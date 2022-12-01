@@ -15,9 +15,11 @@ import { Button } from "../../components/common/Button";
 import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
+import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
+import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -27,7 +29,12 @@ import type { GameInfo, Player } from "../../types/game";
 const RoomPage = () => {
   const roomId = useAtomValue(roomIdAtom);
   const socket = useAtomValue(socketAtom);
+  const peer = useAtomValue(peerAtom);
   const [players, setPlayers] = useAtom(playersAtom);
+  useAudioCommunication(
+    peer,
+    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id)
+  );
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
