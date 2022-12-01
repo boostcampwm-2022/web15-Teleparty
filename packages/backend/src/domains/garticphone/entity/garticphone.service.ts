@@ -1,4 +1,4 @@
-import { GarticphonePort } from "../inbound/garticphone.port";
+import { GarticphonePort, RoundType } from "../inbound/garticphone.port";
 import { GarticphoneRepository } from "../outbound/garticphone.repository";
 import { GarticphoneRepositoryDataPort } from "../outbound/garitcphone.repository.port";
 import { Garticphone } from "./garticphone";
@@ -7,6 +7,7 @@ import { GarticphoneEventAdapter } from "../outbound/garticphoneEvent.adapter";
 import { GarticphoneToRoom } from "../outbound/garticphoneToRoom.port";
 import { GarticphoneToRoomAdapter } from "../outbound/garticphoneToRoom.adapter";
 
+const MSEC_PER_SEC = 1000;
 export class GarticphoneService implements GarticphonePort {
   repository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
   eventEmitter: GarticphoneEventPort = new GarticphoneEventAdapter();
@@ -21,18 +22,23 @@ export class GarticphoneService implements GarticphonePort {
       roundInfo: game.roundData,
     });
 
-    const timerId = setTimeout(() => this.timeOut(roomId), roundTime);
+    const timerId = setTimeout(
+      () => this.timeOut(roomId),
+      roundTime * MSEC_PER_SEC
+    );
 
     game.setTimer(timerId);
+    console.log(GarticphoneRepository.games);
     this.repository.save(game);
   }
 
   sendAlbum(roomId: string, playerId: string) {
     const game = this.repository.findById(roomId);
-    if (!game) return;
+    if (!game || !game.isHost(playerId)) return;
 
     const player = game.nextPlayer();
-    if (!player || game.isHost(playerId)) return;
+    console.log("send album", playerId);
+    if (!player) return;
 
     const AlbumData = {
       peerId: player.id,
@@ -55,11 +61,17 @@ export class GarticphoneService implements GarticphonePort {
     this.eventEmitter.timeOut(roomId);
   }
 
-  setAlbumData(roomId: string, playerId: string, data: string) {
+  setAlbumData(
+    roomId: string,
+    playerId: string,
+    data: string,
+    type: RoundType
+  ) {
     const game = this.repository.findById(roomId);
-    if (!game) return;
+    if (!game || game.currentRoundType !== type) return;
 
     game.setAlbumData(data, playerId);
+
     if (game.currentRoundType === "keyword") {
       this.eventEmitter.keywordInput(roomId, playerId);
     } else {
@@ -71,31 +83,31 @@ export class GarticphoneService implements GarticphonePort {
 
       if (game.isGameEnded) {
         this.eventEmitter.gameEnd(roomId);
+        this.repository.save(game);
       } else {
         game.roundEnd();
         this.roundStart(game);
       }
     }
-
-    this.repository.save(game);
   }
 
   roundStart(game: Garticphone) {
     const players = game.getPlayerList();
     const roundInfo = game.roundData;
-
+    console.log(game, roundInfo);
     players.forEach((player) => {
       const target = game.getAlbumOwner(player.id, game.currentRound);
       if (!target) return;
 
       if (target.isExit) {
-        this.setAlbumData(game.roomId, player.id, "");
+        this.setAlbumData(game.roomId, player.id, "", game.currentRoundType);
       } else {
         const lastData = target.getLastAlbumData();
+
         const type = game.currentRoundType;
         const data = {
-          keyword: type === "keyword" ? lastData : null,
-          img: type === "painting" ? lastData : null,
+          keyword: type !== "keyword" ? lastData : null,
+          img: type !== "painting" ? lastData : null,
           roundInfo,
         };
 
@@ -103,7 +115,10 @@ export class GarticphoneService implements GarticphonePort {
       }
     });
 
-    const timerId = setTimeout(() => this.timeOut(game.roomId), game.roundTime);
+    const timerId = setTimeout(
+      () => this.timeOut(game.roomId),
+      game.roundTime * MSEC_PER_SEC
+    );
     game.setTimer(timerId);
 
     this.repository.save(game);
@@ -114,6 +129,11 @@ export class GarticphoneService implements GarticphonePort {
     if (!game) return;
 
     game.cancelAlbumData(playerId);
+    console.log(
+      game.players.map((player) => {
+        return { id: player.id, input: player.isInputEnded };
+      })
+    );
     if (game.currentRoundType === "keyword") {
       this.eventEmitter.keywordCancel(roomId, playerId);
     } else {
