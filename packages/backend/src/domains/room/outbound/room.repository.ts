@@ -6,6 +6,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
 
   create(roomId: string) {
     const room = new Room(roomId);
+    console.log(RoomRepository.rooms.map((room) => room.roomId));
     RoomRepository.rooms.push(room);
     return room;
   }
@@ -28,7 +29,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   updateHostByRoomId(roomId: string, peerId: string) {
-    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
+    RoomRepository.rooms.forEach((room) => {
       if (room.roomId === roomId) {
         room.host = peerId;
       }
@@ -37,7 +38,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   updateStateByRoomId(roomId: string, state: boolean) {
-    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
+    RoomRepository.rooms.forEach((room) => {
       if (room.roomId === roomId) {
         room.state = state;
       }
@@ -46,7 +47,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   updateGameModeByRoomId(roomId: string, gameMode: GAME_MODE) {
-    RoomRepository.rooms = RoomRepository.rooms.map((room) => {
+    RoomRepository.rooms.forEach((room) => {
       if (room.roomId === roomId) {
         room.gameMode = gameMode;
       }
@@ -55,9 +56,13 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   deleteByRoomId(roomId: string) {
-    RoomRepository.rooms = RoomRepository.rooms.filter((room) => {
-      room.roomId !== roomId;
-    });
+    console.log("delete roomId", roomId);
+    console.log(RoomRepository.rooms.map((room) => room.roomId));
+
+    RoomRepository.rooms = RoomRepository.rooms.filter(
+      (room) => room.roomId !== roomId
+    );
+    console.log(RoomRepository.rooms.map((room) => room.roomId));
   }
 
   deletePlayerofRoomByPeerId(peerId: string) {
