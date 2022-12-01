@@ -24,7 +24,7 @@ interface JoinResponse {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [roomId, setRoomId] = useAtom(roomIdAtom);
+  const setRoomId = useSetAtom(roomIdAtom);
   const socket = useAtomValue(socketAtom);
   const nickname = useAtomValue(nicknameAtom);
   const nicknameError = useAtomValue(nicknameErrorAtom);
@@ -38,7 +38,7 @@ const LandingPage = () => {
     setRoomId(invite);
 
     // avatar 추가 필요
-    socket.emit("join", { userName: nickname, avatar: "", roomId });
+    socket.emit("join", { userName: nickname, avatar: "", roomId: invite });
   };
 
   const runAfterSocketConnected = (callback: () => void) => {
