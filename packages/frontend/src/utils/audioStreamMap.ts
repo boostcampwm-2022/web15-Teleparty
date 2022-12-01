@@ -55,6 +55,24 @@ class AudioStreamManager {
 
     return true;
   }
+
+  toggleMute(id: string) {
+    const realTimeAudio = this.map.get(id);
+    if (!realTimeAudio) return false;
+    const { stream } = realTimeAudio;
+
+    stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
+
+    return true;
+  }
+
+  getMute(id: string) {
+    const realTimeAudio = this.map.get(id);
+    if (!realTimeAudio) return false;
+    const { stream } = realTimeAudio;
+
+    return !stream.getAudioTracks()[0].enabled;
+  }
 }
 
 export const audioStreamManager = new AudioStreamManager();
