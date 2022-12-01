@@ -35,6 +35,7 @@ export interface RoomApiPort {
     goalScore: number
   ) => void;
   chatting: (peerId: string, roomId: string, message: string) => void;
+  playerQuit: (gameMode: string, roomId: string, playerId: string) => void;
   getAllPlayer: () => Player[];
 }
 
