@@ -65,9 +65,7 @@ const Gartic = () => {
   const buttonClickMap = {
     gameStart: keywordButtonClick,
     drawing: drawingButtonClick,
-    inputKeyword: () => {
-      return;
-    },
+    inputKeyword: keywordButtonClick,
     gameEnd: () => {
       return;
     },
@@ -96,9 +94,22 @@ const Gartic = () => {
       </KeywordInputLayout>
     ),
     drawing: <PaintToolBox />,
-    inputKeyword: null,
+    inputKeyword: (
+      <KeywordInputLayout>
+        <Input
+          disabled={isDone}
+          variant="medium"
+          placeholder="제시어를 입력하세요."
+          onChange={onKeywordInputChange}
+        />
+      </KeywordInputLayout>
+    ),
     gameEnd: null,
   };
+
+  useEffect(() => {
+    setKeywordInput("");
+  }, [gameState]);
 
   useEffect(() => {
     const context = canvasRef.current?.getContext("2d");
