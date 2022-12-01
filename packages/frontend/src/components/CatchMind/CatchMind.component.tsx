@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
@@ -34,6 +34,7 @@ const CatchMind = () => {
   const socket = useAtomValue(socketAtom);
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const { gamePlayerList, gameState, isMyTurn, roundEndInfo, roundInfo } =
     useCatchMind(socket, players, gameInfo.roundInfo);
@@ -89,7 +90,7 @@ const CatchMind = () => {
   const getCenterElement = () => {
     switch (gameState) {
       case "drawing":
-        if (isMyTurn) return <Canvas />;
+        if (isMyTurn) return <Canvas canvasRef={canvasRef} />;
         return <CanvasLayout />;
       case "gameEnd":
         return (
