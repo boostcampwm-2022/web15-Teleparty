@@ -18,7 +18,6 @@ import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import usePreventClose from "../../hooks/usePreventClose";
-import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
@@ -26,6 +25,7 @@ import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 
 import type { GameInfo, Player } from "../../types/game";
+import type { MediaConnection } from "peerjs";
 
 const RoomPage = () => {
   const roomId = useAtomValue(roomIdAtom);
