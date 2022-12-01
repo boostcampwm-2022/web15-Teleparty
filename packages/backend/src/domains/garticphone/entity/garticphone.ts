@@ -51,6 +51,14 @@ export class Player {
   }
 }
 
+const getPrime = () => {
+  const primeArrayBuffer = Crypto.generatePrimeSync(
+    Math.floor(Math.random() * 7) + 2
+  );
+  const primeArray = new Uint8Array(primeArrayBuffer);
+  return primeArray[0];
+};
+
 export class Garticphone {
   totalRound: number;
   currentRound: number;
@@ -59,6 +67,7 @@ export class Garticphone {
   roundTime: number;
   roomId: string;
   sendIdx: number;
+  orderSeed: number;
 
   constructor(players: string[], roundTime: number, roomId: string) {
     this.players = players.map((playerId) => new Player(playerId));
@@ -67,6 +76,7 @@ export class Garticphone {
     this.roomId = roomId;
     this.currentRound = 1;
     this.sendIdx = 0;
+    this.orderSeed = getPrime();
   }
 
   get currentRoundType() {
@@ -96,6 +106,9 @@ export class Garticphone {
     return this.players.every((player) => player.isExit);
   }
 
+  isHost(playerId: string) {
+    return this.players[0].id === playerId;
+  }
   cancelAlbumData(playerId: string) {
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
 
@@ -122,7 +135,8 @@ export class Garticphone {
 
     if (initailIdx === -1) return;
 
-    const currentIdx = (initailIdx + round - 1) % this.players.length;
+    const currentIdx =
+      (initailIdx + (round - 1) * this.orderSeed) % this.players.length;
 
     return this.players[currentIdx];
   }

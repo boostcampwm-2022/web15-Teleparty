@@ -27,13 +27,13 @@ export class GarticphoneService implements GarticphonePort {
     this.repository.save(game);
   }
 
-  sendAlbum(roomId: string) {
+  sendAlbum(roomId: string, playerId: string) {
     const game = this.repository.findById(roomId);
     if (!game) return;
 
     const player = game.nextPlayer();
-    if (!player) return;
-    console.log(player);
+    if (!player || game.isHost(playerId)) return;
+
     const AlbumData = {
       peerId: player.id,
       isLast: game.isLastAlbum,

@@ -42,7 +42,7 @@ router.get("keyword-cancel", (socket: Socket) => {
 
 router.get("request-album", (socket: Socket) => {
   const room = searchRoom(socket.id);
-  if (room) service.sendAlbum(room.roomId);
+  if (room) service.sendAlbum(room.roomId, socket.id);
 });
 
 router.get("quit-game", (socket: Socket) => {
