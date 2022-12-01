@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useAtomValue } from "jotai";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
 import useGartic from "../../hooks/useGartic";
 import {
   GamePageContentBox,
@@ -74,13 +75,13 @@ const Gartic = () => {
   const headerElementMap = {
     gameStart: "제시어를 입력해주세요",
     drawing: `제시어: ${keyword}`,
-    inputKeyword: "",
+    inputKeyword: "그림을 보고 제시어를 입력해주세요.",
     gameEnd: "",
   };
   const centerElementMap = {
     gameStart: <CanvasLayout />,
     drawing: <Canvas canvasRef={canvasRef} />,
-    inputKeyword: null,
+    inputKeyword: <CanvasLayout ref={canvasRef} />,
     gameEnd: null,
   };
   const footerElementMap = {
@@ -98,6 +99,21 @@ const Gartic = () => {
     inputKeyword: null,
     gameEnd: null,
   };
+
+  useEffect(() => {
+    const context = canvasRef.current?.getContext("2d");
+    const convertedImage = new Image();
+    convertedImage.src = image;
+    convertedImage.onload = () => {
+      context?.drawImage(
+        convertedImage,
+        0,
+        0,
+        CANVAS_SIZE.WIDTH,
+        CANVAS_SIZE.HEIGHT
+      );
+    };
+  }, [image]);
 
   return gameState !== "gameEnd" ? (
     <>
