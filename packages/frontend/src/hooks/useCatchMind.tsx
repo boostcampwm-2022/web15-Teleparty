@@ -161,7 +161,7 @@ export const useCatchMind = (
     connectToPlayersToSendMyCanvasStream();
 
     return clearAllMediaConnection;
-  }, [outgoingCanvasStream, connectToPlayersToSendMyCanvasStream]);
+  }, [outgoingCanvasStream]);
 
   return {
     roundInfo,

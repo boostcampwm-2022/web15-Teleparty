@@ -11,7 +11,6 @@ const Video = ({ srcObject }: VideoProps) => {
 
   useEffect(() => {
     if (!videoRef.current) return;
-
     videoRef.current.srcObject = srcObject;
   }, [srcObject]);
 

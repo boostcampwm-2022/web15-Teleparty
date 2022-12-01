@@ -121,7 +121,14 @@ const CatchMind = () => {
       case "inputKeyword":
         return <Video srcObject={incomingCanvasStream} />;
       case "roundEnd":
-        return <Video srcObject={incomingCanvasStream} />;
+        return isMyTurn ? (
+          <Canvas
+            canvasRef={canvasRef}
+            setOutgoingCanvasStream={setOutgoingCanvasStream}
+          />
+        ) : (
+          <Video srcObject={incomingCanvasStream} />
+        );
       default:
         return null;
     }
