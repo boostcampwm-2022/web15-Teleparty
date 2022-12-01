@@ -7,6 +7,8 @@ import { CatchMindRepository } from "../outbound/catchMind.repository";
 import { CatchMindToRoomAdapter } from "../outbound/catchMindToRoom.adapter";
 import { CatchMindToRoom } from "../outbound/catchMindToRoom.port";
 
+const MSEC_PER_SEC = 1000;
+
 export class CatchMindService implements CatchMindInputPort {
   eventEmitter: CatchMindEventPort = new CatchMindEventAdapter();
   repository: CatchMindRepositoryDataPort = new CatchMindRepository();
@@ -45,7 +47,7 @@ export class CatchMindService implements CatchMindInputPort {
 
     game.timerId = setTimeout(() => {
       this.roundEnd(game, null);
-    }, game.roundTime);
+    }, game.roundTime * MSEC_PER_SEC);
 
     this.repository.save(game);
   }
