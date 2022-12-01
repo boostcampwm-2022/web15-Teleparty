@@ -60,7 +60,11 @@ export class GarticphoneService implements GarticphonePort {
     if (!game) return;
 
     game.setAlbumData(data, playerId);
-    this.eventEmitter.keywordInput(roomId, playerId);
+    if (game.currentRoundType === "keyword") {
+      this.eventEmitter.keywordInput(roomId, playerId);
+    } else {
+      this.eventEmitter.drawInput(roomId, playerId);
+    }
 
     if (game.isAllInputed) {
       clearTimeout(game.timerId);
@@ -110,7 +114,11 @@ export class GarticphoneService implements GarticphonePort {
     if (!game) return;
 
     game.cancelAlbumData(playerId);
-    this.eventEmitter.keywordCancel(roomId, playerId);
+    if (game.currentRoundType === "keyword") {
+      this.eventEmitter.keywordCancel(roomId, playerId);
+    } else {
+      this.eventEmitter.drawCancel(roomId, playerId);
+    }
 
     this.repository.save(game);
   }

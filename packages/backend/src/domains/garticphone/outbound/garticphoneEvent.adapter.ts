@@ -24,6 +24,14 @@ export class GarticphoneEventAdapter implements GarticphoneEventPort {
     this.emitter.broadcastRoom(roomId, "keyword-cancel", { peerId: playerId });
   }
 
+  drawInput(roomId: string, playerId: string) {
+    this.emitter.broadcastRoom(roomId, "draw-input", { peerId: playerId });
+  }
+
+  drawCancel(roomId: string, playerId: string) {
+    this.emitter.broadcastRoom(roomId, "draw-cancel", { peerId: playerId });
+  }
+
   timeOut(roomId: string) {
     this.emitter.broadcastRoom(roomId, "time-out");
   }

@@ -25,6 +25,8 @@ export interface GarticphoneEventPort {
   gameStart: (roomId: string, data: GarticStartData) => void;
   keywordInput: (roomId: string, playerId: string) => void;
   keywordCancel: (roomId: string, playerId: string) => void;
+  drawInput: (roomId: string, playerId: string) => void;
+  drawCancel: (roomId: string, playerId: string) => void;
   timeOut: (roomId: string) => void;
 
   roundstart: (
