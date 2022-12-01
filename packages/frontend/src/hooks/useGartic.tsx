@@ -52,10 +52,18 @@ const useGartic = () => {
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
+      console.log("gameStart:", gameStartResponse);
+      setGarticPlayerList((prev) =>
+        prev.map((player) => ({ ...player, isDone: false }))
+      );
       setGameState("gameStart");
       setRoundInfo(gameStartResponse.roundInfo);
     };
     const drawStartListener = ({ keyword, roundInfo }: DrawStartResponse) => {
+      setGarticPlayerList((prev) =>
+        prev.map((player) => ({ ...player, isDone: false }))
+      );
+      console.log("drawStart:", keyword, roundInfo);
       setKeyword(keyword);
       setRoundInfo(roundInfo);
       setGameState("drawing");
@@ -64,12 +72,17 @@ const useGartic = () => {
       img,
       roundInfo,
     }: KeywordInputStartResponse) => {
+      console.log("keywordInputStart", img, roundInfo);
+      setGarticPlayerList((prev) =>
+        prev.map((player) => ({ ...player, isDone: false }))
+      );
       setImage(img);
       setRoundInfo(roundInfo);
       setGameState("inputKeyword");
     };
     const gameEndListener = () => {
       setGameState("gameEnd");
+      socket.emit("request-album");
     };
     const setDoneOrNot = (peerId: string, isDone: boolean) => {
       setGarticPlayerList((prev) => {
@@ -82,12 +95,15 @@ const useGartic = () => {
       });
     };
     const inputDoneListener = ({ peerId }: { peerId: string }) => {
+      console.log("input done");
       setDoneOrNot(peerId, true);
     };
     const inputCancelListener = ({ peerId }: { peerId: string }) => {
+      console.log("input cancel");
       setDoneOrNot(peerId, false);
     };
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
+      console.log("album:", peerId, isLast, result);
       setGarticPlayerList((prev) => {
         const copiedList = [...prev];
         const convertMyResultToDone = copiedList.map((player) =>
@@ -113,7 +129,6 @@ const useGartic = () => {
     socket.on("keyword-cancel", inputCancelListener);
     socket.on("draw-input", inputDoneListener);
     socket.on("draw-cancel", inputCancelListener);
-    socket.on("game-end", gameEndListener);
     socket.on("album", albumListener);
     return () => {
       socket.off("game-start", gameStartListener);
@@ -124,7 +139,6 @@ const useGartic = () => {
       socket.off("keyword-cancel", inputCancelListener);
       socket.off("draw-input", inputDoneListener);
       socket.off("draw-cancel", inputCancelListener);
-      socket.off("game-end", gameEndListener);
       socket.off("album", albumListener);
     };
   }, [socket]);
