@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import { useAtomValue } from "jotai";
 
@@ -9,6 +9,7 @@ import {
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { socketAtom } from "../../store/socket";
+import Canvas from "../Canvas/Canvas.component";
 import { CanvasLayout } from "../Canvas/Canvas.styles";
 import Chat from "../Chat/Chat.component";
 import { Button } from "../common/Button";
@@ -17,6 +18,7 @@ import { Logo } from "../Logo/Logo.component";
 import MoonTimer from "../MoonTimer/MoonTimer.component";
 import PaintBoard from "../PaintBoard/PaintBoard.component";
 import { KeywordInputLayout } from "../PaintBoard/PaintBoard.styles";
+import PaintToolBox from "../PaintToolBox/PaintToolBox.component";
 import PlayerList from "../PlayerList/PlayerList.component";
 
 const Gartic = () => {
@@ -35,10 +37,10 @@ const Gartic = () => {
     garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
     false;
   const [keywordInput, setKeywordInput] = useState("");
-
   const onButtonClick = () => {
     buttonClickMap[gameState]();
   };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const keywordButtonClick = () => {
     if (isDone) {
@@ -72,7 +74,7 @@ const Gartic = () => {
   };
   const centerElementMap = {
     gameStart: <CanvasLayout />,
-    drawing: null,
+    drawing: <Canvas canvasRef={canvasRef} />,
     inputKeyword: null,
     gameEnd: null,
   };
@@ -87,7 +89,7 @@ const Gartic = () => {
         />
       </KeywordInputLayout>
     ),
-    drawing: null,
+    drawing: <PaintToolBox />,
     inputKeyword: null,
     gameEnd: null,
   };

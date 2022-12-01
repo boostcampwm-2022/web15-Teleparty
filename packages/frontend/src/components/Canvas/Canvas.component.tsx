@@ -18,13 +18,16 @@ import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
-const CANVAS_PROPS = {
+const CANVAS_SIZE = {
   WIDTH: 1036,
   HEIGHT: 644,
 };
 
-const Canvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+interface CanvasProps {
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+}
+
+const Canvas = ({ canvasRef }: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -38,7 +41,7 @@ const Canvas = () => {
     if (!ctx) return;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-  }, []);
+  }, [canvasRef]);
 
   const captureCanvas = () => {
     const canvas = canvasRef.current;
@@ -141,7 +144,7 @@ const Canvas = () => {
     if ((e.metaKey || e.ctrlKey) && e.key === "z") {
       const ctx = canvasRef.current?.getContext("2d");
       shapeList.current.pop();
-      ctx?.clearRect(0, 0, CANVAS_PROPS.WIDTH, CANVAS_PROPS.HEIGHT);
+      ctx?.clearRect(0, 0, CANVAS_SIZE.WIDTH, CANVAS_SIZE.HEIGHT);
       canvasImageData.current = null;
       drawAllShapes();
     }
@@ -149,8 +152,8 @@ const Canvas = () => {
 
   return (
     <CanvasLayout
-      width={CANVAS_PROPS.WIDTH}
-      height={CANVAS_PROPS.HEIGHT}
+      width={CANVAS_SIZE.WIDTH}
+      height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
       onMouseDown={drawStart}
       onMouseMove={draw}
