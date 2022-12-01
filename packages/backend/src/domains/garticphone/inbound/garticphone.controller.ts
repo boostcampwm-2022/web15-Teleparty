@@ -38,6 +38,11 @@ router.get("keyword-cancel", (socket: Socket) => {
   cancelInput(socket.id);
 });
 
+router.get("request-album", (socket: Socket) => {
+  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+  if (room) service.sendAlbum(room.roomId);
+});
+
 connecter.register(
   "garticphone/game-start",
   ({
