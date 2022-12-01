@@ -2,7 +2,7 @@ import Crypto from "crypto";
 
 type DataType = "keyword" | "painting";
 
-class AlbumData {
+export class AlbumData {
   type: DataType;
   ownerId: string;
   data: string;
@@ -14,7 +14,7 @@ class AlbumData {
   }
 }
 
-class Player {
+export class Player {
   id: string;
   isInputEnded: boolean;
   album: AlbumData[] = [];
@@ -53,6 +53,7 @@ export class Garticphone {
   timerId: NodeJS.Timer | undefined;
   roundTime: number;
   roomId: string;
+  sendIdx: number;
 
   constructor(players: string[], roundTime: number, roomId: string) {
     this.players = players.map((playerId) => new Player(playerId));
@@ -60,6 +61,7 @@ export class Garticphone {
     this.roundTime = roundTime;
     this.roomId = roomId;
     this.currentRound = 1;
+    this.sendIdx = 0;
   }
 
   get currentRoundType() {
@@ -79,6 +81,10 @@ export class Garticphone {
 
   get isGameEnded() {
     return this.totalRound === this.currentRound;
+  }
+
+  get isLastAlbum() {
+    return this.players.length === this.sendIdx + 1;
   }
 
   cancelAlbumData(playerId: string) {
@@ -109,12 +115,8 @@ export class Garticphone {
     return this.players[currentIdx];
   }
 
-  getAlbum(playerId: string): AlbumData[] | undefined {
-    const player = this.players.find((player) => player.id === playerId);
-
-    if (!player) return;
-
-    return player.album;
+  nextPlayer() {
+    return this.players[this.sendIdx++];
   }
 
   getPlayerList() {
@@ -123,6 +125,7 @@ export class Garticphone {
 
   roundEnd() {
     this.currentRound++;
+    this.players.forEach((player) => (player.isInputEnded = false));
   }
 
   setTimer(timerId: NodeJS.Timer) {

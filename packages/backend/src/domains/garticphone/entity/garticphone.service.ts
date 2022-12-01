@@ -24,6 +24,30 @@ export class GarticphoneService implements GarticphonePort {
     this.repository.save(game);
   }
 
+  sendAlbum(roomId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    const player = game.nextPlayer();
+    if (!player) return;
+
+    const AlbumData = {
+      peerId: player.id,
+      isLast: game.isLastAlbum,
+      result: player.getAlbum().map((data) => {
+        return {
+          peerId: data.ownerId,
+          keyword: data.type === "keyword" ? data.data : null,
+          img: data.type === "painting" ? data.data : null,
+        };
+      }),
+    };
+
+    this.eventEmitter.sendAlbum(roomId, AlbumData);
+
+    this.repository.save(game);
+  }
+
   timeOut(roomId: string) {
     this.eventEmitter.timeOut(roomId);
   }
@@ -39,7 +63,7 @@ export class GarticphoneService implements GarticphonePort {
       clearTimeout(game.timerId);
 
       if (game.isGameEnded) {
-        return;
+        this.eventEmitter.gameEnd(roomId);
       } else {
         game.roundEnd();
         this.roundStart(game);
@@ -53,23 +77,25 @@ export class GarticphoneService implements GarticphonePort {
     const players = game.getPlayerList();
     const roundInfo = game.roundData;
 
-    if (game.currentRoundType === "keyword") {
-      players.forEach((player) => {
-        const target = game.getAlbumOwner(player.id, game.currentRound);
-        if (!target) return;
+    players.forEach((player) => {
+      const target = game.getAlbumOwner(player.id, game.currentRound);
+      if (!target) return;
 
-        const lastData = target.getLastAlbumData();
-        this.eventEmitter.keywordInputStart(player.id, lastData, roundInfo);
-      });
-    } else {
-      players.forEach((player) => {
-        const target = game.getAlbumOwner(player.id, game.currentRound);
-        if (!target) return;
+      const lastData = target.getLastAlbumData();
+      const type = game.currentRoundType;
+      const data = {
+        keyword: type === "keyword" ? lastData : null,
+        img: type === "painting" ? lastData : null,
+        roundInfo,
+      };
 
-        const lastData = target.getLastAlbumData();
-        this.eventEmitter.drawStart(player.id, lastData, roundInfo);
-      });
-    }
+      this.eventEmitter.roundstart(player.id, type, data);
+    });
+
+    const timerId = setTimeout(() => this.timeOut(game.roomId), game.roundTime);
+    game.setTimer(timerId);
+
+    this.repository.save(game);
   }
 
   cancelAlbumData(roomId: string, playerId: string) {
