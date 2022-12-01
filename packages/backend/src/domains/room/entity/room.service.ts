@@ -1,3 +1,4 @@
+import { Player } from "../../player/entity/player.entitiy";
 import { RoomPort } from "../inbound/room.port";
 import { RoomApiAdapter } from "../outbound/room.api.adapter";
 import { RoomEventAdapter } from "../outbound/room.event.adapter";
@@ -37,17 +38,19 @@ export class RoomService implements RoomPort {
       this.roomEventEmitter.join(
         {
           roomId: newRoom.roomId,
-          players: players.map((player) => {
-            if (newRoom.players.includes(player.peerId)) {
-              return {
-                peerId: player.peerId,
-                userName: player.userName,
-                avataURL: player.avata,
-                isHost: player.peerId === newRoom.host,
-                isMicOn: player.isMicOn,
-              };
-            }
-          }) as PlayerInfo[],
+          players: newRoom.players.map((peerId) => {
+            const player = players.find((player) => {
+              return player.peerId === peerId;
+            }) as Player;
+
+            return {
+              peerId: player.peerId,
+              userName: player.userName,
+              avataURL: player.avata,
+              isHost: player.peerId === newRoom.host,
+              isMicOn: player.isMicOn,
+            };
+          }),
         },
         peerId
       );
@@ -62,17 +65,19 @@ export class RoomService implements RoomPort {
     this.roomEventEmitter.join(
       {
         roomId: room.roomId,
-        players: players.map((player) => {
-          if (room.players.includes(player.peerId)) {
-            return {
-              peerId: player.peerId,
-              userName: player.userName,
-              avataURL: player.avata,
-              isHost: player.peerId === room.host,
-              isMicOn: player.isMicOn,
-            };
-          }
-        }) as PlayerInfo[],
+        players: room.players.map((peerId) => {
+          const player = players.find((player) => {
+            return player.peerId === peerId;
+          }) as Player;
+
+          return {
+            peerId: player.peerId,
+            userName: player.userName,
+            avataURL: player.avata,
+            isHost: player.peerId === room.host,
+            isMicOn: player.isMicOn,
+          };
+        }),
       },
       peerId
     );
