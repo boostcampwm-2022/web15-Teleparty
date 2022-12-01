@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { SetStateAction, useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
@@ -25,9 +25,10 @@ const CANVAS_SIZE = {
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
+  setOutgoingCanvasStream: React.Dispatch<SetStateAction<MediaStream | null>>;
 }
 
-const Canvas = ({ canvasRef }: CanvasProps) => {
+const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -35,6 +36,15 @@ const Canvas = ({ canvasRef }: CanvasProps) => {
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    setOutgoingCanvasStream(canvasRef.current.captureStream());
+
+    return () => {
+      setOutgoingCanvasStream(null);
+    };
+  }, []);
 
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");

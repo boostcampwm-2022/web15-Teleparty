@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+
+import Peer, { MediaConnection } from "peerjs";
 
 import type {
   Player,
@@ -10,11 +12,18 @@ import type { Socket } from "socket.io-client";
 
 type GameState = "inputKeyword" | "drawing" | "roundEnd" | "gameEnd";
 
+const getPeerIdForCatchMind = (id: string) => {
+  // PeerJS id제약 때문에 끝에 a를 붙임
+  // https://peerjs.com/docs/#api
+  return `catchmind-${id}a`;
+};
+
 // socket, player, first round info
 export const useCatchMind = (
   socket: Socket,
   playerList: Player[],
-  initialRoundInfo: CatchMindRoundInfo
+  initialRoundInfo: CatchMindRoundInfo,
+  outgoingCanvasStream: MediaStream | null
 ) => {
   const [roundInfo, setRoundInfo] =
     useState<CatchMindRoundInfo>(initialRoundInfo);
@@ -32,7 +41,13 @@ export const useCatchMind = (
   const [isMyTurn, setIsMyTurn] = useState(
     initialRoundInfo.turnPlayer === socket.id
   );
+  const peerRef = useRef(new Peer(getPeerIdForCatchMind(socket.id)));
+  const peer = peerRef.current;
+  const mediaConnectionListRef = useRef<MediaConnection[]>([]);
+  const [incomingCanvasStream, setIncomingCanvasStream] =
+    useState<MediaStream | null>(null);
 
+  // socket for game logic
   useEffect(() => {
     const roundStartListener = (roundInfo: CatchMindRoundInfo) => {
       console.log("round start!!: ", roundInfo);
@@ -84,5 +99,76 @@ export const useCatchMind = (
     };
   }, [gamePlayerList, socket]);
 
-  return { roundInfo, gameState, gamePlayerList, roundEndInfo, isMyTurn };
+  const initMediaConnection = (mediaConnection: MediaConnection) => {
+    mediaConnection.on("stream", (stream) => {
+      setIncomingCanvasStream(stream);
+    });
+
+    mediaConnection.on("close", () => {
+      setIncomingCanvasStream(null);
+    });
+
+    mediaConnection.on("error", (error) => {
+      setIncomingCanvasStream(null);
+      console.log(error);
+    });
+  };
+
+  const answerCallAndUpdateCanvasStream = (
+    mediaConnection: MediaConnection
+  ) => {
+    mediaConnection.answer();
+    initMediaConnection(mediaConnection);
+  };
+
+  const initPeer = () => {
+    if (!peer) return;
+    peer.on("call", answerCallAndUpdateCanvasStream);
+  };
+
+  const clearPeer = () => {
+    if (!peer) return;
+    peer.off("call", answerCallAndUpdateCanvasStream);
+  };
+
+  // peer(WebRTC) for canvas share
+  useEffect(() => {
+    initPeer();
+    return clearPeer;
+  }, []);
+
+  const connectToPlayersToSendMyCanvasStream = useCallback(() => {
+    if (!outgoingCanvasStream) return;
+
+    for (const { peerId } of gamePlayerList) {
+      if (peerId === socket.id) continue;
+      const mediaConnection = peer.call(
+        getPeerIdForCatchMind(peerId),
+        outgoingCanvasStream
+      );
+      mediaConnectionListRef.current.push(mediaConnection);
+    }
+  }, [peer, socket, outgoingCanvasStream, gamePlayerList]);
+
+  const clearAllMediaConnection = () => {
+    for (const connection of mediaConnectionListRef.current) {
+      connection.close();
+    }
+  };
+
+  useEffect(() => {
+    if (!outgoingCanvasStream) return;
+    connectToPlayersToSendMyCanvasStream();
+
+    return clearAllMediaConnection;
+  }, [outgoingCanvasStream, connectToPlayersToSendMyCanvasStream]);
+
+  return {
+    roundInfo,
+    gameState,
+    gamePlayerList,
+    roundEndInfo,
+    isMyTurn,
+    incomingCanvasStream,
+  };
 };

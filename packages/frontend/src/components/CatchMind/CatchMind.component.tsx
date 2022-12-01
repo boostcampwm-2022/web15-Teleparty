@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
@@ -35,10 +35,18 @@ const CatchMind = () => {
   const [keyword, setKeyword] = useState("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [outgoingCanvasStream, setOutgoingCanvasStream] =
+    useState<MediaStream | null>(null);
 
-  const { gamePlayerList, gameState, isMyTurn, roundEndInfo, roundInfo } =
-    useCatchMind(socket, players, gameInfo.roundInfo);
-
+  const {
+    gamePlayerList,
+    gameState,
+    isMyTurn,
+    roundEndInfo,
+    roundInfo,
+    incomingCanvasStream,
+  } = useCatchMind(socket, players, gameInfo.roundInfo, outgoingCanvasStream);
+  console.log(incomingCanvasStream);
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
@@ -90,7 +98,13 @@ const CatchMind = () => {
   const getCenterElement = () => {
     switch (gameState) {
       case "drawing":
-        if (isMyTurn) return <Canvas canvasRef={canvasRef} />;
+        if (isMyTurn)
+          return (
+            <Canvas
+              canvasRef={canvasRef}
+              setOutgoingCanvasStream={setOutgoingCanvasStream}
+            />
+          );
         return <CanvasLayout />;
       case "gameEnd":
         return (
