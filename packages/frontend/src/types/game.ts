@@ -4,6 +4,7 @@ export interface Player {
   avatarURL: string;
   isHost: boolean;
   isMicOn: boolean;
+  isAudioDetected: boolean;
 }
 
 export interface GamePlayer extends Player {

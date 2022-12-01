@@ -96,6 +96,12 @@ export const useAudioCommunication = (
     const initAudioConnection = async () => {
       if (!voiceInputMediaStream)
         voiceInputMediaStream = await getAudioMediaStream();
+      if (!peer) return;
+      audioStreamManager.addStream(peer.id, voiceInputMediaStream);
+      if (audioDetectListener) {
+        audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
+      }
+
       initPeer();
       connectAudioWithPeers();
     };

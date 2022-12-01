@@ -35,6 +35,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     isCurrentTurn,
     isReady,
     score,
+    isAudioDetected,
   } = player;
   const playerState = isReady ? "ready" : isCurrentTurn ? "turn" : "normal";
 
@@ -73,7 +74,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
   return (
     <PlayerListItemLayout sizeType={sizeType} state={playerState}>
       <RightSection>
-        <AvatarContainer>
+        <AvatarContainer spotlight={isAudioDetected}>
           {isHost && <Icon icon="check" size={20} />}
           {avatarURL && <Avatar src={avatarURL} />}
         </AvatarContainer>

@@ -14,8 +14,8 @@ export type AudioDetectListener = (
 
 const MIN_DECIBEL = -100;
 const MAX_DECIBEL = 0;
-const MINIMUM_AUDIO_DETECTION_PERCENTAGE = 15;
-const AUDIO_DETECTION_INTERVAL = 250;
+const MINIMUM_AUDIO_DETECTION_PERCENTAGE = 3;
+const AUDIO_DETECTION_INTERVAL = 150;
 
 class AudioStreamManager {
   private realTimeAudioMap = new Map<string, RealTimeAudio>();
@@ -42,7 +42,7 @@ class AudioStreamManager {
     analyser.fftSize = 512;
     analyser.minDecibels = MIN_DECIBEL;
     analyser.maxDecibels = MAX_DECIBEL;
-    analyser.smoothingTimeConstant = 0.1;
+    analyser.smoothingTimeConstant = 0.3;
     audioSource.connect(analyser);
 
     return {
@@ -151,7 +151,6 @@ class AudioStreamManager {
       volumes.reduce((prev, cur) => prev + cur, 0) / volumes.length;
     const volumePercentage =
       (volume * 100) / Math.abs(MAX_DECIBEL - MIN_DECIBEL);
-
     return volumePercentage >= MINIMUM_AUDIO_DETECTION_PERCENTAGE;
   }
 

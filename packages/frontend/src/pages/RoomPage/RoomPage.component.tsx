@@ -23,6 +23,7 @@ import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
+import { AudioDetectListener } from "../../utils/audioStreamMap";
 
 import type { GameInfo, Player } from "../../types/game";
 import type { MediaConnection } from "peerjs";
@@ -32,14 +33,29 @@ const RoomPage = () => {
   const socket = useAtomValue(socketAtom);
   const peer = useAtomValue(peerAtom);
   const [players, setPlayers] = useAtom(playersAtom);
-  useAudioCommunication(
-    peer,
-    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id)
-  );
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
   usePreventClose();
+
+  const changeAudioDetectionStateOfPlayer: AudioDetectListener = (
+    id,
+    isAudioDetected
+  ) => {
+    setPlayers(
+      players.map((player) => ({
+        ...player,
+        isAudioDetected:
+          player.peerId === id ? isAudioDetected : player.isAudioDetected,
+      }))
+    );
+  };
+
+  useAudioCommunication(
+    peer,
+    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id),
+    changeAudioDetectionStateOfPlayer
+  );
 
   const onInviteClick = () => {
     const inviteUrl = `${window.location.origin}/?invite=${roomId}`;
