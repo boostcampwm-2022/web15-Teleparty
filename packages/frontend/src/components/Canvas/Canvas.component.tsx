@@ -69,7 +69,7 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     if (!canvas || !ctx) return;
 
     // clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // draw saved image to canvas
     if (canvasImageData.current) {
@@ -153,9 +153,12 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
 
   const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "z") {
+      const canvas = canvasRef.current;
       const ctx = canvasRef.current?.getContext("2d");
+      if (!canvas || !ctx) return;
+
+      const { width, height } = canvas;
       shapeList.current.pop();
-      ctx?.clearRect(0, 0, CANVAS_SIZE.WIDTH, CANVAS_SIZE.HEIGHT);
       canvasImageData.current = null;
       drawAllShapes();
     }
