@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { useAtomValue } from "jotai";
 
+import { GarticResultContentLayout, GarticResultLayout } from "./Gartic.styles";
+
 import { CANVAS_SIZE } from "../../constants/canvas";
 import useGartic from "../../hooks/useGartic";
 import {
@@ -10,6 +12,7 @@ import {
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { socketAtom } from "../../store/socket";
+import Album from "../Album/Album.component";
 import Canvas from "../Canvas/Canvas.component";
 import { CanvasLayout } from "../Canvas/Canvas.styles";
 import Chat from "../Chat/Chat.component";
@@ -74,13 +77,11 @@ const Gartic = () => {
     gameStart: "제시어를 입력해주세요",
     drawing: `제시어: ${keyword}`,
     inputKeyword: "그림을 보고 제시어를 입력해주세요.",
-    gameEnd: "",
   };
   const centerElementMap = {
     gameStart: <CanvasLayout />,
     drawing: <Canvas canvasRef={canvasRef} />,
     inputKeyword: <CanvasLayout ref={canvasRef} />,
-    gameEnd: null,
   };
   const footerElementMap = {
     gameStart: (
@@ -104,7 +105,6 @@ const Gartic = () => {
         />
       </KeywordInputLayout>
     ),
-    gameEnd: null,
   };
 
   useEffect(() => {
@@ -157,7 +157,20 @@ const Gartic = () => {
         </Button>
       </GamePageContentBox>
     </>
-  ) : null;
+  ) : (
+    <GarticResultLayout>
+      <Logo height={80} />
+      <GarticResultContentLayout>
+        <GamePageContentBox>
+          <PlayerList maxPlayer={10} sizeType="large" />
+        </GamePageContentBox>
+        <GamePageContentBox>
+          <Album album={album} isLastAlbum={isLastAlbum} />
+          <Chat variant="horizontal" />
+        </GamePageContentBox>
+      </GarticResultContentLayout>
+    </GarticResultLayout>
+  );
 };
 
 export default Gartic;

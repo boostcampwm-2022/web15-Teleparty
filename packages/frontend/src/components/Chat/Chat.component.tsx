@@ -27,7 +27,7 @@ const Chat = ({ variant }: ChatProps) => {
   const socket = useAtomValue(socketAtom);
   const players = useAtomValue(playersAtom);
 
-  const getUserNameById = (id: string | undefined | null) => {
+  const getUserNameById = (id: string) => {
     return players.find(({ peerId }) => peerId === id)?.userName;
   };
 
@@ -55,7 +55,7 @@ const Chat = ({ variant }: ChatProps) => {
     return () => {
       socket.off("chatting", chatListener);
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -69,7 +69,7 @@ const Chat = ({ variant }: ChatProps) => {
           <ChatBubble
             key={index}
             variant={variant}
-            isMine={id === socket.id}
+            isRightSide={id === socket.id}
             isFirst={messages[index - 1]?.id !== id}
             username={getUserNameById(id)}
           >
