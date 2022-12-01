@@ -67,6 +67,7 @@ const LandingPage = () => {
         ...prev,
         ...players.map((player) => ({
           ...player,
+          isMicOn: true,
           isAudioDetected: false,
         })),
       ]);
