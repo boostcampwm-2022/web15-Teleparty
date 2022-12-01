@@ -1,4 +1,4 @@
-import { Room } from "../entity/room.entity";
+import { GAME_MODE, Room } from "../entity/room.entity";
 import { Player } from "../../player/entity/player.entitiy";
 
 export type PlayerInfo = {
@@ -28,14 +28,14 @@ export interface RoomEvent {
 export interface RoomApiPort {
   gameStart: (
     roomId: string,
-    gameMode: string,
+    gameMode: GAME_MODE,
     players: string[],
     totalRound: number,
     roundTime: number,
     goalScore: number
   ) => void;
   chatting: (peerId: string, roomId: string, message: string) => void;
-  playerQuit: (gameMode: string, roomId: string, playerId: string) => void;
+  playerQuit: (gameMode: GAME_MODE, roomId: string, playerId: string) => void;
   getAllPlayer: () => Player[];
 }
 

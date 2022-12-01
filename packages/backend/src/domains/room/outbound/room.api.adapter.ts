@@ -1,16 +1,45 @@
 import { RoomApiPort } from "./room.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
+import { GAME_MODE } from "../entity/room.entity";
+
+interface StartData {
+  roomId: string;
+  players: string[];
+  totalRound: number;
+  roundTime: number;
+  goalScore: number;
+}
+
+const connecter = DomainConnecter.getInstance();
+
+const gameModeStartMap = {
+  CatchMind: (data: StartData) => connecter.call("catchMind/game-start", data),
+
+  Garticphone: (data: StartData) =>
+    connecter.call("garticphone/game-start", data),
+};
+
+const gameModeMap = {
+  CatchMind: (roomId: string, playerId: string) =>
+    connecter.call("catchMind/player-quit", {
+      roomId,
+      playerId,
+    }),
+  Garticphone: (roomId: string, playerId: string) =>
+    connecter.call("garticphone/player-quit", {
+      roomId,
+      playerId,
+    }),
+};
 
 export class RoomApiAdapter implements RoomApiPort {
-  connecter = DomainConnecter.getInstance();
-
   chatting(peerId: string, roomId: string, message: string) {
-    this.connecter.call("chat/send", { message, peerId, roomId });
+    connecter.call("chat/send", { message, peerId, roomId });
   }
 
   gameStart(
     roomId: string,
-    gameMode: string,
+    gameMode: GAME_MODE,
     players: string[],
     totalRound: number,
     roundTime: number,
@@ -20,40 +49,27 @@ export class RoomApiAdapter implements RoomApiPort {
 
     // if or switch로 거르기 -> game Mode;
 
-    switch (gameMode) {
-      case "Garticphone":
-        this.connecter.call("garticphone/game-start", {
-          roomId,
-          roundTime,
-          players,
-        });
-        break;
+    if (!gameMode) return;
 
-      case "CatchMind":
-        this.connecter.call("catchMind/game-start", {
-          goalScore,
-          players,
-          roundTime,
-          roomId,
-          totalRound,
-        });
-        break;
-
-      default:
-        break;
-    }
-
-    // console.log(roomId, gameMode, "gameStart");
+    gameModeStartMap[gameMode]({
+      roomId,
+      players,
+      totalRound,
+      roundTime,
+      goalScore,
+    });
 
     return;
   }
 
-  playerQuit(gameMode: string, roomId: string, playerId: string) {
+  playerQuit(gameMode: GAME_MODE, roomId: string, playerId: string) {
     // 여기서 게임 모드로 분기
-    this.connecter.call("catchMind/player-quit", { roomId, playerId });
+    if (!gameMode) return;
+
+    gameModeMap[gameMode](roomId, playerId);
   }
 
   getAllPlayer() {
-    return this.connecter.call("player/get-all-players");
+    return connecter.call("player/get-all-players");
   }
 }

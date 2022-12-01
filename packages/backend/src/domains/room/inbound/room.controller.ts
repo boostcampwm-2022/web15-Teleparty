@@ -2,7 +2,7 @@ import { RoomService } from "../entity/room.service";
 import { RoomPort } from "./room.port";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Socket } from "socket.io";
-
+import { GAME_MODE } from "../entity/room.entity";
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
 const router = new SocketRouter();
@@ -10,14 +10,20 @@ const roomService: RoomPort = new RoomService();
 
 router.get(
   "game-start",
-  (socket: Socket, { gameMode }: { gameMode: string }) => {
+  (socket: Socket, { gameMode }: { gameMode: GAME_MODE }) => {
+    if (!["CatchMind", "Garticphone"].includes(gameMode)) {
+      return;
+    }
     roomService.gameStart(socket.id, gameMode);
   }
 );
 
 router.get(
   "mode-change",
-  (socket: Socket, { gameMode }: { gameMode: string }) => {
+  (socket: Socket, { gameMode }: { gameMode: GAME_MODE }) => {
+    if (!["CatchMind", "Garticphone"].includes(gameMode)) {
+      return;
+    }
     roomService.chooseMode(socket.id, gameMode);
   }
 );
