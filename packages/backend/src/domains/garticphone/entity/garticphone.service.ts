@@ -4,10 +4,13 @@ import { GarticphoneRepositoryDataPort } from "../outbound/garitcphone.repositor
 import { Garticphone } from "./garticphone";
 import { GarticphoneEventPort } from "../outbound/garticphoneEvent.port";
 import { GarticphoneEventAdapter } from "../outbound/garticphoneEvent.adapter";
+import { GarticphoneToRoom } from "../outbound/garticphoneToRoom.port";
+import { GarticphoneToRoomAdapter } from "../outbound/garticphoneToRoom.adapter";
 
 export class GarticphoneService implements GarticphonePort {
   repository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
   eventEmitter: GarticphoneEventPort = new GarticphoneEventAdapter();
+  roomAPI: GarticphoneToRoom = new GarticphoneToRoomAdapter();
 
   startGame(roomId: string, roundTime: number, players: string[]) {
     const game = new Garticphone(players, roundTime, roomId);
@@ -106,5 +109,23 @@ export class GarticphoneService implements GarticphonePort {
     this.eventEmitter.keywordCancel(roomId, playerId);
 
     this.repository.save(game);
+  }
+
+  exitGame(roomId: string, playerId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    const result = game.exitGame(playerId);
+
+    if (result) {
+      this.eventEmitter.playerExit(game.roomId, playerId);
+    }
+
+    if (game.isAllExit) {
+      this.roomAPI.gameEnded(game.roomId);
+      this.repository.delete(game.roomId);
+    } else {
+      this.repository.save(game);
+    }
   }
 }

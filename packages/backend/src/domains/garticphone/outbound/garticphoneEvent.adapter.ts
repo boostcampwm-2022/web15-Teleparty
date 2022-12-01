@@ -43,4 +43,8 @@ export class GarticphoneEventAdapter implements GarticphoneEventPort {
   sendAlbum(roomId: string, data: GarticAlbum) {
     this.emitter.broadcastRoom(roomId, "game-end", data);
   }
+
+  playerExit(roomId: string, playerId: string) {
+    this.emitter.broadcastRoom(roomId, "quit-game", { peerId: playerId });
+  }
 }

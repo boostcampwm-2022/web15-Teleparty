@@ -9,13 +9,15 @@ const router = new SocketRouter();
 const service: GarticphonePort = new GarticphoneService();
 const connecter = DomainConnecter.getInstance();
 
+const searchRoom = (id: string) =>
+  connecter.call("room/get-by-playerId", { id });
 const inputData = (id: string, data: string) => {
-  const room = connecter.call("room/get-by-playerId", { id });
+  const room = searchRoom(id);
   if (room) service.setAlbumData(room.roomId, id, data);
 };
 
 const cancelInput = (id: string) => {
-  const room = connecter.call("room/get-by-playerId", { id });
+  const room = searchRoom(id);
   if (room) service.cancelAlbumData(room.roomId, id);
 };
 
@@ -39,8 +41,14 @@ router.get("keyword-cancel", (socket: Socket) => {
 });
 
 router.get("request-album", (socket: Socket) => {
-  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+  const room = searchRoom(socket.id);
   if (room) service.sendAlbum(room.roomId);
+});
+
+router.get("quit-game", (socket: Socket) => {
+  const room = searchRoom(socket.id);
+
+  if (room) service.exitGame(room.roomId, socket.id);
 });
 
 connecter.register(

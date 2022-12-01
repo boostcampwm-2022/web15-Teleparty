@@ -17,11 +17,13 @@ export class AlbumData {
 export class Player {
   id: string;
   isInputEnded: boolean;
+  isExit: boolean;
   album: AlbumData[] = [];
 
   constructor(id: string) {
     this.id = id;
     this.isInputEnded = false;
+    this.isExit = false;
   }
 
   setAlbumData(index: number, data: AlbumData) {
@@ -43,6 +45,10 @@ export class Player {
 
   getAlbum() {
     return this.album;
+  }
+
+  exitGame() {
+    this.isExit = true;
   }
 }
 
@@ -85,6 +91,10 @@ export class Garticphone {
 
   get isLastAlbum() {
     return this.players.length === this.sendIdx + 1;
+  }
+
+  get isAllExit() {
+    return this.players.every((player) => player.isExit);
   }
 
   cancelAlbumData(playerId: string) {
@@ -130,5 +140,14 @@ export class Garticphone {
 
   setTimer(timerId: NodeJS.Timer) {
     this.timerId = timerId;
+  }
+
+  exitGame(playerId: string) {
+    const player = this.players.find((player) => player.id == playerId);
+
+    if (player) {
+      player.exitGame();
+      return true;
+    } else return false;
   }
 }

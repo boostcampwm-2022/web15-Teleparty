@@ -34,4 +34,5 @@ export interface GarticphoneEventPort {
   ) => void;
   gameEnd: (roomId: string) => void;
   sendAlbum: (roomId: string, data: GarticAlbum) => void;
+  playerExit: (roomId: string, playerId: string) => void;
 }
