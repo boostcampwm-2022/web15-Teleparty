@@ -15,7 +15,7 @@ const Video = ({ srcObject }: VideoProps) => {
     videoRef.current.srcObject = srcObject;
   }, [srcObject]);
 
-  return <VideoLayout ref={videoRef} width={500} height={500} autoPlay />;
+  return <VideoLayout ref={videoRef} autoPlay />;
 };
 
 export default Video;
