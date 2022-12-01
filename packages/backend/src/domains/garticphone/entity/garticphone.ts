@@ -34,8 +34,6 @@ export class Player {
     if (this.album[index]) {
       this.album.pop();
     }
-
-    this.isInputEnded = false;
   }
 
   getLastAlbumData() {
@@ -77,6 +75,9 @@ export class Garticphone {
     this.currentRound = 1;
     this.sendIdx = 0;
     this.orderSeed = getPrime();
+    while (this.orderSeed === this.players.length) {
+      this.orderSeed = getPrime();
+    }
   }
 
   get currentRoundType() {
@@ -99,7 +100,7 @@ export class Garticphone {
   }
 
   get isLastAlbum() {
-    return this.players.length === this.sendIdx + 1;
+    return this.players.length === this.sendIdx;
   }
 
   get isAllExit() {
@@ -111,10 +112,12 @@ export class Garticphone {
   }
   cancelAlbumData(playerId: string) {
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
+    const player = this.players.find((player) => player.id === playerId);
 
-    if (!ownerPlayer) return;
+    if (!ownerPlayer || !player) return;
 
     ownerPlayer.cancelAlbumData(this.currentRound);
+    player.isInputEnded = false;
   }
 
   setAlbumData(data: string, playerId: string) {
