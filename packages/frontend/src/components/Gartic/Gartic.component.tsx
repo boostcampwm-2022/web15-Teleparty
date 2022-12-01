@@ -66,7 +66,7 @@ const Gartic = () => {
   };
   const headerElementMap = {
     gameStart: "제시어를 입력해주세요",
-    drawing: "",
+    drawing: `제시어: ${keyword}`,
     inputKeyword: "",
     gameEnd: "",
   };
@@ -114,7 +114,10 @@ const Gartic = () => {
         <Button
           variant="large"
           onClick={onButtonClick}
-          disabled={!keywordInput}
+          disabled={
+            (gameState === "gameStart" || gameState === "inputKeyword") &&
+            !keywordInput
+          }
         >
           {isDone ? "편집" : "완료"}
         </Button>
