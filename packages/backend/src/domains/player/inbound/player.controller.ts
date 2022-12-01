@@ -25,22 +25,26 @@ router.get(
     // const searchRoomController: SearchRoomController =
     //   new SearchRoomController();
 
+    // 파라미터에 roomId가 있을 때
     if (roomId) {
       const room: Room | undefined = connecter.call("room/get-by-roomId", {
         roomId,
       });
 
-      if (room) {
-        socket.join(room.roomId);
+      // 유효하지 않는 방 번호일 떄
+      if (!room) {
+        roomId = "123123"; // 나중에 uuid 같은걸로 바꾸기
       } else {
-        socket.join("123123"); // 나중에 uuid 같은걸로 바꾸기
+        // 접속이 불가능한 방일 때 ex) 게임 하고 있을 땐 못들어감
+        if (!room.state) {
+          playerService.sendError(socket.id, "이미 게임을 시작한 방입니다.");
+        }
       }
     } else {
-      socket.join("123123"); // 나중에 uuid 같은걸로 바꾸기
-      roomId = "123123";
+      roomId = "123123"; // 나중에 uuid 같은걸로 바꾸기
     }
 
-    playerService.createPlayer(socket.id, userName, avata, roomId);
+    playerService.createPlayer(socket, socket.id, userName, avata, roomId);
   }
 );
 
