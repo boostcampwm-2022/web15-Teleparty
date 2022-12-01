@@ -79,7 +79,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           isRightSide={!img}
           username={getUserNameById(peerId) ?? ""}
         >
-          {img ? <img src={img} alt="result" /> : keyword}
+          {img ? <img src={img} alt="result" width={460} /> : keyword}
         </AlbumBubble>
       ))}
       {showNext && (
