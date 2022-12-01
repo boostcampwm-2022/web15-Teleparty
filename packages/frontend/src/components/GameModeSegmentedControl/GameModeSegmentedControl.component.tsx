@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import {
   GameModeSegmentedControlLayout,
   GameModeButtonLayout,
@@ -15,11 +13,17 @@ import {
   GAME_MODE_DESCRIPTION_MAP,
 } from "../../constants/game-mode";
 
-const GameModeSegmentedControl = () => {
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
-    GAME_MODE_LIST[0]
-  );
+interface GameModeSegmentedControlProps {
+  selectedGameMode: "catchMind" | "garticPhone";
+  setSelectedGameMode: React.Dispatch<
+    React.SetStateAction<"catchMind" | "garticPhone">
+  >;
+}
 
+const GameModeSegmentedControl = ({
+  selectedGameMode,
+  setSelectedGameMode,
+}: GameModeSegmentedControlProps) => {
   const onChangeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     setSelectedGameMode(e.target.value as GameMode);
   };
