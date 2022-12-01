@@ -47,10 +47,15 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   }, []);
 
   useEffect(() => {
+    const canvas = canvasRef.current;
     const ctx = canvasRef.current?.getContext("2d");
-    if (!ctx) return;
+    if (!canvas || !ctx) return;
+
+    const { width, height } = canvas;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width, height);
   }, [canvasRef]);
 
   const captureCanvas = () => {
