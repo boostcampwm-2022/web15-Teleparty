@@ -7,6 +7,14 @@ interface RealTimeAudio {
   audioDetected: boolean;
 }
 
+interface AudioOptions {
+  autoPlay: boolean;
+}
+
+const defaultAudioOptions: AudioOptions = {
+  autoPlay: true,
+};
+
 export type AudioDetectListener = (
   id: string,
   isAudioDetected: boolean
@@ -22,20 +30,31 @@ class AudioStreamManager {
   private audioDetectionListenerMap = new Map<string, AudioDetectListener>();
   private audioDetectionTimerId: NodeJS.Timer | number = 0;
 
-  addStream(id: string, stream: MediaStream) {
+  addStream(
+    id: string,
+    stream: MediaStream,
+    options: AudioOptions = defaultAudioOptions
+  ) {
     if (stream.getAudioTracks().length === 0) {
       console.warn("stream has 0 audio tracks, so nothing will be played.");
     }
 
-    this.realTimeAudioMap.set(id, this.streamToRealTimeAudio(stream));
+    this.realTimeAudioMap.set(id, this.streamToRealTimeAudio(stream, options));
 
     return this;
   }
 
-  private streamToRealTimeAudio(stream: MediaStream): RealTimeAudio {
+  private streamToRealTimeAudio(
+    stream: MediaStream,
+    options: AudioOptions
+  ): RealTimeAudio {
     const audio = new Audio();
     audio.srcObject = stream;
-    audio.autoplay = true;
+    if (options) {
+      const { autoPlay } = options;
+      audio.autoplay = autoPlay;
+    }
+
     const audioContext = new AudioContext();
     const audioSource = audioContext.createMediaStreamSource(stream);
     const analyser = audioContext.createAnalyser();

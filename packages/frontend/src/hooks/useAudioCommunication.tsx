@@ -94,10 +94,13 @@ export const useAudioCommunication = (
   // 2. connect audio channel with all peers
   useEffect(() => {
     const initAudioConnection = async () => {
+      if (!peer) return;
       if (!voiceInputMediaStream)
         voiceInputMediaStream = await getAudioMediaStream();
-      if (!peer) return;
-      audioStreamManager.addStream(peer.id, voiceInputMediaStream);
+
+      audioStreamManager.addStream(peer.id, voiceInputMediaStream, {
+        autoPlay: false,
+      });
       if (audioDetectListener) {
         audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
       }
