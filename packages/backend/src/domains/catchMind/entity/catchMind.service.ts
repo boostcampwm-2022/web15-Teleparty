@@ -14,7 +14,7 @@ export class CatchMindService implements CatchMindInputPort {
 
   gameStart(
     goalScore: number,
-    players: Player[],
+    players: string[],
     roundTime: number,
     roomId: string,
     totalRound: number
@@ -64,7 +64,6 @@ export class CatchMindService implements CatchMindInputPort {
     });
 
     if (game.isGameEnded) {
-      this.repository.delete(game.roomId);
       this.roomAPI.gameEnded(game.roomId);
     } else {
       this.repository.save(game);
@@ -109,6 +108,23 @@ export class CatchMindService implements CatchMindInputPort {
     this.repository.save(game);
   }
 
+  exitGame(roomId: string, playerId: string) {
+    const game = this.repository.findById(roomId);
+    if (!game) return;
+
+    const result = game.exitGame(playerId);
+
+    if (result) {
+      this.eventEmitter.playerExit(game.roomId, playerId);
+    }
+
+    if (game.isAllExit) {
+      this.roomAPI.gameEnded(game.roomId);
+      this.repository.delete(game.roomId);
+    } else {
+      this.repository.save(game);
+    }
+  }
   quitDuringGame(roomId: string, playerId: string) {
     const game = this.repository.findById(roomId);
     if (!game) return;

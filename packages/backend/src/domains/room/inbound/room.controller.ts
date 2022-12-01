@@ -48,6 +48,6 @@ connecter.register("room/leave", (data: { peerId: string }) => {
   return;
 });
 
-connecter.register("room/end-game", ({ roomId }: { roomId: string }) => {
+connecter.register("room/game-end", ({ roomId }: { roomId: string }) => {
   roomService.endGame(roomId);
 });
