@@ -21,7 +21,7 @@ import { debounceByFrame } from "../../utils/debounce";
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  setOutgoingCanvasStream: React.Dispatch<SetStateAction<MediaStream | null>>;
+  setOutgoingCanvasStream?: React.Dispatch<SetStateAction<MediaStream | null>>;
 }
 
 const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
@@ -34,7 +34,7 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const thickness = useAtomValue(thicknessAtom);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !setOutgoingCanvasStream) return;
     setOutgoingCanvasStream(canvasRef.current.captureStream());
 
     return () => {
