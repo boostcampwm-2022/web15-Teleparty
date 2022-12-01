@@ -31,7 +31,7 @@ export const useAudioCommunication = (
     mediaConnectionSet.current.add(mediaConnection);
 
     mediaConnection.on("stream", (stream) => {
-      audioStreamManager.add(id, stream);
+      audioStreamManager.addStream(id, stream);
       if (audioDetectListener) {
         audioStreamManager.addAudioDetectListener(id, audioDetectListener);
       }
@@ -40,13 +40,13 @@ export const useAudioCommunication = (
 
     mediaConnection.on("close", () => {
       mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.remove(id);
+      audioStreamManager.removeStream(id);
       connectedPeerIdSet.current.delete(id);
     });
 
     mediaConnection.on("error", (error) => {
       mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.remove(id);
+      audioStreamManager.removeStream(id);
       connectedPeerIdSet.current.delete(id);
       console.error(error);
     });
@@ -86,7 +86,7 @@ export const useAudioCommunication = (
       mediaConnection.close();
     }
     for (const connectedPeerId of connectedPeerIdSet.current) {
-      audioStreamManager.remove(connectedPeerId);
+      audioStreamManager.removeStream(connectedPeerId);
     }
   };
 

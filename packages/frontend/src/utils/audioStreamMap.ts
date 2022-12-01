@@ -22,7 +22,7 @@ class AudioStreamManager {
   private audioDetectionListenerMap = new Map<string, AudioDetectListener>();
   private audioDetectionTimerId: NodeJS.Timer | number = 0;
 
-  add(id: string, stream: MediaStream) {
+  addStream(id: string, stream: MediaStream) {
     if (stream.getAudioTracks().length === 0) {
       console.warn("stream has 0 audio tracks, so nothing will be played.");
     }
@@ -55,7 +55,7 @@ class AudioStreamManager {
     };
   }
 
-  remove(id: string) {
+  removeStream(id: string) {
     const realTimeAudio = this.realTimeAudioMap.get(id);
     if (!realTimeAudio) return false;
     const { audio } = realTimeAudio;
