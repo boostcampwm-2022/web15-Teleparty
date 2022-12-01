@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { PlayerPort } from "./player.port";
-import { PlayerService } from "../entity/palyer.service";
+import { PlayerService } from "../entity/player.service";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Room } from "../../room/entity/room.entity";
 import { randomUUID } from "crypto";
