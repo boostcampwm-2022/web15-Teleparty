@@ -1,4 +1,4 @@
-import { GarticphonePort } from "./garticphone.port";
+import { GarticphonePort, RoundType } from "./garticphone.port";
 import { GarticphoneService } from "../entity/garticphone.service";
 
 import { SocketRouter } from "../../../utils/socketRouter";
@@ -11,9 +11,9 @@ const connecter = DomainConnecter.getInstance();
 
 const searchRoom = (id: string) =>
   connecter.call("room/get-by-playerId", { id });
-const inputData = (id: string, data: string) => {
+const inputData = (id: string, data: string, type: RoundType) => {
   const room = searchRoom(id);
-  if (room) service.setAlbumData(room.roomId, id, data);
+  if (room) service.setAlbumData(room.roomId, id, data, type);
 };
 
 const cancelInput = (id: string) => {
@@ -24,7 +24,7 @@ const cancelInput = (id: string) => {
 router.get(
   "input-keyword",
   (socket: Socket, { keyword }: { keyword: string }) => {
-    inputData(socket.id, keyword);
+    inputData(socket.id, keyword, "keyword");
   }
 );
 
@@ -33,15 +33,16 @@ router.get("keyword-cancel", (socket: Socket) => {
 });
 
 router.get("draw-input", (socket: Socket, { img }: { img: string }) => {
-  inputData(socket.id, img);
+  inputData(socket.id, img, "painting");
 });
 
-router.get("keyword-cancel", (socket: Socket) => {
+router.get("draw-cancel", (socket: Socket) => {
   cancelInput(socket.id);
 });
 
 router.get("request-album", (socket: Socket) => {
   const room = searchRoom(socket.id);
+
   if (room) service.sendAlbum(room.roomId, socket.id);
 });
 
