@@ -1,10 +1,13 @@
 import { RoomService } from "../entity/room.service";
 import { RoomPort } from "./room.port";
-import { SocketRouter } from "../../../utils/socketMiddlware";
+import { SocketRouter } from "../../../utils/socketRouter";
 import { Socket } from "socket.io";
 
+import { DomainConnecter } from "../../../utils/domainConnecter";
+
 const router = new SocketRouter();
-const roomService = new RoomService();
+const roomService: RoomPort = new RoomService();
+
 router.get(
   "game-start",
   (socket: Socket, { gameMode }: { gameMode: string }) => {
@@ -29,22 +32,24 @@ router.get(
   }
 );
 
-export const RoomApiController = {
-  joinRoom: (data: { roomId: string; peerId: string }) => {
-    const { peerId, roomId } = data;
-    roomService.join(peerId, roomId);
-
-    return;
-  },
-  leaveRoom: (data: { peerId: string }) => {
-    const { peerId } = data;
-    roomService.leave(peerId);
-
-    return;
-  },
-  endGame: (roomId: string) => {
-    roomService.endGame(roomId);
-  },
-};
-
 export const RoomController = router.router;
+
+const connecter = DomainConnecter.getInstance();
+
+connecter.register("room/join", (data: { roomId: string; peerId: string }) => {
+  const { peerId, roomId } = data;
+  roomService.join(peerId, roomId);
+
+  return;
+});
+
+connecter.register("room/leave", (data: { peerId: string }) => {
+  const { peerId } = data;
+  roomService.leave(peerId);
+
+  return;
+});
+
+connecter.register("room/end-game", ({ roomId }: { roomId: string }) => {
+  roomService.endGame(roomId);
+});

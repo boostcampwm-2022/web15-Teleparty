@@ -18,7 +18,7 @@ export type RoundEndData = {
   isLastRound: boolean;
 };
 
-export interface CatchMindEvent {
+export interface CatchMindEventPort {
   gameStart: (roomId: string, data: StartGameData) => void;
   drawStart: (roomId: string, player: Player) => void;
   roundEnd: (roomId: string, data: RoundEndData) => void;
