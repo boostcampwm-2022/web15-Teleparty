@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { useAtomValue } from "jotai";
 
@@ -30,6 +31,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const albumEndRef = useRef<HTMLDivElement>(null);
   const players = useAtomValue(playersAtom);
   const socket = useAtomValue(socketAtom);
+  const navigate = useNavigate();
 
   const getUserNameById = (id: string) => {
     return players.find(({ peerId }) => peerId === id)?.userName;
@@ -60,6 +62,15 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     };
   }, [album]);
 
+  const onNextClick = () => {
+    socket.emit("request-album");
+  };
+
+  const onGoRoomClick = () => {
+    socket.emit("quit-game");
+    navigate("/room", { replace: true });
+  };
+
   return (
     <AlbumLayout>
       {renderedAlbum.map(({ peerId, img, keyword }, index) => (
@@ -79,9 +90,15 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
               <Icon icon="download" size={36} />
             </Button>
             {isLastAlbum ? (
-              <Button variant="large">방으로 이동</Button>
+              <Button variant="large" onClick={onGoRoomClick}>
+                방으로 이동
+              </Button>
             ) : (
-              isHost && <Button variant="large">다음</Button>
+              isHost && (
+                <Button variant="large" onClick={onNextClick}>
+                  다음
+                </Button>
+              )
             )}
           </AlbumNextButtonBox>
         </AlbumNextLayout>
