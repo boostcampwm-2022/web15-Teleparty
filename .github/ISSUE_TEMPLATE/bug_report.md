@@ -1,9 +1,10 @@
 ---
 name: Bug report
 about: Bug report template
-title: "[bug] "
-labels: bug
-assignees: ""
+title: "[BUG] "
+labels: ''
+assignees: ''
+
 ---
 
 ## 버그 설명
