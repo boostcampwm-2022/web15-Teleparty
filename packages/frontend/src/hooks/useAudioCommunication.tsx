@@ -5,7 +5,7 @@ import Peer, { MediaConnection } from "peerjs";
 import {
   AudioDetectListener,
   audioStreamManager,
-} from "../utils/audioStreamMap";
+} from "../utils/audioStreamManager";
 
 const getAudioMediaStream = () => {
   return navigator.mediaDevices.getUserMedia({
