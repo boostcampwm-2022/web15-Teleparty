@@ -104,6 +104,7 @@ export const useAudioCommunication = (
       if (audioDetectListener) {
         audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
       }
+      audioStreamManager.removeStream(peer.id);
 
       initPeer();
       connectAudioWithPeers();
