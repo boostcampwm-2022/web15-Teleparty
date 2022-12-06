@@ -23,7 +23,7 @@ export const useAudioCommunication = (
 ) => {
   const mediaConnectionMap = useRef<Map<string, MediaConnection>>(new Map());
 
-  const closeConnection = (id: string) => {
+  const closeAudioConnection = (id: string) => {
     const mediaConnection = mediaConnectionMap.current.get(id);
     mediaConnection?.close();
     audioStreamManager.removeStream(id);
@@ -42,11 +42,11 @@ export const useAudioCommunication = (
     });
 
     mediaConnection.on("close", () => {
-      closeConnection(id);
+      closeAudioConnection(id);
     });
 
     mediaConnection.on("error", (error) => {
-      closeConnection(id);
+      closeAudioConnection(id);
       console.error(error);
     });
   };
@@ -77,7 +77,7 @@ export const useAudioCommunication = (
     }
   };
 
-  const closeAllMediaConnections = () => {
+  const closeAllAudioConnections = () => {
     for (const [
       connectedPeerId,
       mediaConnection,
@@ -122,7 +122,7 @@ export const useAudioCommunication = (
 
     return () => {
       clearPeer();
-      closeAllMediaConnections();
+      closeAllAudioConnections();
       clearMyAudio();
     };
   }, []);
