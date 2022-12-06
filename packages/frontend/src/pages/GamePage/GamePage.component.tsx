@@ -16,7 +16,7 @@ const GamePage = () => {
 
   return (
     <GamePageLayout>
-      {gameInfo.gameMode === "catchMind" ? <CatchMind /> : <Gartic />}
+      {gameInfo.gameMode === "CatchMind" ? <CatchMind /> : <Gartic />}
     </GamePageLayout>
   );
 };

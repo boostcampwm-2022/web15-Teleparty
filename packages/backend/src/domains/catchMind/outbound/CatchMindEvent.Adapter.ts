@@ -16,7 +16,7 @@ export class CatchMindEventAdapter implements CatchMindEventPort {
 
   gameStart(roomId: string, { totalRound, roundInfo }: StartGameData) {
     this.emitter.broadcastRoom(roomId, "game-start", {
-      gameMode: "catchMind",
+      gameMode: "CatchMind",
       totalRound,
       roundInfo,
     });
