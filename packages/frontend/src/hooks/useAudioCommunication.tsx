@@ -85,6 +85,7 @@ export const useAudioCommunication = (
       const mediaConnection = peer.call(peerId, voiceInputMediaStream);
       if (!mediaConnection) {
         console.warn(`${peerId}와 audio communication을 맺는데 실패했습니다!`);
+        continue;
       }
       initMediaConnection(peerId, mediaConnection);
     }
