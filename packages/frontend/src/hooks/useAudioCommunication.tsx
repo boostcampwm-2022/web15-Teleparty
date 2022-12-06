@@ -43,9 +43,12 @@ export const useAudioCommunication = (
     mediaConnectionMap.current.set(id, mediaConnection);
 
     mediaConnection.on("stream", (stream) => {
-      audioStreamManager.addStream(id, stream);
+      audioStreamManager.addStream(restoreIdFromPeerId(id), stream);
       if (audioDetectListener)
-        audioStreamManager.addAudioDetectListener(id, audioDetectListener);
+        audioStreamManager.addAudioDetectListener(
+          restoreIdFromPeerId(id),
+          audioDetectListener
+        );
     });
 
     mediaConnection.on("close", () => {
@@ -104,11 +107,18 @@ export const useAudioCommunication = (
     }
 
     // 자신의 mediaStream을 audioStreamManager에 등록 및 audioDetectListener 등록
-    audioStreamManager.addStream(peer.id, voiceInputMediaStream, {
-      autoPlay: false,
-    });
+    audioStreamManager.addStream(
+      restoreIdFromPeerId(peer.id),
+      voiceInputMediaStream,
+      {
+        autoPlay: false,
+      }
+    );
     if (audioDetectListener) {
-      audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
+      audioStreamManager.addAudioDetectListener(
+        restoreIdFromPeerId(peer.id),
+        audioDetectListener
+      );
     }
   };
 
@@ -116,7 +126,7 @@ export const useAudioCommunication = (
     if (!voiceInputMediaStream) return;
     voiceInputMediaStream.getTracks().forEach((track) => track.stop());
     voiceInputMediaStream = null;
-    audioStreamManager.removeStream(peer.id);
+    audioStreamManager.removeStream(restoreIdFromPeerId(peer.id));
   };
 
   // 1. init peer(WebRTC) to accept incoming audio connection
