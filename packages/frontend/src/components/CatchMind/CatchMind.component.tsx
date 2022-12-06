@@ -34,7 +34,8 @@ const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
-  const [keyword, setKeyword] = useState("");
+  const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
+  const keywordRef = useRef("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [outgoingCanvasStream, setOutgoingCanvasStream] =
@@ -57,8 +58,12 @@ const CatchMind = () => {
 
   const currentTurnUserName = getUserNameById(turnPlayer);
 
-  const onKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyword(e.target.value);
+  const onKeywordChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) setIsKeywordEmpty(true);
+    else setIsKeywordEmpty(false);
+    keywordRef.current = value;
   };
 
   const onReady = () => {
@@ -66,8 +71,8 @@ const CatchMind = () => {
   };
 
   const onKeywordSubmit = () => {
-    if (!keyword) return;
-    socket.emit("input-keyword", { keyword });
+    if (!keywordRef.current) return;
+    socket.emit("input-keyword", { keyword: keywordRef.current });
   };
 
   const onGoToRoomClick = () => {
@@ -82,7 +87,7 @@ const CatchMind = () => {
           : `${currentTurnUserName}님이 제시어를 입력하고 있습니다.`;
       case "drawing":
         return isMyTurn
-          ? `제시어: ${keyword}`
+          ? `제시어: ${keywordRef.current}`
           : "그림을 보고 제시어를 맞춰 주세요";
       case "roundEnd":
         return roundEndInfo?.roundWinner
@@ -195,7 +200,11 @@ const CatchMind = () => {
         )}
         <Chat />
         {gameState === "inputKeyword" && isMyTurn && (
-          <Button variant="large" onClick={onKeywordSubmit}>
+          <Button
+            variant="large"
+            onClick={onKeywordSubmit}
+            disabled={isKeywordEmpty}
+          >
             완료
           </Button>
         )}
