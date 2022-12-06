@@ -6,6 +6,5 @@ export class GarticphoneToRoomAdapter implements GarticphoneToRoom {
 
   gameEnded(roomId: string) {
     this.connecter.call("room/game-end", { roomId });
-    console.log("hello");
   }
 }
