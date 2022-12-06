@@ -40,7 +40,9 @@ router.get(
         roomId = createUUID();
       } else {
         if (room.players.length === room.maxPlayer) {
+          console.log("방이 가득참");
           playerService.sendError(socket.id, "방이 가득 찼습니다");
+          return;
         }
 
         // 접속이 불가능한 방일 때 ex) 게임 하고 있을 땐 못들어감
