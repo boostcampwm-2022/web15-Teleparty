@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import { MoonTimerLayout } from "./MoonTimer.styles";
 
@@ -7,6 +7,7 @@ import { colors } from "../../global-styles/theme";
 interface MoonTimerProps {
   secondTime: number;
   radius: number;
+  gameState: string;
 }
 
 const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
@@ -84,4 +85,4 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
   );
 };
 
-export default MoonTimer;
+export default memo(MoonTimer);
