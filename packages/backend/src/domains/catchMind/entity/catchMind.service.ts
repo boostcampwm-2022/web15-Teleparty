@@ -65,10 +65,9 @@ export class CatchMindService implements CatchMindInputPort {
       roundWinner: winner,
     });
 
-    if (game.isGameEnded) {
-      this.roomAPI.gameEnded(game.roomId);
-    } else {
+    if (!game.isGameEnded) {
       this.repository.save(game);
+      // this.roomAPI.gameEnded(game.roomId);
     }
   }
 
