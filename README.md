@@ -65,7 +65,7 @@ $ npm run dev -w packages/frontend # 클라이언트 개발 서버
 
 ## 팀원
 
-| J126(PM) | J028 | J133 | J222 |
-| --- | --- | --- | --- |
-| <img src="https://user-images.githubusercontent.com/58547919/200453110-74f21d43-49d5-46d7-bc12-c61719fa56c2.jpg" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200453873-f7e4a8de-c2de-457f-8d5e-dbfa36c15d02.png" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200453183-712d7085-4aff-4d41-a71f-b4800fd10cab.jpg" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200454027-54ef3480-d774-470c-ad0c-4383ef326037.png" width="165" height="165" > |
-| 유진 | 김도형 | 이군호 | 김현호 |
+J126(PM) | J028 | J133 | J222
+:--: | :--: | :--: | :--:
+<img src="https://user-images.githubusercontent.com/58547919/200453110-74f21d43-49d5-46d7-bc12-c61719fa56c2.jpg" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200453873-f7e4a8de-c2de-457f-8d5e-dbfa36c15d02.png" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200453183-712d7085-4aff-4d41-a71f-b4800fd10cab.jpg" width="165" height="165"> | <img src="https://user-images.githubusercontent.com/58547919/200454027-54ef3480-d774-470c-ad0c-4383ef326037.png" width="165" height="165" >
+ [유진](https://github.com/jjiny0716) | [김도형](https://github.com/m4nd4r1n) | [이군호](https://github.com/youhavetopay) | [김현호](https://github.com/spaff13)
