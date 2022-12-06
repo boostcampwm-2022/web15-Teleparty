@@ -41,6 +41,7 @@ export interface RoomApiPort {
 
 export interface RoomRepositoryDataPort {
   create: (roomId: string) => Room;
+  savePlayers: (roomId: string, players: string[]) => void;
   findOneByRoomId: (roomId?: string) => Room | undefined;
   findOneByPeerId: (peerId: string) => Room | undefined;
   findAll: () => Room[];

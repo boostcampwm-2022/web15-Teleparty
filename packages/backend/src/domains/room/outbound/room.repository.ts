@@ -11,6 +11,14 @@ export class RoomRepository implements RoomRepositoryDataPort {
     return room;
   }
 
+  savePlayers(roomId: string, players: string[]) {
+    RoomRepository.rooms.forEach((room) => {
+      if (room.roomId === roomId) {
+        room.players = players;
+      }
+    });
+  }
+
   findOneByRoomId(roomId?: string) {
     const room = RoomRepository.rooms.find((room) => room.roomId === roomId);
     return room;
