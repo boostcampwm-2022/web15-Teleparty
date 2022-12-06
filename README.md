@@ -1,7 +1,10 @@
+<div align="center">
 
-![Frame_24](https://user-images.githubusercontent.com/80938577/205789368-1c39693d-ed95-4c31-bcd1-6ad507680f21.png)
+<img src="https://user-images.githubusercontent.com/80938577/205789368-1c39693d-ed95-4c31-bcd1-6ad507680f21.png">
 
 내 마음을 읽어봐! ( ु⁎ᴗ_ᴗ⁎)ु.｡oO 다같이 모여서 노는 그림 퀴즈 게임
+</div>
+
 
 # ✨프로젝트 소개
 
@@ -16,11 +19,14 @@
 
 ## 플레이 화면
 
-![Untitled](https://user-images.githubusercontent.com/80938577/205789438-0e02d8b2-1bb7-4b77-9b6b-c59246dd16a1.png)
-![Untitled 1](https://user-images.githubusercontent.com/80938577/205789461-e825a614-3fd1-48c6-9508-fc371ae68478.png)
-![Untitled 3](https://user-images.githubusercontent.com/80938577/205789477-ed3b34f9-95d2-4f5b-beca-6c012565e236.png)
-![Untitled 2](https://user-images.githubusercontent.com/80938577/205789489-b4aa6f30-15a8-457d-82f2-cd815d322c61.png)
+<div>
 
+<img width="400" src="https://user-images.githubusercontent.com/96206089/205789363-7c390dde-d505-4b18-abc0-4ec093a52198.png">
+<img width="400" src="https://user-images.githubusercontent.com/96206089/205789415-fcba9cc9-a221-4c3b-9e4c-ca9ed66ac498.png">
+<img width="400" src="https://user-images.githubusercontent.com/96206089/205789437-637a8fec-f679-4909-9b2c-7672f9354792.png">
+<img width="400" src="https://user-images.githubusercontent.com/96206089/205789469-d00860c6-f047-4e7f-a033-82f59cc3d803.png">
+
+</div>
 
 ## 간단 소개
 
