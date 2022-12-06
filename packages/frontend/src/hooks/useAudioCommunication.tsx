@@ -17,37 +17,36 @@ const getAudioMediaStream = () => {
 export let voiceInputMediaStream: MediaStream | null = null;
 
 export const useAudioCommunication = (
-  peer: Peer | null,
+  peer: Peer,
   peerIdList: string[],
   audioDetectListener?: AudioDetectListener
 ) => {
-  const mediaConnectionSet = useRef<Set<MediaConnection>>(new Set());
-  const connectedPeerIdSet = useRef<Set<string>>(new Set());
+  const mediaConnectionMap = useRef<Map<string, MediaConnection>>(new Map());
+
+  const closeConnection = (id: string) => {
+    const mediaConnection = mediaConnectionMap.current.get(id);
+    mediaConnection?.close();
+    audioStreamManager.removeStream(id);
+  };
 
   const initMediaConnection = (
     id: string,
     mediaConnection: MediaConnection
   ) => {
-    mediaConnectionSet.current.add(mediaConnection);
+    mediaConnectionMap.current.set(id, mediaConnection);
 
     mediaConnection.on("stream", (stream) => {
       audioStreamManager.addStream(id, stream);
-      if (audioDetectListener) {
+      if (audioDetectListener)
         audioStreamManager.addAudioDetectListener(id, audioDetectListener);
-      }
-      connectedPeerIdSet.current.add(id);
     });
 
     mediaConnection.on("close", () => {
-      mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.removeStream(id);
-      connectedPeerIdSet.current.delete(id);
+      closeConnection(id);
     });
 
     mediaConnection.on("error", (error) => {
-      mediaConnectionSet.current.delete(mediaConnection);
-      audioStreamManager.removeStream(id);
-      connectedPeerIdSet.current.delete(id);
+      closeConnection(id);
       console.error(error);
     });
   };
@@ -55,24 +54,21 @@ export const useAudioCommunication = (
   // answer to call and handle new MediaConnection
   const handleCall = (mediaConnection: MediaConnection) => {
     if (!voiceInputMediaStream) return;
+
     mediaConnection.answer(voiceInputMediaStream);
     initMediaConnection(mediaConnection.peer, mediaConnection);
   };
 
   const initPeer = () => {
-    if (!peer) return;
     peer.on("call", handleCall);
   };
 
   const clearPeer = () => {
-    if (!peer) return;
     peer.off("call", handleCall);
   };
 
   // call to all peers and handle each new MediaConnection
   const connectAudioWithPeers = () => {
-    if (!peer) return;
-
     if (!voiceInputMediaStream) return;
 
     for (const peerId of peerIdList) {
@@ -82,38 +78,52 @@ export const useAudioCommunication = (
   };
 
   const closeAllMediaConnections = () => {
-    for (const mediaConnection of mediaConnectionSet.current) {
+    for (const [
+      connectedPeerId,
+      mediaConnection,
+    ] of mediaConnectionMap.current.entries()) {
+      mediaConnectionMap.current.delete(connectedPeerId);
       mediaConnection.close();
-    }
-    for (const connectedPeerId of connectedPeerIdSet.current) {
       audioStreamManager.removeStream(connectedPeerId);
     }
+  };
+
+  const initMyAudio = async () => {
+    if (!voiceInputMediaStream) {
+      voiceInputMediaStream = await getAudioMediaStream();
+    }
+
+    // 자신의 mediaStream을 audioStreamManager에 등록 및 audioDetectListener 등록
+    audioStreamManager.addStream(peer.id, voiceInputMediaStream, {
+      autoPlay: false,
+    });
+    if (audioDetectListener) {
+      audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
+    }
+  };
+
+  const clearMyAudio = () => {
+    if (!voiceInputMediaStream) return;
+    voiceInputMediaStream.getTracks().forEach((track) => track.stop());
+    voiceInputMediaStream = null;
+    audioStreamManager.removeStream(peer.id);
   };
 
   // 1. init peer(WebRTC) to accept incoming audio connection
   // 2. connect audio channel with all peers
   useEffect(() => {
-    const initAudioConnection = async () => {
-      if (!peer) return;
-      if (!voiceInputMediaStream)
-        voiceInputMediaStream = await getAudioMediaStream();
-
-      audioStreamManager.addStream(peer.id, voiceInputMediaStream, {
-        autoPlay: false,
-      });
-      if (audioDetectListener) {
-        audioStreamManager.addAudioDetectListener(peer.id, audioDetectListener);
-      }
-      audioStreamManager.removeStream(peer.id);
-
+    const initAudioCommunication = async () => {
+      await initMyAudio();
       initPeer();
       connectAudioWithPeers();
     };
-    initAudioConnection();
+
+    initAudioCommunication();
 
     return () => {
       clearPeer();
       closeAllMediaConnections();
+      clearMyAudio();
     };
   }, []);
 };

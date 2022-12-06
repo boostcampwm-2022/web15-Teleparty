@@ -51,7 +51,7 @@ const RoomPage = () => {
   };
 
   useAudioCommunication(
-    peer,
+    peer!,
     players.map(({ peerId }) => peerId).filter((id) => id !== socket.id),
     changeAudioDetectionStateOfPlayer
   );
