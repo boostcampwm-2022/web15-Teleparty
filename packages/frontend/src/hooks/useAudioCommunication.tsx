@@ -6,6 +6,7 @@ import {
   AudioDetectListener,
   audioStreamManager,
 } from "../utils/audioStreamManager";
+import { createPeerId, restoreIdFromPeerId } from "../utils/peer";
 
 const getAudioMediaStream = () => {
   return navigator.mediaDevices.getUserMedia({
@@ -21,12 +22,18 @@ export const useAudioCommunication = (
   peerIdList: string[],
   audioDetectListener?: AudioDetectListener
 ) => {
+  if (!peer.id) {
+    console.error(
+      "useAudioCommunication에서 connection이 맺어지지 않은 peer를 전달받았습니다!"
+    );
+  }
+  peerIdList = peerIdList.map((id) => createPeerId(id));
   const mediaConnectionMap = useRef<Map<string, MediaConnection>>(new Map());
 
-  const closeAudioConnection = (id: string) => {
-    const mediaConnection = mediaConnectionMap.current.get(id);
+  const closeAudioConnection = (peerId: string) => {
+    const mediaConnection = mediaConnectionMap.current.get(peerId);
     mediaConnection?.close();
-    audioStreamManager.removeStream(id);
+    audioStreamManager.removeStream(restoreIdFromPeerId(peerId));
   };
 
   const initMediaConnection = (
@@ -73,6 +80,9 @@ export const useAudioCommunication = (
 
     for (const peerId of peerIdList) {
       const mediaConnection = peer.call(peerId, voiceInputMediaStream);
+      if (!mediaConnection) {
+        console.warn(`${peerId}와 audio communication을 맺는데 실패했습니다!`);
+      }
       initMediaConnection(peerId, mediaConnection);
     }
   };
@@ -84,7 +94,7 @@ export const useAudioCommunication = (
     ] of mediaConnectionMap.current.entries()) {
       mediaConnectionMap.current.delete(connectedPeerId);
       mediaConnection.close();
-      audioStreamManager.removeStream(connectedPeerId);
+      audioStreamManager.removeStream(restoreIdFromPeerId(connectedPeerId));
     }
   };
 
@@ -126,4 +136,16 @@ export const useAudioCommunication = (
       clearMyAudio();
     };
   }, []);
+
+  // player id list 변경시 제거된 id를 찾아 audio connection 해제 및 관련 자원 반환
+  useEffect(() => {
+    const removedIdList = [];
+    for (const peerId of mediaConnectionMap.current.keys()) {
+      if (!peerIdList.includes(peerId)) removedIdList.push(peerId);
+    }
+
+    for (const removedId of removedIdList) {
+      closeAudioConnection(removedId);
+    }
+  }, [peerIdList]);
 };
