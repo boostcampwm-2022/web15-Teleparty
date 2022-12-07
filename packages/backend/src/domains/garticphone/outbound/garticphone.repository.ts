@@ -9,16 +9,39 @@ import { GarticphoneRepositoryDataPort } from "./garitcphone.repository.port";
 import { redisCli } from "../../../config/redis";
 
 export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
+  static lock: Map<string, ((value: unknown) => void)[]> = new Map();
   save(game: Garticphone) {
     const gameData = this.stringify(game);
     redisCli.set(`Gartic/${game.roomId}`, gameData);
-    console.log("saved");
   }
 
   async findById(id: string) {
     const data = await redisCli.get(`Gartic/${id}`);
     if (!data) return;
+
     return this.parse(JSON.parse(data));
+  }
+
+  getLock(id: string) {
+    if (!GarticphoneRepository.lock.has(id)) {
+      GarticphoneRepository.lock.set(id, []);
+      return new Promise((resolve) => resolve(true));
+    } else {
+      return new Promise((resolve) => {
+        GarticphoneRepository.lock.get(id)?.push(resolve);
+      });
+    }
+  }
+
+  release(id: string) {
+    if (GarticphoneRepository.lock.has(id)) {
+      const blockedList = GarticphoneRepository.lock.get(id);
+
+      if (blockedList?.length === 1) GarticphoneRepository.lock.delete(id);
+      else GarticphoneRepository.lock.set(id, blockedList!.slice(1));
+
+      blockedList![0](1);
+    }
   }
 
   async delete(roomId: string) {
