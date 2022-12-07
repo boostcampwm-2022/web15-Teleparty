@@ -82,7 +82,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     <PlayerListItemLayout sizeType={sizeType} state={playerState}>
       <RightSection>
         <AvatarContainer spotlight={isAudioDetected}>
-          {isHost && <Icon icon="check" size={20} />}
+          {isHost && <Icon icon="crown" size={20} />}
           {avatarURL && <Avatar src={avatarURL} />}
         </AvatarContainer>
         <Name>{userName}</Name>
