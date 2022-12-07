@@ -4,7 +4,7 @@ import { useSetAtom } from "jotai";
 import Peer, { DataConnection } from "peerjs";
 
 import { dataConnectionMapAtom } from "../store/dataConnectionMap";
-import { createPeerId } from "../utils/peer";
+import { createPeerId, restoreIdFromPeerId } from "../utils/peer";
 
 export const useDataConnectionWithPeers = (
   peer: Peer,
@@ -21,7 +21,7 @@ export const useDataConnectionWithPeers = (
     );
   }
 
-  const connectDataChannelWithPeers = useCallback(() => {
+  const connectDataChannelWithPeers = () => {
     const newDataConnectionMap = new Map<string, DataConnection>();
     for (const peerId of peerIdList) {
       const dataConnection = peer.connect(createPeerId(peerId));
@@ -31,14 +31,14 @@ export const useDataConnectionWithPeers = (
     dataConnectionsRef.current = [...newDataConnectionMap.values()];
     setDataConnectionMap(newDataConnectionMap);
     console.log(dataConnectionsRef.current);
-  }, [peer, peerIdList, setDataConnectionMap]);
+  };
 
-  const closeAllDataChannel = useCallback(() => {
+  const closeAllDataChannel = () => {
     for (const dataConnection of dataConnectionsRef.current) {
       dataConnection.close();
     }
     setDataConnectionMap(new Map());
-  }, [setDataConnectionMap]);
+  };
 
   const syncDataChannelWithPeerIdList = useCallback(() => {
     setDataConnectionMap((dataConnectionMap) => {
@@ -55,11 +55,32 @@ export const useDataConnectionWithPeers = (
     });
   }, [peerIdList, setDataConnectionMap]);
 
+  const peerConnectionHandler = (connection: DataConnection) => {
+    dataConnectionsRef.current.push(connection);
+    setDataConnectionMap((dataConnectionMap) => {
+      dataConnectionMap.set(restoreIdFromPeerId(connection.peer), connection);
+      return new Map(dataConnectionMap);
+    });
+  };
+
+  const initPeerToAcceptConnection = () => {
+    peer.on("connection", peerConnectionHandler);
+  };
+
+  const clearPeer = () => {
+    peer.off("connection", peerConnectionHandler);
+  };
+
   // 마운트시 피어들과 데이터 채널 연결
   useEffect(() => {
+    initPeerToAcceptConnection();
     connectDataChannelWithPeers();
-    return closeAllDataChannel;
-  }, [connectDataChannelWithPeers, closeAllDataChannel]);
+
+    return () => {
+      clearPeer();
+      closeAllDataChannel();
+    };
+  }, []);
 
   // peerIdList에서 사라진 peer와의 dataConnection 제거
   useEffect(() => {
