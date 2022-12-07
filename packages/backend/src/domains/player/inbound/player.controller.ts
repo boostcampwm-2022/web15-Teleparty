@@ -4,7 +4,6 @@ import { PlayerService } from "../entity/player.service";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Room } from "../../room/entity/room.entity";
 import { randomUUID } from "crypto";
-// import { SearchRoomController } from "../../room/inbound/SearchRoom.api.controller";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
@@ -23,9 +22,6 @@ router.get(
       roomId,
     }: { userName: string; avata: string; roomId: string | null }
   ) => {
-    // const searchRoomController: SearchRoomController =
-    //   new SearchRoomController();
-
     // 파라미터에 roomId가 있을 때
     if (roomId) {
       const room: Room | undefined = connecter.call("room/get-by-roomId", {
@@ -65,14 +61,10 @@ router.get("disconnect", (socket: Socket) => {
   playerService.leavePlayer(socket.id);
 });
 
-// router.get("player-quit", (socket: Socket) => {
-//   playerService.leavePlayer(socket.id);
-// });
-
 export const PlayerController = router.router;
 
-connecter.register("player/get-all-players", () => {
-  return playerService.getAllPlayer();
+connecter.register("player/get-all-players", async () => {
+  return await playerService.getAllPlayer();
 });
 
 const createUUID = () => {

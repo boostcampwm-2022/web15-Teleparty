@@ -6,10 +6,9 @@ import {
   RoomApiPort,
   RoomRepositoryDataPort,
   RoomEvent,
-  PlayerInfo,
 } from "../outbound/room.port";
 import { RoomRepository } from "../outbound/room.repository";
-import { Room, GAME_MODE } from "./room.entity";
+import { GAME_MODE } from "./room.entity";
 
 export class RoomService implements RoomPort {
   roomRepository: RoomRepositoryDataPort;
@@ -23,9 +22,14 @@ export class RoomService implements RoomPort {
   }
 
   // roomId는 playerController에서 처리하기 때문에 무조건 넘어옴
-  join(peerId: string, roomId: string) {
+  async join(peerId: string, roomId: string) {
     const room = this.roomRepository.findOneByRoomId(roomId);
-    const players = this.roomApiAdapter.getAllPlayer();
+    const allPlayer = await this.roomApiAdapter.getAllPlayer();
+
+    if (!allPlayer) {
+      // 접속한 플레이어가 없으면 문제 있는거임 ㅋ
+      return;
+    }
 
     // 생성된 방이 없는 경우
     if (!room) {
@@ -40,7 +44,7 @@ export class RoomService implements RoomPort {
         {
           roomId: newRoom.roomId,
           players: newRoom.players.map((peerId) => {
-            const player = players.find(
+            const player = allPlayer.find(
               (player) => player.peerId === peerId
             ) as Player;
 
@@ -71,7 +75,7 @@ export class RoomService implements RoomPort {
       {
         roomId: room.roomId,
         players: room.players.map((peerId) => {
-          const player = players.find(
+          const player = allPlayer.find(
             (player) => player.peerId === peerId
           ) as Player;
 
@@ -87,7 +91,7 @@ export class RoomService implements RoomPort {
       peerId
     );
 
-    const playerInfo = players.find((player) => player.peerId === peerId);
+    const playerInfo = allPlayer.find((player) => player.peerId === peerId);
 
     if (playerInfo) {
       this.roomEventEmitter.newJoin(
@@ -105,7 +109,7 @@ export class RoomService implements RoomPort {
     return;
   }
 
-  leave(peerId: string) {
+  async leave(peerId: string) {
     const room = this.roomRepository.findOneByPeerId(peerId);
 
     if (!room) {
@@ -133,13 +137,18 @@ export class RoomService implements RoomPort {
 
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
 
-    const players = this.roomApiAdapter.getAllPlayer();
+    const allPlayer = await this.roomApiAdapter.getAllPlayer();
+
+    if (!allPlayer) {
+      // 총 접속한 플레이어가 없을 때 이벤트를 보낼 필요가 없음으로 끝내기
+      return;
+    }
 
     this.roomEventEmitter.quitPlayer(
       {
-        roomId: room.roomId as string,
+        roomId: room.roomId,
         players: room.players.map((peerId) => {
-          const player = players.find((player) => {
+          const player = allPlayer.find((player) => {
             return player.peerId === peerId;
           }) as Player;
 

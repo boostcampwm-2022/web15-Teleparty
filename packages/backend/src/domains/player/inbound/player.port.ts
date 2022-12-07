@@ -12,7 +12,7 @@ export interface PlayerPort {
 
   leavePlayer: (peerId: string) => void;
 
-  getAllPlayer: () => Player[];
+  getAllPlayer: () => Promise<Player[] | undefined>;
 
   sendError: (peerId: string, message: string) => void;
 }

@@ -36,7 +36,7 @@ export interface RoomApiPort {
   ) => void;
   chatting: (senderId: string, roomId: string, message: string) => void;
   playerQuit: (gameMode: GAME_MODE, roomId: string, playerId: string) => void;
-  getAllPlayer: () => Player[];
+  getAllPlayer: () => Promise<Player[] | undefined>;
 }
 
 export interface RoomRepositoryDataPort {

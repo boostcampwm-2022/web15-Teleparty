@@ -20,14 +20,14 @@ export class PlayerService implements PlayerPort {
     this.playerEventAdapter = new PlayerEventAdapter();
   }
 
-  createPlayer(
+  async createPlayer(
     socket: Socket,
     peerId: string,
     userName: string,
     avata: string,
     roomId: string
   ) {
-    const checkPlayer = this.playerRepository.findOneByPeerId(peerId);
+    const checkPlayer = await this.playerRepository.findOneByPeerId(peerId);
 
     // 중복 입장 체크
     if (checkPlayer) {
@@ -55,8 +55,8 @@ export class PlayerService implements PlayerPort {
     return;
   }
 
-  getAllPlayer() {
-    return this.playerRepository.findAll();
+  async getAllPlayer() {
+    return await this.playerRepository.findAll();
   }
 
   sendError(peerId: string, message: string) {
