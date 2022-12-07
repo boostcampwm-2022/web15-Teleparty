@@ -2,7 +2,7 @@ name: CI test
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, fix/#180/CI-fileChange-update]
   pull_request:
     branches: [dev]
 
