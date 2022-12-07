@@ -43,7 +43,7 @@ const Gartic = () => {
   const isDone =
     garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
     false;
-  const [keywordInput, setKeywordInput] = useState("");
+  const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -52,12 +52,15 @@ const Gartic = () => {
       socket.emit("keyword-cancel");
       return;
     }
-    socket.emit("input-keyword", { keyword: keywordInput });
+    socket.emit("input-keyword", { keyword: keywordInputRef.current });
   };
 
-  const onKeywordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeywordInput(e.target.value);
-    keywordInputRef.current = e.target.value;
+  const onKeywordInputChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) setIsKeywordEmpty(true);
+    else setIsKeywordEmpty(false);
+    keywordInputRef.current = value;
   };
 
   const drawingButtonClick = () => {
@@ -110,10 +113,6 @@ const Gartic = () => {
   };
 
   useEffect(() => {
-    setKeywordInput("");
-  }, [gameState]);
-
-  useEffect(() => {
     const timeOutListener = () => {
       if (gameState === "gameStart" || gameState === "inputKeyword")
         socket.emit("input-keyword", { keyword: keywordInputRef.current });
@@ -146,14 +145,14 @@ const Gartic = () => {
         />
       </GamePageContentBox>
       <GamePageContentBox>
-        <MoonTimer radius={60} secondTime={roundTime} />
+        <MoonTimer radius={60} secondTime={roundTime} gameState={gameState} />
         <Chat />
         <Button
           variant="large"
           onClick={buttonClickMap[gameState]}
           disabled={
             (gameState === "gameStart" || gameState === "inputKeyword") &&
-            !keywordInput
+            isKeywordEmpty
           }
         >
           {isDone ? "편집" : "완료"}
