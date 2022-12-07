@@ -6,8 +6,8 @@ import { DomainConnecter } from "../../../utils/domainConnecter";
 const connecter = DomainConnecter.getInstance();
 const roomAPI: SearchRoomApiPort = new SerchRoomApiService();
 
-connecter.register("room/get-by-playerId", ({ id }: { id: string }) => {
-  return roomAPI.searchById(id);
+connecter.register("room/get-by-playerId", async ({ id }: { id: string }) => {
+  return await roomAPI.searchById(id);
 });
 
 connecter.register(

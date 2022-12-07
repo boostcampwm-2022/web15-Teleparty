@@ -9,15 +9,15 @@ const router = new SocketRouter();
 const service: GarticphonePort = new GarticphoneService();
 const connecter = DomainConnecter.getInstance();
 
-const searchRoom = (id: string) =>
-  connecter.call("room/get-by-playerId", { id });
-const inputData = (id: string, data: string, type: RoundType) => {
-  const room = searchRoom(id);
+const searchRoom = async (id: string) =>
+  await connecter.call("room/get-by-playerId", { id });
+const inputData = async (id: string, data: string, type: RoundType) => {
+  const room = await searchRoom(id);
   if (room) service.setAlbumData(room.roomId, id, data, type);
 };
 
-const cancelInput = (id: string) => {
-  const room = searchRoom(id);
+const cancelInput = async (id: string) => {
+  const room = await searchRoom(id);
   if (room) service.cancelAlbumData(room.roomId, id);
 };
 
@@ -40,14 +40,14 @@ router.get("draw-cancel", (socket: Socket) => {
   cancelInput(socket.id);
 });
 
-router.get("request-album", (socket: Socket) => {
-  const room = searchRoom(socket.id);
+router.get("request-album", async (socket: Socket) => {
+  const room = await searchRoom(socket.id);
 
   if (room) service.sendAlbum(room.roomId, socket.id);
 });
 
-router.get("quit-game", (socket: Socket) => {
-  const room = searchRoom(socket.id);
+router.get("quit-game", async (socket: Socket) => {
+  const room = await searchRoom(socket.id);
 
   if (room) service.exitGame(room.roomId, socket.id);
 });

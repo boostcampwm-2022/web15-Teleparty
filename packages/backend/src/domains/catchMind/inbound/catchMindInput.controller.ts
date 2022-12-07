@@ -11,26 +11,33 @@ const connecter = DomainConnecter.getInstance();
 
 router.get(
   "input-keyword",
-  (socket: Socket, { keyword }: { keyword: string }) => {
-    const room = connecter.call("room/get-by-playerId", { id: socket.id });
+  async (socket: Socket, { keyword }: { keyword: string }) => {
+    const room = await connecter.call("room/get-by-playerId", {
+      id: socket.id,
+    });
 
     if (room) gameService.drawStart(room.roomId, keyword);
   }
 );
 
-router.get("chatting", (socket: Socket, { message }: { message: string }) => {
-  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+router.get(
+  "chatting",
+  async (socket: Socket, { message }: { message: string }) => {
+    const room = await connecter.call("room/get-by-playerId", {
+      id: socket.id,
+    });
 
-  if (room) gameService.checkAnswer(room.roomId, message, socket.id);
-});
+    if (room) gameService.checkAnswer(room.roomId, message, socket.id);
+  }
+);
 
-router.get("round-ready", (socket: Socket) => {
-  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+router.get("round-ready", async (socket: Socket) => {
+  const room = await connecter.call("room/get-by-playerId", { id: socket.id });
   if (room) gameService.roundReady(room.roomId, socket.id);
 });
 
-router.get("quit-game", (socket: Socket) => {
-  const room = connecter.call("room/get-by-playerId", { id: socket.id });
+router.get("quit-game", async (socket: Socket) => {
+  const room = await connecter.call("room/get-by-playerId", { id: socket.id });
 
   if (room) gameService.exitGame(room.roomId, socket.id);
 });
