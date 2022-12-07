@@ -6,7 +6,6 @@ const GamePageLayout = styled.main`
   justify-content: center;
   gap: 3rem;
   height: 100vh;
-  ${(props) => props.theme.backgrounds.nightCity}
 `;
 
 const GamePageRoundParagraph = styled.p`

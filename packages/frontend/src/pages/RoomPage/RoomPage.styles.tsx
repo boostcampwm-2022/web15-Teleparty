@@ -7,7 +7,6 @@ const RoomPageLayout = styled.main`
   justify-content: center;
   gap: 5rem;
   height: 100vh;
-  ${(props) => props.theme.backgrounds.nightCity}
 `;
 
 const RoomPageContentBox = styled.div`
