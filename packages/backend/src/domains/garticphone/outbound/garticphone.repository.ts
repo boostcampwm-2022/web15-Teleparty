@@ -34,13 +34,19 @@ export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
   }
 
   release(id: string) {
+    console.log("release", id);
     if (GarticphoneRepository.lock.has(id)) {
       const blockedList = GarticphoneRepository.lock.get(id);
 
-      if (blockedList?.length === 1) GarticphoneRepository.lock.delete(id);
-      else GarticphoneRepository.lock.set(id, blockedList!.slice(1));
+      if (blockedList!.length <= 1) {
+        GarticphoneRepository.lock.delete(id);
+      } else {
+        GarticphoneRepository.lock.set(id, blockedList!.slice(1));
+      }
 
-      blockedList![0](1);
+      if (blockedList![0]) {
+        blockedList![0](1);
+      }
     }
   }
 
