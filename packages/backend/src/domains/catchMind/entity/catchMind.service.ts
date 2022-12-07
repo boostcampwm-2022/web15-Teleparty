@@ -85,6 +85,7 @@ export class CatchMindService implements CatchMindInputPort {
     game.clearKeyword();
 
     this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
   }
 
   async checkAnswer(roomId: string, answer: string, playerId: string) {
@@ -115,19 +116,18 @@ export class CatchMindService implements CatchMindInputPort {
     if (player && !player.isReady) {
       this.eventEmitter.roundReady(game.roomId, player);
       game.ready(playerId);
-      this.gameRepository.save(game);
     }
 
     if (game.isAllReady) {
       this.roundStart(game);
     }
+    this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
   roundStart(game: CatchMind) {
     game.nextTurn();
     this.eventEmitter.roundStart(game.roomId, game.roundInfo);
-    this.gameRepository.save(game);
   }
 
   async exitGame(roomId: string, playerId: string) {
@@ -137,7 +137,7 @@ export class CatchMindService implements CatchMindInputPort {
       this.gameRepository.release(roomId);
       return;
     }
-    console.log("???", roomId);
+
     if (game.isTurnPlayer(playerId)) {
       this.roundEnd(roomId, null);
       this.cancelTimer(roomId);
