@@ -6,7 +6,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
 
   create(roomId: string) {
     const room = new Room(roomId);
-    console.log(RoomRepository.rooms.map((room) => room.roomId));
+
     RoomRepository.rooms.push(room);
     return room;
   }
@@ -64,13 +64,9 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   deleteByRoomId(roomId: string) {
-    console.log("delete roomId", roomId);
-    console.log(RoomRepository.rooms.map((room) => room.roomId));
-
     RoomRepository.rooms = RoomRepository.rooms.filter(
       (room) => room.roomId !== roomId
     );
-    console.log(RoomRepository.rooms.map((room) => room.roomId));
   }
 
   deletePlayerofRoomByPeerId(peerId: string) {

@@ -34,7 +34,6 @@ export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
   }
 
   release(id: string) {
-    console.log("release", id);
     if (GarticphoneRepository.lock.has(id)) {
       const blockedList = GarticphoneRepository.lock.get(id);
 
