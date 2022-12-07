@@ -46,6 +46,7 @@ export const useCatchMind = (
         isReady: false,
         isCurrentTurn: player.peerId === initialRoundInfo.turnPlayer,
         score: 0,
+        isGameQuit: false,
       }))
     );
   }, [setGamePlayerList, initialRoundInfo]);

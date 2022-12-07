@@ -44,6 +44,7 @@ const useGartic = () => {
         ...player,
         isReady: false,
         isCurrentTurn: false,
+        isGameQuit: false,
       }))
     );
   }, [setGamePlayerList]);
