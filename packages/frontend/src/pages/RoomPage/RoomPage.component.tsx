@@ -84,9 +84,22 @@ const RoomPage = () => {
     const newJoinListener = (player: Player) => {
       setPlayers((prev) => [...prev, player]);
     };
+    const playerQuitListener = ({ peerId }: { peerId: string }) => {
+      setPlayers((prev) => {
+        const newPlayerList = [...prev];
+        const quitPlayerIndex = newPlayerList.findIndex(
+          (player) => player.peerId === peerId
+        );
+        if (quitPlayerIndex === -1) return prev;
+        newPlayerList.splice(quitPlayerIndex, 1);
+        return newPlayerList;
+      });
+    };
     socket.on("new-join", newJoinListener);
+    socket.on("player-quit", playerQuitListener);
     return () => {
       socket.off("new-join", newJoinListener);
+      socket.off("player-quit", playerQuitListener);
     };
   }, [socket, setPlayers]);
 
