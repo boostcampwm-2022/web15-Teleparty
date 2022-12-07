@@ -8,6 +8,7 @@ import { CanvasLayout } from "./Canvas.styles";
 import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
 import Line from "./utils/Line";
+import { Point } from "./utils/Point";
 import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
@@ -15,7 +16,7 @@ import straightLine from "./utils/StraightLine";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
-import { toolAtom, paletteAtom } from "../../store/tool";
+import { toolAtom, paletteAtom, Tool } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
@@ -38,6 +39,7 @@ const Canvas = ({
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
+  console.log("dc: ", dataConnections);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -84,12 +86,15 @@ const Canvas = ({
     }
   });
 
-  const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+  const drawStart = (
+    x: number,
+    y: number,
+    tool: Tool,
+    color: string,
+    transparency: number,
+    lineWidth: number
+  ) => {
+    const point: Point = { x, y };
 
     if (tool === "fill") {
       if (!canvasRef.current) return;
@@ -97,7 +102,7 @@ const Canvas = ({
         color,
         transparency,
         10,
-        findEdgePoints(canvasRef.current, currentPoint)
+        findEdgePoints(canvasRef.current, point)
       );
       shapeList.current.push(polygon);
       drawAllShapes();
@@ -105,59 +110,98 @@ const Canvas = ({
     }
 
     const shapeCreateFunctionMap = {
-      pen: () => new Line(color, transparency, thickness * 16),
-      fill: () => new Line(color, transparency, thickness * 16),
-      circle: () =>
-        new Ellipse(color, transparency, thickness * 16, currentPoint),
-      erase: () => new Line("#ffffff", 1, thickness * 16),
+      pen: () => new Line(color, transparency, lineWidth),
+      fill: () => new Line(color, transparency, lineWidth),
+      circle: () => new Ellipse(color, transparency, lineWidth, point),
+      erase: () => new Line("#ffffff", 1, lineWidth),
       straightLine: () =>
-        new straightLine(color, transparency, thickness * 16, currentPoint),
-      rectangle: () =>
-        new Rectangle(color, transparency, thickness * 16, currentPoint),
+        new straightLine(color, transparency, lineWidth, point),
+      rectangle: () => new Rectangle(color, transparency, lineWidth, point),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
+
     captureCanvas();
+    draw(x, y);
   };
 
-  const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
+  const draw = (x: number, y: number) => {
     if (!isDrawing.current) return;
 
     const target = shapeList.current.at(-1);
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+    const point: Point = { x, y };
 
     if (target instanceof Line) {
-      target.pushPoint(currentPoint);
+      target.pushPoint(point);
     } else if (target instanceof Rectangle) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     } else if (target instanceof Ellipse) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     } else if (target instanceof straightLine) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     }
 
     drawAllShapes();
   };
 
-  const drawEnd: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    draw(event);
+  const drawEnd = () => {
     isDrawing.current = false;
   };
 
-  const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-      const canvas = canvasRef.current;
-      const ctx = canvasRef.current?.getContext("2d");
-      if (!canvas || !ctx) return;
+  const undo = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-      const { width, height } = canvas;
-      shapeList.current.pop();
-      canvasImageData.current = null;
-      drawAllShapes();
+    const { width, height } = canvas;
+    shapeList.current.pop();
+    canvasImageData.current = null;
+    drawAllShapes();
+  };
+
+  useEffect(() => {
+    console.log("useEffect event 등록 called");
+    for (const dataConnection of dataConnections) {
+      console.log("dataConnection에 등록!");
+      dataConnection.on("data", (data) => {
+        console.log(data);
+      });
+    }
+  }, []);
+
+  const mouseDownHandler: React.MouseEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    const point = getCoordRelativeToElement(
+      event.clientX,
+      event.clientY,
+      event.target as Element
+    );
+
+    drawStart(point.x, point.y, tool, color, transparency, thickness * 16);
+  };
+
+  const mouseMoveHandler: React.MouseEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    const point = getCoordRelativeToElement(
+      event.clientX,
+      event.clientY,
+      event.target as Element
+    );
+
+    draw(point.x, point.y);
+  };
+
+  const mouseUpHandler: React.MouseEventHandler<HTMLCanvasElement> = () => {
+    drawEnd();
+  };
+
+  const keyDownHandler: React.KeyboardEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+      undo();
     }
   };
 
@@ -166,10 +210,10 @@ const Canvas = ({
       width={CANVAS_SIZE.WIDTH}
       height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
-      onMouseDown={readonly ? undefined : drawStart}
-      onMouseMove={readonly ? undefined : draw}
-      onMouseUp={readonly ? undefined : drawEnd}
-      onKeyDown={readonly ? undefined : undo}
+      onMouseDown={readonly ? undefined : mouseDownHandler}
+      onMouseMove={readonly ? undefined : mouseMoveHandler}
+      onMouseUp={readonly ? undefined : mouseUpHandler}
+      onKeyDown={readonly ? undefined : keyDownHandler}
       tabIndex={1}
     />
   );

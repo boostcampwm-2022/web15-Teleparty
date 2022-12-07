@@ -25,6 +25,7 @@ export const useDataConnectionWithPeers = (
     const newDataConnectionMap = new Map<string, DataConnection>();
     for (const peerId of peerIdList) {
       const dataConnection = peer.connect(createPeerId(peerId));
+      console.log(dataConnection);
       newDataConnectionMap.set(peerId, dataConnection);
     }
 
@@ -56,6 +57,7 @@ export const useDataConnectionWithPeers = (
   }, [peerIdList, setDataConnectionMap]);
 
   const peerConnectionHandler = (connection: DataConnection) => {
+    console.log("incomming connection!");
     dataConnectionsRef.current.push(connection);
     setDataConnectionMap((dataConnectionMap) => {
       dataConnectionMap.set(restoreIdFromPeerId(connection.peer), connection);
@@ -78,7 +80,7 @@ export const useDataConnectionWithPeers = (
 
     return () => {
       clearPeer();
-      closeAllDataChannel();
+      // closeAllDataChannel();
     };
   }, []);
 
