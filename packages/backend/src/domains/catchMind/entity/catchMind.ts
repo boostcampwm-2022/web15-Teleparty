@@ -2,12 +2,22 @@ export interface Player {
   id: string;
   score: number;
   isReady: boolean;
-  isExit: boolean;
+}
+
+export class Timer {
+  roomId: string;
+  timer: NodeJS.Timeout;
+  constructor(roomId: string, id: NodeJS.Timeout) {
+    this.roomId = roomId;
+    this.timer = id;
+  }
+  cancelTimer() {
+    clearTimeout(this.timer);
+  }
 }
 
 export class CatchMind {
   keyword: string;
-  timerId: NodeJS.Timeout | undefined;
   goalScore: number;
 
   currentRound: number;
@@ -31,7 +41,6 @@ export class CatchMind {
     });
     this.goalScore = goalScore;
     this.keyword = "";
-    this.timerId = undefined;
     this.currentRound = 1;
     this.roundTime = roundTime;
     this.totalRound = totalRound;
@@ -64,7 +73,15 @@ export class CatchMind {
   }
 
   get isAllExit() {
-    return this.players.every((player) => player.isExit);
+    return this.players.length === 0;
+  }
+
+  get scoreMap() {
+    const playerScoreMap: { [K: string]: number } = {};
+    this.players.forEach((player: Player) => {
+      playerScoreMap[player.id] = player.score;
+    });
+    return playerScoreMap;
   }
 
   nextTurn() {
@@ -80,6 +97,10 @@ export class CatchMind {
       keyword === this.keyword &&
       playerId !== this.turnPlayer.id
     );
+  }
+
+  isTurnPlayer(playerId: string) {
+    return this.turnPlayer.id === playerId;
   }
 
   addScore(playerId: string) {
@@ -103,17 +124,13 @@ export class CatchMind {
     if (player) player.isReady = true;
   }
 
-  exitGame(id: string) {
-    const player = this.players.find((player) => player.id === id);
-
-    if (player && !player.isExit) {
-      player.isExit = true;
-      return true;
-    } else {
-      return false;
-    }
-  }
-  removePlayer(playerId: string) {
+  exitGame(playerId: string) {
+    const prevLen = this.players.length;
     this.players = this.players.filter((player) => player.id !== playerId);
+    const curLen = this.players.length;
+
+    this.turnPlayerIdx %= curLen;
+
+    return prevLen !== curLen;
   }
 }

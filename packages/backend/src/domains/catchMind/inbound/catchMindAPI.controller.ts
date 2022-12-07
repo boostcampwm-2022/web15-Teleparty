@@ -24,6 +24,6 @@ connecter.register(
 connecter.register(
   "catchMind/player-quit",
   ({ roomId, playerId }: { roomId: string; playerId: string }) => {
-    gameService.quitDuringGame(roomId, playerId);
+    gameService.exitGame(roomId, playerId);
   }
 );
