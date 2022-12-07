@@ -22,7 +22,7 @@ export interface RoomEvent {
   join: (data: JoinPlayerTotalInfo, peerId: string) => void;
   newJoin: (data: PlayerInfo, roomId: string) => void;
   modeChange: (data: GameMode, roomId: string) => void;
-  quitPlayer: (data: JoinPlayerTotalInfo, roomId: string) => void;
+  quitPlayer: (roomId: string, peerId: string) => void;
 }
 
 export interface RoomApiPort {
