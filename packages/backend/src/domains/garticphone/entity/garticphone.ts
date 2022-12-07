@@ -2,6 +2,18 @@ import Crypto from "crypto";
 
 type DataType = "keyword" | "painting";
 
+export class Timer {
+  roomId: string;
+  timer: NodeJS.Timeout;
+  constructor(roomId: string, id: NodeJS.Timeout) {
+    this.roomId = roomId;
+    this.timer = id;
+  }
+  cancelTimer() {
+    clearTimeout(this.timer);
+  }
+}
+
 export class AlbumData {
   type: DataType;
   ownerId: string;
@@ -61,7 +73,6 @@ export class Garticphone {
   totalRound: number;
   currentRound: number;
   players: Player[];
-  timerId: NodeJS.Timer | undefined;
   roundTime: number;
   roomId: string;
   sendIdx: number;
@@ -154,11 +165,13 @@ export class Garticphone {
 
   roundEnd() {
     this.currentRound++;
-    this.players.forEach((player) => (player.isInputEnded = false));
-  }
-
-  setTimer(timerId: NodeJS.Timer) {
-    this.timerId = timerId;
+    this.players.forEach((player) => {
+      if (!player.isExit) {
+        player.isInputEnded = false;
+      } else {
+        this.setAlbumData("", player.id);
+      }
+    });
   }
 
   exitGame(playerId: string) {
@@ -166,6 +179,7 @@ export class Garticphone {
 
     if (player) {
       player.exitGame();
+      this.setAlbumData("", playerId);
       return true;
     } else return false;
   }
