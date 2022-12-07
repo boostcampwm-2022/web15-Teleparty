@@ -38,7 +38,12 @@ export class PlayerService implements PlayerPort {
     // socket room 입장 처리
     socket.join(roomId);
 
-    const player = this.playerRepository.create(peerId, userName, avata);
+    const player = this.playerRepository.create(
+      peerId,
+      userName,
+      avata,
+      roomId
+    );
     console.log("palyer.service, 새로 들어온 플레이어", player.peerId);
 
     // roomController로 join 실행

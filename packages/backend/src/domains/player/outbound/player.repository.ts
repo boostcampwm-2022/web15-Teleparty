@@ -5,8 +5,8 @@ import { PlayerRepositoryDataPort } from "./player.port";
 const PLAYERS_KEY = "players";
 
 export class PlayerRepository implements PlayerRepositoryDataPort {
-  create(peerId: string, userName: string, avata: string) {
-    const player = new Player(peerId, userName, avata);
+  create(peerId: string, userName: string, avata: string, roomId: string) {
+    const player = new Player(peerId, userName, avata, roomId);
 
     const setPlayer = async (newPlayer: Player) => {
       await redisCli.HSET(
@@ -14,6 +14,8 @@ export class PlayerRepository implements PlayerRepositoryDataPort {
         newPlayer.peerId,
         JSON.stringify(newPlayer)
       );
+
+      await redisCli.SET(peerId, JSON.stringify(newPlayer));
     };
 
     setPlayer(player);
@@ -32,15 +34,16 @@ export class PlayerRepository implements PlayerRepositoryDataPort {
   }
 
   async findOneByPeerId(peerId: string) {
-    const playerInfo = await redisCli.HGET(PLAYERS_KEY, peerId);
+    const playerJson = await redisCli.HGET(PLAYERS_KEY, peerId);
 
-    if (playerInfo) {
-      const playerJSON = JSON.parse(playerInfo);
+    if (playerJson) {
+      const playerInfo = JSON.parse(playerJson);
 
       return new Player(
-        playerJSON.peerId,
-        playerJSON.userName,
-        playerJSON.avata
+        playerInfo.peerId,
+        playerInfo.userName,
+        playerInfo.avata,
+        playerInfo.roomId
       );
     }
 
@@ -54,12 +57,13 @@ export class PlayerRepository implements PlayerRepositoryDataPort {
       return;
     }
 
-    return allPlayer.map((playerJSON: string) => {
-      const playerInfo = JSON.parse(playerJSON);
+    return allPlayer.map((playerJson: string) => {
+      const playerInfo = JSON.parse(playerJson);
       return new Player(
         playerInfo.peerId,
         playerInfo.userName,
-        playerInfo.avata
+        playerInfo.avata,
+        playerInfo.roomId
       );
     });
   }

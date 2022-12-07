@@ -6,7 +6,12 @@ export interface PlayerApiPort {
 }
 
 export interface PlayerRepositoryDataPort {
-  create: (peerId: string, userName: string, avata: string) => Player;
+  create: (
+    peerId: string,
+    userName: string,
+    avata: string,
+    roomId: string
+  ) => Player;
   deleteByPeerId: (peerId: string) => void;
   findOneByPeerId: (peerId: string) => Promise<Player | undefined>;
   findAll: () => Promise<Player[] | undefined>;
