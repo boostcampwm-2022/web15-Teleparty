@@ -13,6 +13,7 @@ import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
+import { createPeerId } from "../../utils/peer";
 
 import type { Player } from "../../types/game";
 
@@ -58,7 +59,7 @@ const LandingPage = () => {
     runAfterSocketConnected(() => {
       console.log("my id: ", socket.id);
       setPeer(
-        new Peer(socket.id, {
+        new Peer(createPeerId(socket.id), {
           debug: 0,
         })
       );
