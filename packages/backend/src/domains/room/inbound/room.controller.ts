@@ -1,4 +1,4 @@
-import { RoomService } from "../entity/room.service";
+import { RoomService } from "../service/room.service";
 import { RoomPort } from "./room.port";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Socket } from "socket.io";

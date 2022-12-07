@@ -1,4 +1,4 @@
-import { Player } from "./player.entitiy";
+import { Player } from "../entity/player.entitiy";
 import { RoomPort } from "../inbound/room.port";
 import { RoomApiAdapter } from "../outbound/room.api.adapter";
 import { RoomEventAdapter } from "../outbound/room.event.adapter";
@@ -8,7 +8,7 @@ import {
   RoomEvent,
 } from "../outbound/room.port";
 import { RoomRepository } from "../outbound/room.repository";
-import { GAME_MODE, Room } from "./room.entity";
+import { GAME_MODE, Room } from "../entity/room.entity";
 import { randomUUID } from "crypto";
 
 export class RoomService implements RoomPort {

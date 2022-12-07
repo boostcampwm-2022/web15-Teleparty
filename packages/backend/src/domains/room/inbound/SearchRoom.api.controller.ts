@@ -1,5 +1,5 @@
 import { SearchRoomApiPort } from "./searchRoom.api.port";
-import { SerchRoomApiService } from "../entity/searchRoom.service";
+import { SerchRoomApiService } from "../service/searchRoom.service";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
