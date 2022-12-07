@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import { gameInfoAtom } from "../store/game";
 import { playersAtom } from "../store/players";
 import { socketAtom } from "../store/socket";
 
-import type {
-  AlbumType,
-  GameInfo,
-  GarticPlayer,
-  GarticRoundInfo,
-} from "../types/game";
+import type { AlbumType, GameInfo, GarticRoundInfo } from "../types/game";
 
 type GarticGameState = "gameStart" | "drawing" | "inputKeyword" | "gameEnd";
 
@@ -32,7 +27,6 @@ interface KeywordInputStartResponse {
 
 const useGartic = () => {
   const socket = useAtomValue(socketAtom);
-  const playerList = useAtomValue(playersAtom);
   const gameInfo = useAtomValue(gameInfoAtom);
   const [keyword, setKeyword] = useState("");
   const [image, setImage] = useState("");
@@ -41,27 +35,31 @@ const useGartic = () => {
     gameInfo.roundInfo
   );
   const [gameState, setGameState] = useState<GarticGameState>("gameStart");
-  const [garticPlayerList, setGarticPlayerList] = useState<GarticPlayer[]>(
-    playerList.map((player) => ({
-      ...player,
-      isDone: false,
-      isMyResult: false,
-    }))
-  );
+  const setGamePlayerList = useSetAtom(playersAtom);
   const [isLastAlbum, setIsLastAlbum] = useState(false);
+
+  useEffect(() => {
+    setGamePlayerList((prev) =>
+      prev.map((player) => ({
+        ...player,
+        isReady: false,
+        isCurrentTurn: false,
+      }))
+    );
+  }, [setGamePlayerList]);
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
       console.log("gameStart:", gameStartResponse);
-      setGarticPlayerList((prev) =>
-        prev.map((player) => ({ ...player, isDone: false }))
+      setGamePlayerList((prev) =>
+        prev.map((player) => ({ ...player, isReady: false }))
       );
       setGameState("gameStart");
       setRoundInfo(gameStartResponse.roundInfo);
     };
     const drawStartListener = ({ keyword, roundInfo }: DrawStartResponse) => {
-      setGarticPlayerList((prev) =>
-        prev.map((player) => ({ ...player, isDone: false }))
+      setGamePlayerList((prev) =>
+        prev.map((player) => ({ ...player, isReady: false }))
       );
       console.log("drawStart:", keyword, roundInfo);
       setKeyword(keyword);
@@ -73,8 +71,8 @@ const useGartic = () => {
       roundInfo,
     }: KeywordInputStartResponse) => {
       console.log("keywordInputStart", img, roundInfo);
-      setGarticPlayerList((prev) =>
-        prev.map((player) => ({ ...player, isDone: false }))
+      setGamePlayerList((prev) =>
+        prev.map((player) => ({ ...player, isReady: false }))
       );
       setImage(img);
       setRoundInfo(roundInfo);
@@ -82,15 +80,18 @@ const useGartic = () => {
     };
     const gameEndListener = () => {
       setGameState("gameEnd");
+      setGamePlayerList((prev) =>
+        prev.map((player) => ({ ...player, isReady: false }))
+      );
       socket.emit("request-album");
     };
-    const setDoneOrNot = (peerId: string, isDone: boolean) => {
-      setGarticPlayerList((prev) => {
+    const setDoneOrNot = (peerId: string, isReady: boolean) => {
+      setGamePlayerList((prev) => {
         const copiedList = [...prev];
         const donePlayerIndex = copiedList.findIndex(
           (player) => player.peerId === peerId
         );
-        copiedList[donePlayerIndex].isDone = isDone;
+        copiedList[donePlayerIndex].isReady = isReady;
         return copiedList;
       });
     };
@@ -104,17 +105,17 @@ const useGartic = () => {
     };
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
       console.log("album:", peerId, isLast, result);
-      setGarticPlayerList((prev) => {
+      setGamePlayerList((prev) => {
         const copiedList = [...prev];
         const convertMyResultToDone = copiedList.map((player) =>
-          player.isMyResult
-            ? { ...player, isMyResult: false, isDone: true }
+          player.isCurrentTurn
+            ? { ...player, isCurrentTurn: false, isReady: true }
             : player
         );
         const currentPlayerIndex = convertMyResultToDone.findIndex(
           (player) => player.peerId === peerId
         );
-        convertMyResultToDone[currentPlayerIndex].isMyResult = true;
+        convertMyResultToDone[currentPlayerIndex].isCurrentTurn = true;
         return convertMyResultToDone;
       });
       setIsLastAlbum(isLast);
@@ -141,11 +142,10 @@ const useGartic = () => {
       socket.off("draw-cancel", inputCancelListener);
       socket.off("album", albumListener);
     };
-  }, [socket]);
+  }, [socket, setGamePlayerList]);
 
   return {
     gameState,
-    garticPlayerList,
     roundInfo,
     keyword,
     image,

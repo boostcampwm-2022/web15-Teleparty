@@ -14,6 +14,7 @@ import {
   GamePageRoundParagraph,
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
+import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import Album from "../Album/Album.component";
 import Canvas from "../Canvas/Canvas.component";
@@ -32,7 +33,6 @@ const Gartic = () => {
   const {
     gameState,
     album,
-    garticPlayerList,
     image,
     isLastAlbum,
     keyword,
@@ -40,8 +40,9 @@ const Gartic = () => {
   } = useGartic();
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
+  const gamePlayerList = useAtomValue(playersAtom);
   const isDone =
-    garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
+    gamePlayerList.find((player) => player.peerId === socket.id)?.isReady ??
     false;
   const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
