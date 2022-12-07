@@ -28,7 +28,7 @@ export class GarticphoneService implements GarticphonePort {
     );
 
     game.setTimer(timerId);
-    console.log(GarticphoneRepository.games);
+
     this.repository.save(game);
   }
 
@@ -94,7 +94,7 @@ export class GarticphoneService implements GarticphonePort {
   roundStart(game: Garticphone) {
     const players = game.getPlayerList();
     const roundInfo = game.roundData;
-    console.log(game, roundInfo);
+    console.log("roundStart", game, roundInfo);
     players.forEach((player) => {
       const target = game.getAlbumOwner(player.id, game.currentRound);
       if (!target) return;
@@ -129,11 +129,7 @@ export class GarticphoneService implements GarticphonePort {
     if (!game) return;
 
     game.cancelAlbumData(playerId);
-    console.log(
-      game.players.map((player) => {
-        return { id: player.id, input: player.isInputEnded };
-      })
-    );
+
     if (game.currentRoundType === "keyword") {
       this.eventEmitter.keywordCancel(roomId, playerId);
     } else {

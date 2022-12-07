@@ -77,6 +77,7 @@ const CatchMind = () => {
 
   const onGoToRoomClick = () => {
     navigate("/room", { replace: true });
+    socket.emit("quit-game");
   };
 
   const getHeaderElement = () => {
