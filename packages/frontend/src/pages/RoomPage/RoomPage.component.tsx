@@ -109,6 +109,7 @@ const RoomPage = () => {
         delete player.isReady;
         delete player.isCurrentTurn;
         delete player.score;
+        delete player.isGameQuit;
         return player;
       })
     );
