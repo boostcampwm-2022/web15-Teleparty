@@ -2,6 +2,7 @@ import { SetStateAction, useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { DataConnection } from "peerjs";
 
 import { CanvasLayout } from "./Canvas.styles";
 import { findEdgePoints } from "./utils/canvas";
@@ -21,10 +22,15 @@ import { debounceByFrame } from "../../utils/debounce";
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  setOutgoingCanvasStream?: React.Dispatch<SetStateAction<MediaStream | null>>;
+  readonly?: boolean;
+  dataConnections: DataConnection[];
 }
 
-const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
+const Canvas = ({
+  canvasRef,
+  readonly = false,
+  dataConnections,
+}: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -32,15 +38,6 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
-
-  useEffect(() => {
-    if (!canvasRef.current || !setOutgoingCanvasStream) return;
-    setOutgoingCanvasStream(canvasRef.current.captureStream());
-
-    return () => {
-      setOutgoingCanvasStream(null);
-    };
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -169,10 +166,10 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
       width={CANVAS_SIZE.WIDTH}
       height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
-      onMouseDown={drawStart}
-      onMouseMove={draw}
-      onMouseUp={drawEnd}
-      onKeyDown={undo}
+      onMouseDown={readonly ? undefined : drawStart}
+      onMouseMove={readonly ? undefined : draw}
+      onMouseUp={readonly ? undefined : drawEnd}
+      onKeyDown={readonly ? undefined : undo}
       tabIndex={1}
     />
   );
