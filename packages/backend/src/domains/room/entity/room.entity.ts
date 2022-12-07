@@ -1,5 +1,17 @@
 export type GAME_MODE = "CatchMind" | "Garticphone" | "";
 
+export interface RoomData {
+  roomId: string;
+  players?: string[];
+  host?: string;
+  state?: boolean;
+  gameMode?: GAME_MODE;
+  totalRound?: number;
+  roundTime?: number;
+  goalScore?: number;
+  maxPlayer?: number;
+}
+
 export class Room {
   roomId: string;
   players: string[];
@@ -11,15 +23,15 @@ export class Room {
   goalScore: number;
   maxPlayer: number;
 
-  constructor(roomId: string) {
-    this.roomId = roomId;
-    this.players = [];
-    this.host = "";
-    this.state = true; // 방 입장 여부
-    this.gameMode = "";
-    this.totalRound = 10;
-    this.roundTime = 60;
-    this.goalScore = 3;
-    this.maxPlayer = 10;
+  constructor(data: RoomData) {
+    this.roomId = data.roomId;
+    this.players = data.players || [];
+    this.host = data.host || "";
+    this.state = data.state || true; // 방 입장 여부
+    this.gameMode = data.gameMode || "";
+    this.totalRound = data.totalRound || 10;
+    this.roundTime = data.roundTime || 60;
+    this.goalScore = data.goalScore || 3;
+    this.maxPlayer = data.maxPlayer || 10;
   }
 }
