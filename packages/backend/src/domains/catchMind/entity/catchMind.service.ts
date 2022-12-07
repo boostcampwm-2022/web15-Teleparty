@@ -41,9 +41,16 @@ export class CatchMindService implements CatchMindInputPort {
     this.gameRepository.save(game);
   }
 
-  async drawStart(roomId: string, keyword: string) {
+  async drawStart(roomId: string, keyword: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game) return;
+    if (!game || !game.isTurnPlayer(playerId)) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+
+    console.log("catch input keyword", roomId, keyword);
+
     game.keyword = keyword;
     this.eventEmitter.drawStart(game.roomId, game.turnPlayer);
 
@@ -55,12 +62,17 @@ export class CatchMindService implements CatchMindInputPort {
 
     this.timerRepository.save(game.roomId, timer);
     this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
   }
 
   async roundEnd(roomId: string, winner: string | null) {
+    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game) return;
-
+    if (!game) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+    console.log("\x1b[36mround End catch\x1b[37m", roomId, winner);
     if (winner) game.addScore(winner);
 
     this.eventEmitter.roundEnd(game.roomId, {
@@ -76,18 +88,27 @@ export class CatchMindService implements CatchMindInputPort {
   }
 
   async checkAnswer(roomId: string, answer: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game) return;
+    if (!game) {
+      this.gameRepository.release(roomId);
+      return;
+    }
 
     if (game.isRightAnswer(answer, playerId)) {
       this.cancelTimer(roomId);
       this.roundEnd(roomId, playerId);
     }
+    this.gameRepository.release(roomId);
   }
 
   async roundReady(roomId: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game) return;
+    if (!game) {
+      await this.gameRepository.getLock(roomId);
+      return;
+    }
 
     const player = game.findPlayer(playerId);
 
@@ -100,6 +121,7 @@ export class CatchMindService implements CatchMindInputPort {
     if (game.isAllReady) {
       this.roundStart(game);
     }
+    this.gameRepository.release(roomId);
   }
 
   roundStart(game: CatchMind) {
@@ -109,9 +131,13 @@ export class CatchMindService implements CatchMindInputPort {
   }
 
   async exitGame(roomId: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game) return;
-
+    if (!game) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+    console.log("???", roomId);
     if (game.isTurnPlayer(playerId)) {
       this.roundEnd(roomId, null);
       this.cancelTimer(roomId);
@@ -124,11 +150,14 @@ export class CatchMindService implements CatchMindInputPort {
     }
 
     if (game.isAllExit) {
+      console.log("\x1b[33mend game\x1b[37m", roomId);
       this.roomAPI.gameEnded(roomId);
       this.gameRepository.delete(roomId);
     } else {
       this.gameRepository.save(game);
     }
+
+    this.gameRepository.release(roomId);
   }
 
   cancelTimer(roomId: string) {

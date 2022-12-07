@@ -20,6 +20,8 @@ interface GameData {
 }
 
 export class CatchMindRepository implements CatchMindRepositoryDataPort {
+  static lock: Map<string, ((value: unknown) => void)[]> = new Map();
+
   save(game: CatchMind) {
     const gameData = this.stringify(game);
     redisCli.set(`CatchMind/${game.roomId}`, gameData);
@@ -35,6 +37,33 @@ export class CatchMindRepository implements CatchMindRepositoryDataPort {
   async delete(roomId: string) {
     if (await redisCli.exists(`CatchMind/${roomId}`))
       redisCli.del(`CatchMind/${roomId}`);
+  }
+
+  getLock(id: string) {
+    if (!CatchMindRepository.lock.has(id)) {
+      CatchMindRepository.lock.set(id, []);
+      return new Promise((resolve) => resolve(true));
+    } else {
+      return new Promise((resolve) => {
+        CatchMindRepository.lock.get(id)?.push(resolve);
+      });
+    }
+  }
+
+  release(id: string) {
+    if (CatchMindRepository.lock.has(id)) {
+      const blockedList = CatchMindRepository.lock.get(id);
+
+      if (blockedList!.length <= 1) {
+        CatchMindRepository.lock.delete(id);
+      } else {
+        CatchMindRepository.lock.set(id, blockedList!.slice(1));
+      }
+
+      if (blockedList![0]) {
+        blockedList![0](1);
+      }
+    }
   }
 
   parse(data: GameData) {
