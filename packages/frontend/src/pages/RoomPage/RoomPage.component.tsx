@@ -90,6 +90,17 @@ const RoomPage = () => {
     };
   }, [socket, setPlayers]);
 
+  useEffect(() => {
+    setPlayers((prev) =>
+      prev.map((player) => {
+        delete player.isReady;
+        delete player.isCurrentTurn;
+        delete player.score;
+        return player;
+      })
+    );
+  }, [setPlayers]);
+
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
