@@ -76,6 +76,7 @@ const CatchMind = () => {
   };
 
   const onGoToRoomClick = () => {
+    socket.emit("quit-game");
     navigate("/room", { replace: true });
     socket.emit("quit-game");
   };
