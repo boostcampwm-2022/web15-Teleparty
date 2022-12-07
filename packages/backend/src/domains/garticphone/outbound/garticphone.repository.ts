@@ -22,7 +22,7 @@ export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
   }
 
   async delete(roomId: string) {
-    if (await redisCli.isExists(`Gartic/${roomId}`))
+    if (await redisCli.exists(`Gartic/${roomId}`))
       redisCli.del(`Gartic/${roomId}`);
   }
 

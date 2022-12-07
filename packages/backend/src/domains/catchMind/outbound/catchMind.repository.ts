@@ -33,7 +33,7 @@ export class CatchMindRepository implements CatchMindRepositoryDataPort {
   }
 
   async delete(roomId: string) {
-    if (await redisCli.isExists(`CatchMind/${roomId}`))
+    if (await redisCli.exists(`CatchMind/${roomId}`))
       redisCli.del(`CatchMind/${roomId}`);
   }
 
