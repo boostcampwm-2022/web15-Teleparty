@@ -13,6 +13,12 @@ import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
+import {
+  CanvasEventType,
+  DrawStartParameter,
+  DrawParameter,
+  CanvasEvent,
+} from "./utils/types";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
@@ -86,16 +92,13 @@ const Canvas = ({
     }
   });
 
-  const drawStart = (
-    x: number,
-    y: number,
-    tool: Tool,
-    color: string,
-    transparency: number,
-    lineWidth: number
-  ) => {
-    const point: Point = { x, y };
-
+  const drawStart = ({
+    point,
+    tool,
+    color,
+    transparency,
+    lineWidth,
+  }: DrawStartParameter) => {
     if (tool === "fill") {
       if (!canvasRef.current) return;
       const polygon = new Polygon(
@@ -122,14 +125,11 @@ const Canvas = ({
     isDrawing.current = true;
 
     captureCanvas();
-    draw(x, y);
+    draw({ point });
   };
 
-  const draw = (x: number, y: number) => {
-    if (!isDrawing.current) return;
-
+  const draw = ({ point }: DrawParameter) => {
     const target = shapeList.current.at(-1);
-    const point: Point = { x, y };
 
     if (target instanceof Line) {
       target.pushPoint(point);
@@ -159,12 +159,27 @@ const Canvas = ({
     drawAllShapes();
   };
 
-  useEffect(() => {
-    console.log("useEffect event 등록 called");
+  const sendDataToAllConnections = (event: CanvasEventType, data?: any) => {
     for (const dataConnection of dataConnections) {
-      console.log("dataConnection에 등록!");
+      dataConnection.send({ event, data });
+    }
+  };
+
+  useEffect(() => {
+    for (const dataConnection of dataConnections) {
       dataConnection.on("data", (data) => {
-        console.log(data);
+        const { event, data: eventData } = data as CanvasEvent;
+
+        switch (event) {
+          case "canvas:draw-start":
+            return drawStart(eventData as DrawStartParameter);
+          case "canvas:draw":
+            return draw(eventData as DrawParameter);
+          case "canvas:draw-end":
+            return drawEnd();
+          case "canvas:undo":
+            return undo();
+        }
       });
     }
   }, []);
@@ -178,31 +193,47 @@ const Canvas = ({
       event.target as Element
     );
 
-    drawStart(point.x, point.y, tool, color, transparency, thickness * 16);
+    const drawStartArgument: DrawStartParameter = {
+      point,
+      tool,
+      color,
+      transparency,
+      lineWidth: thickness * 16,
+    };
+    drawStart(drawStartArgument);
+    sendDataToAllConnections("canvas:draw-start", drawStartArgument);
+    isDrawing.current = true;
   };
 
   const mouseMoveHandler: React.MouseEventHandler<HTMLCanvasElement> = (
     event
   ) => {
+    if (!isDrawing.current) return;
+
     const point = getCoordRelativeToElement(
       event.clientX,
       event.clientY,
       event.target as Element
     );
 
-    draw(point.x, point.y);
+    const drawArgument: DrawParameter = { point };
+    draw(drawArgument);
+    sendDataToAllConnections("canvas:draw", drawArgument);
   };
 
   const mouseUpHandler: React.MouseEventHandler<HTMLCanvasElement> = () => {
     drawEnd();
+    sendDataToAllConnections("canvas:draw-end");
+    isDrawing.current = false;
   };
 
   const keyDownHandler: React.KeyboardEventHandler<HTMLCanvasElement> = (
     event
   ) => {
-    if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-      undo();
-    }
+    if (!((event.metaKey || event.ctrlKey) && event.key === "z")) return;
+
+    undo();
+    sendDataToAllConnections("canvas:undo");
   };
 
   return (
