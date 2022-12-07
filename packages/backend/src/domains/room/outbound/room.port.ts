@@ -18,11 +18,15 @@ export interface JoinPlayerTotalInfo {
   players: PlayerInfo[];
 }
 
+export interface QuitPlayerInfo {
+  peerId: string;
+}
+
 export interface RoomEvent {
   join: (data: JoinPlayerTotalInfo, peerId: string) => void;
   newJoin: (data: PlayerInfo, roomId: string) => void;
   modeChange: (data: GameMode, roomId: string) => void;
-  quitPlayer: (data: JoinPlayerTotalInfo, roomId: string) => void;
+  quitPlayer: (data: QuitPlayerInfo, roomId: string) => void;
 }
 
 export interface RoomApiPort {
