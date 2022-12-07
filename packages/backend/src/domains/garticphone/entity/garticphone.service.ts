@@ -1,15 +1,18 @@
 import { GarticphonePort, RoundType } from "../inbound/garticphone.port";
 import { GarticphoneRepository } from "../outbound/garticphone.repository";
 import { GarticphoneRepositoryDataPort } from "../outbound/garitcphone.repository.port";
-import { Garticphone } from "./garticphone";
+import { Garticphone, Timer } from "./garticphone";
 import { GarticphoneEventPort } from "../outbound/garticphoneEvent.port";
 import { GarticphoneEventAdapter } from "../outbound/garticphoneEvent.adapter";
 import { GarticphoneToRoom } from "../outbound/garticphoneToRoom.port";
 import { GarticphoneToRoomAdapter } from "../outbound/garticphoneToRoom.adapter";
+import { TimerRepository } from "../outbound/timer.repository";
+import { TimerRepositoryDataPort } from "../outbound/timer.repository.port";
 
 const MSEC_PER_SEC = 1000;
 export class GarticphoneService implements GarticphonePort {
-  repository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
+  gameRepository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
+  timerRepository: TimerRepositoryDataPort = new TimerRepository();
   eventEmitter: GarticphoneEventPort = new GarticphoneEventAdapter();
   roomAPI: GarticphoneToRoom = new GarticphoneToRoomAdapter();
 
@@ -24,16 +27,16 @@ export class GarticphoneService implements GarticphonePort {
 
     const timerId = setTimeout(
       () => this.timeOut(roomId),
-      roundTime * MSEC_PER_SEC
+      game.roundTime * MSEC_PER_SEC
     );
 
-    game.setTimer(timerId);
-    console.log(GarticphoneRepository.games);
-    this.repository.save(game);
+    this.timerRepository.save(roomId, new Timer(roomId, timerId));
+
+    this.gameRepository.save(game);
   }
 
   sendAlbum(roomId: string, playerId: string) {
-    const game = this.repository.findById(roomId);
+    const game = this.gameRepository.findById(roomId);
     if (!game || !game.isHost(playerId)) return;
 
     const player = game.nextPlayer();
@@ -54,7 +57,7 @@ export class GarticphoneService implements GarticphonePort {
 
     this.eventEmitter.sendAlbum(roomId, AlbumData);
 
-    this.repository.save(game);
+    this.gameRepository.save(game);
   }
 
   timeOut(roomId: string) {
@@ -67,7 +70,7 @@ export class GarticphoneService implements GarticphonePort {
     data: string,
     type: RoundType
   ) {
-    const game = this.repository.findById(roomId);
+    const game = this.gameRepository.findById(roomId);
     if (!game || game.currentRoundType !== type) return;
 
     game.setAlbumData(data, playerId);
@@ -78,12 +81,18 @@ export class GarticphoneService implements GarticphonePort {
       this.eventEmitter.drawInput(roomId, playerId);
     }
 
-    if (game.isAllInputed) {
-      clearTimeout(game.timerId);
+    this.checkRoundEnd(game);
+  }
 
+  checkRoundEnd(game: Garticphone) {
+    const timer = this.timerRepository.findById(game.roomId);
+
+    if (game.isAllInputed) {
+      clearTimeout(timer?.timer);
+      console.log(game.players.map((player) => player.album));
       if (game.isGameEnded) {
-        this.eventEmitter.gameEnd(roomId);
-        this.repository.save(game);
+        this.eventEmitter.gameEnd(game.roomId);
+        this.gameRepository.save(game);
       } else {
         game.roundEnd();
         this.roundStart(game);
@@ -94,70 +103,61 @@ export class GarticphoneService implements GarticphonePort {
   roundStart(game: Garticphone) {
     const players = game.getPlayerList();
     const roundInfo = game.roundData;
-    console.log(game, roundInfo);
+
     players.forEach((player) => {
       const target = game.getAlbumOwner(player.id, game.currentRound);
-      if (!target) return;
+      if (!target || player.isExit) return;
 
-      if (target.isExit) {
-        this.setAlbumData(game.roomId, player.id, "", game.currentRoundType);
-      } else {
-        const lastData = target.getLastAlbumData();
+      const lastData = target.getLastAlbumData();
 
-        const type = game.currentRoundType;
-        const data = {
-          keyword: type !== "keyword" ? lastData : null,
-          img: type !== "painting" ? lastData : null,
-          roundInfo,
-        };
+      const type = game.currentRoundType;
+      const data = {
+        keyword: type !== "keyword" ? lastData : null,
+        img: type !== "painting" ? lastData : null,
+        roundInfo,
+      };
 
-        this.eventEmitter.roundstart(player.id, type, data);
-      }
+      this.eventEmitter.roundstart(player.id, type, data);
     });
 
     const timerId = setTimeout(
       () => this.timeOut(game.roomId),
       game.roundTime * MSEC_PER_SEC
     );
-    game.setTimer(timerId);
 
-    this.repository.save(game);
+    this.timerRepository.save(game.roomId, new Timer(game.roomId, timerId));
+
+    this.gameRepository.save(game);
   }
 
   cancelAlbumData(roomId: string, playerId: string) {
-    const game = this.repository.findById(roomId);
+    const game = this.gameRepository.findById(roomId);
     if (!game) return;
 
     game.cancelAlbumData(playerId);
-    console.log(
-      game.players.map((player) => {
-        return { id: player.id, input: player.isInputEnded };
-      })
-    );
     if (game.currentRoundType === "keyword") {
       this.eventEmitter.keywordCancel(roomId, playerId);
     } else {
       this.eventEmitter.drawCancel(roomId, playerId);
     }
 
-    this.repository.save(game);
+    this.gameRepository.save(game);
   }
 
   exitGame(roomId: string, playerId: string) {
-    const game = this.repository.findById(roomId);
+    const game = this.gameRepository.findById(roomId);
     if (!game) return;
 
     const result = game.exitGame(playerId);
 
     if (result) {
       this.eventEmitter.playerExit(game.roomId, playerId);
+      this.checkRoundEnd(game);
     }
 
     if (game.isAllExit) {
       this.roomAPI.gameEnded(game.roomId);
-      this.repository.delete(game.roomId);
-    } else {
-      this.repository.save(game);
+      this.gameRepository.delete(game.roomId);
     }
   }
 }

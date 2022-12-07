@@ -38,7 +38,7 @@ export class CatchMindService implements CatchMindInputPort {
       roundInfo,
     });
 
-    await this.gameRepository.save(game);
+    this.gameRepository.save(game);
   }
 
   async drawStart(roomId: string, keyword: string) {
@@ -54,7 +54,7 @@ export class CatchMindService implements CatchMindInputPort {
     const timer = new Timer(roomId, timerId);
 
     this.timerRepository.save(game.roomId, timer);
-    await this.gameRepository.save(game);
+    this.gameRepository.save(game);
   }
 
   async roundEnd(roomId: string, winner: string | null) {
