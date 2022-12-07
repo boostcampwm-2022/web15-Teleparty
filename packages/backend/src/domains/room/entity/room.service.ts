@@ -61,6 +61,8 @@ export class RoomService implements RoomPort {
         this.roomRepository.findOneByRoomId(roomId)?.roomId
       );
 
+      this.roomRepository.savePlayers(newRoom.roomId, newRoom.players);
+
       return;
     }
 
@@ -101,6 +103,8 @@ export class RoomService implements RoomPort {
         room.roomId
       );
     }
+
+    this.roomRepository.savePlayers(room.roomId, room.players);
 
     return;
   }
