@@ -6,12 +6,10 @@ import { Server } from "socket.io";
 import { SocketEmitter } from "./utils/socketEmitter";
 import { catchMindRouter } from "./domains/catchMind/inbound/catchMindInput.controller";
 import { RoomController } from "./domains/room/inbound/room.controller";
-import { PlayerController } from "./domains/player/inbound/player.controller";
 import { garticRouter } from "./domains/garticphone/inbound/garticphone.controller";
 
 import "./domains/chat/inbound/chatIn.controller";
 import "./domains/catchMind/inbound/catchMindAPI.controller";
-import "./domains/player/inbound/player.controller";
 import "./domains/room/inbound/room.controller";
 import "./domains/room/inbound/SearchRoom.api.controller";
 
@@ -66,5 +64,4 @@ io.on("connection", (socket) => {
 
 io.use(catchMindRouter);
 io.use(RoomController);
-io.use(PlayerController);
 io.use(garticRouter);
