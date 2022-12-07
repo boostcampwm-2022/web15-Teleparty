@@ -30,6 +30,7 @@ export interface RoomEvent {
   newJoin: (data: PlayerInfo, roomId: string) => void;
   modeChange: (data: GameMode, roomId: string) => void;
   quitPlayer: (roomId: string, peerId: string) => void;
+  sendError: (peerId: string, message: string) => void;
 }
 
 export interface RoomApiPort {
