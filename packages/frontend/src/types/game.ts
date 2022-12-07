@@ -5,6 +5,7 @@ export interface Player {
   isHost: boolean;
   isMicOn: boolean;
   isAudioDetected: boolean;
+  isGameQuit?: boolean;
 }
 
 export interface GamePlayer extends Player {

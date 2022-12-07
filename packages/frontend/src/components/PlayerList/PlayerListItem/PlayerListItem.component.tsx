@@ -36,8 +36,15 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     isReady,
     score,
     isAudioDetected,
+    isGameQuit,
   } = player;
-  const playerState = isReady ? "ready" : isCurrentTurn ? "turn" : "normal";
+  const playerState = isReady
+    ? "ready"
+    : isCurrentTurn
+    ? "turn"
+    : isGameQuit
+    ? "quit"
+    : "normal";
 
   const toggleAudio = () => {
     const setAudioStateChangedPlayer = (

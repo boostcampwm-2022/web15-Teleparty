@@ -32,9 +32,25 @@ const GamePage = () => {
         return newPlayerList;
       });
     };
+    const quitGameListener = ({ peerId }: { peerId: string }) => {
+      setPlayers((prev) => {
+        const newPlayerList = [...prev];
+        const quitGamePlayerIndex = newPlayerList.findIndex(
+          (player) => player.peerId === peerId
+        );
+        if (quitGamePlayerIndex === -1) return prev;
+
+        newPlayerList[quitGamePlayerIndex].isGameQuit = true;
+        delete newPlayerList[quitGamePlayerIndex].isCurrentTurn;
+        delete newPlayerList[quitGamePlayerIndex].isReady;
+        return newPlayerList;
+      });
+    };
     socket.on("player-quit", playerQuitListener);
+    socket.on("quit-game", quitGameListener);
     return () => {
       socket.off("player-quit", playerQuitListener);
+      socket.off("quit-game", quitGameListener);
     };
   }, [socket, setPlayers]);
 
