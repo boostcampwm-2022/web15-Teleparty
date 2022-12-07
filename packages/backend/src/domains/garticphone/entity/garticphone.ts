@@ -2,6 +2,23 @@ import Crypto from "crypto";
 
 type DataType = "keyword" | "painting";
 
+export interface GarticPlayerData {
+  id: string;
+  isInputEnded: boolean;
+  isExit: boolean;
+  album: AlbumData[];
+}
+
+export interface GarticGameData {
+  players: Player[];
+  roundTime: number;
+  roomId: string;
+  totalRound?: number;
+  currentRound?: number;
+  sendIdx?: number;
+  orderSeed?: number;
+}
+
 export class Timer {
   roomId: string;
   timer: NodeJS.Timeout;
@@ -78,14 +95,22 @@ export class Garticphone {
   sendIdx: number;
   orderSeed: number;
 
-  constructor(players: string[], roundTime: number, roomId: string) {
-    this.players = players.map((playerId) => new Player(playerId));
-    this.totalRound = players.length;
+  constructor({
+    players,
+    roundTime,
+    roomId,
+    totalRound,
+    currentRound,
+    sendIdx,
+    orderSeed,
+  }: GarticGameData) {
+    this.players = players;
+    this.totalRound = totalRound || players.length;
     this.roundTime = roundTime;
     this.roomId = roomId;
-    this.currentRound = 1;
-    this.sendIdx = 0;
-    this.orderSeed = getPrime();
+    this.currentRound = currentRound || 1;
+    this.sendIdx = sendIdx || 0;
+    this.orderSeed = orderSeed || getPrime();
     while (this.orderSeed === this.players.length) {
       this.orderSeed = getPrime();
     }

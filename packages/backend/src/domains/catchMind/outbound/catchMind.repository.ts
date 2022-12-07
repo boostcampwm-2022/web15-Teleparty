@@ -22,18 +22,19 @@ interface GameData {
 export class CatchMindRepository implements CatchMindRepositoryDataPort {
   save(game: CatchMind) {
     const gameData = this.stringify(game);
-    redisCli.set(game.roomId, gameData);
+    redisCli.set(`CatchMind/${game.roomId}`, gameData);
   }
 
   async findById(id: string) {
-    const data = await redisCli.get(id);
+    const data = await redisCli.get(`CatchMind/${id}`);
     if (!data) return;
-    console.log(this.parse(JSON.parse(data)));
+
     return this.parse(JSON.parse(data));
   }
 
   async delete(roomId: string) {
-    if (await redisCli.isExists(roomId)) redisCli.del(roomId);
+    if (await redisCli.isExists(`CatchMind/${roomId}`))
+      redisCli.del(`CatchMind/${roomId}`);
   }
 
   parse(data: GameData) {
@@ -46,7 +47,6 @@ export class CatchMindRepository implements CatchMindRepositoryDataPort {
 
   stringify(game: CatchMind): string {
     const gameData: GameData = game;
-
     return JSON.stringify(gameData);
   }
 }
