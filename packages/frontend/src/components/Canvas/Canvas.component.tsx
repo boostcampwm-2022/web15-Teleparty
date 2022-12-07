@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai/utils";
 
 import { CanvasLayout } from "./Canvas.styles";
 import Ellipse from "./utils/Ellipse";
+import FillShape from "./utils/FillShape";
 import { floodFill } from "./utils/floodfill";
 import Line from "./utils/Line";
 import Rectangle from "./utils/Rectangle";
@@ -96,8 +97,10 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     if (tool === "fill") {
       const ctx = canvasRef.current?.getContext("2d");
       if (!canvasRef.current || !ctx) return;
-      ctx.fillStyle = color;
-      floodFill(ctx, Math.floor(currentPoint.x), Math.floor(currentPoint.y));
+      const fillShape = new FillShape(color, transparency, 0, currentPoint);
+      fillShape.draw(ctx);
+      shapeList.current.push(fillShape);
+
       return;
     }
 
