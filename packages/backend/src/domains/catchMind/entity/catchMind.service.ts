@@ -17,20 +17,20 @@ export class CatchMindService implements CatchMindInputPort {
   timerRepository: TimerRepositoryDataPort = new TimerRepository();
   roomAPI: CatchMindToRoom = new CatchMindToRoomAdapter();
 
-  gameStart(
+  async gameStart(
     goalScore: number,
     players: string[],
     roundTime: number,
     roomId: string,
     totalRound: number
   ) {
-    const game = new CatchMind(
+    const game = new CatchMind({
       goalScore,
-      players,
+      players: players.map((id) => new Player(id)),
       roundTime,
       roomId,
-      totalRound
-    );
+      totalRound,
+    });
 
     const { roundInfo } = game;
     this.eventEmitter.gameStart(game.roomId, {
@@ -38,13 +38,12 @@ export class CatchMindService implements CatchMindInputPort {
       roundInfo,
     });
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
   }
 
-  drawStart(roomId: string, keyword: string) {
-    const game = this.gameRepository.findById(roomId);
+  async drawStart(roomId: string, keyword: string) {
+    const game = await this.gameRepository.findById(roomId);
     if (!game) return;
-
     game.keyword = keyword;
     this.eventEmitter.drawStart(game.roomId, game.turnPlayer);
 
@@ -55,11 +54,11 @@ export class CatchMindService implements CatchMindInputPort {
     const timer = new Timer(roomId, timerId);
 
     this.timerRepository.save(game.roomId, timer);
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
   }
 
-  roundEnd(roomId: string, winner: string | null) {
-    const game = this.gameRepository.findById(roomId);
+  async roundEnd(roomId: string, winner: string | null) {
+    const game = await this.gameRepository.findById(roomId);
     if (!game) return;
 
     if (winner) game.addScore(winner);
@@ -76,8 +75,8 @@ export class CatchMindService implements CatchMindInputPort {
     this.gameRepository.save(game);
   }
 
-  checkAnswer(roomId: string, answer: string, playerId: string) {
-    const game = this.gameRepository.findById(roomId);
+  async checkAnswer(roomId: string, answer: string, playerId: string) {
+    const game = await this.gameRepository.findById(roomId);
     if (!game) return;
 
     if (game.isRightAnswer(answer, playerId)) {
@@ -86,8 +85,8 @@ export class CatchMindService implements CatchMindInputPort {
     }
   }
 
-  roundReady(roomId: string, playerId: string) {
-    const game = this.gameRepository.findById(roomId);
+  async roundReady(roomId: string, playerId: string) {
+    const game = await this.gameRepository.findById(roomId);
     if (!game) return;
 
     const player = game.findPlayer(playerId);
@@ -109,8 +108,8 @@ export class CatchMindService implements CatchMindInputPort {
     this.gameRepository.save(game);
   }
 
-  exitGame(roomId: string, playerId: string) {
-    const game = this.gameRepository.findById(roomId);
+  async exitGame(roomId: string, playerId: string) {
+    const game = await this.gameRepository.findById(roomId);
     if (!game) return;
 
     if (game.isTurnPlayer(playerId)) {
