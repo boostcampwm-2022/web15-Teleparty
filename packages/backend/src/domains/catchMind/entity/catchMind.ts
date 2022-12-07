@@ -1,7 +1,24 @@
-export interface Player {
+export interface CatchMindData {
+  goalScore: number;
+  players: Player[];
+  roundTime: number;
+  roomId: string;
+  totalRound: number;
+  keyword?: string;
+  currentRound?: number;
+  turnPlayerIdx?: number;
+}
+
+export class Player {
   id: string;
   score: number;
   isReady: boolean;
+
+  constructor(id: string, score?: number, isReady?: boolean) {
+    this.id = id;
+    this.score = score || 0;
+    this.isReady = isReady || false;
+  }
 }
 
 export class Timer {
@@ -17,36 +34,24 @@ export class Timer {
 }
 
 export class CatchMind {
-  keyword: string;
   goalScore: number;
-
-  currentRound: number;
-  roundTime: number;
-  totalRound: number;
   players: Player[];
+  roundTime: number;
   roomId: string;
-
-  readyCount: number;
+  totalRound: number;
+  keyword: string;
+  currentRound: number;
   turnPlayerIdx: number;
 
-  constructor(
-    goalScore: number,
-    players: string[],
-    roundTime: number,
-    roomId: string,
-    totalRound: number
-  ) {
-    this.players = players.map((playerId) => {
-      return { id: playerId, score: 0, isReady: false, isExit: false };
-    });
-    this.goalScore = goalScore;
-    this.keyword = "";
-    this.currentRound = 1;
-    this.roundTime = roundTime;
-    this.totalRound = totalRound;
-    this.roomId = roomId;
-    this.readyCount = 0;
-    this.turnPlayerIdx = 0;
+  constructor(data: CatchMindData) {
+    this.players = data.players;
+    this.goalScore = data.goalScore;
+    this.keyword = data.keyword || "";
+    this.currentRound = data.currentRound || 1;
+    this.roundTime = data.roundTime;
+    this.totalRound = data.totalRound;
+    this.roomId = data.roomId;
+    this.turnPlayerIdx = data.turnPlayerIdx || 0;
   }
 
   get turnPlayer() {

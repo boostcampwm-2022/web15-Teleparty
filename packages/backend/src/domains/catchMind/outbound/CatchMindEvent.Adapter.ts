@@ -39,6 +39,7 @@ export class CatchMindEventAdapter implements CatchMindEventPort {
   }
 
   playerExit(roomId: string, playerId: string) {
+    console.log("player exit");
     this.emitter.broadcastRoom(roomId, "quit-game", { peerId: playerId });
   }
 }
