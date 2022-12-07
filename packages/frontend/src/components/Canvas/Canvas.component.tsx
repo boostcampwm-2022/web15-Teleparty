@@ -4,11 +4,9 @@ import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
 
 import { CanvasLayout } from "./Canvas.styles";
-import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
 import { floodFill } from "./utils/floodfill";
 import Line from "./utils/Line";
-import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
