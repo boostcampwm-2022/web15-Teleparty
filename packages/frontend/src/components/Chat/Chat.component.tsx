@@ -1,27 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import { ChatInputForm, ChatLayout } from "./Chat.styles";
 import ChatBubble from "./ChatBubble.component";
 
+import { chatAtom, ChatData } from "../../store/chat";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 import Icon from "../Icon/Icon";
 
-interface ChatData {
-  id: string;
-  message: string;
-}
-
 interface ChatProps {
   variant?: "horizontal";
 }
 
 const Chat = ({ variant }: ChatProps) => {
-  const [chats, setChats] = useState<ChatData[]>([]);
+  const [chats, setChats] = useAtom(chatAtom);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
   const socket = useAtomValue(socketAtom);
@@ -55,11 +51,10 @@ const Chat = ({ variant }: ChatProps) => {
     return () => {
       socket.off("chatting", chatListener);
     };
-  }, [socket]);
+  }, [socket, setChats]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    console.log(chats);
   }, [chats]);
 
   return (
