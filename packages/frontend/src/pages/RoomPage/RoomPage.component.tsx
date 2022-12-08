@@ -147,7 +147,9 @@ const RoomPage = () => {
     <>
       <Toaster />
       <RoomPageLayout ratio={ratio}>
-        <Logo height={100} />
+        <div>
+          <Logo height={100} />
+        </div>
         <RoomPageContentBox>
           <PlayerList maxPlayer={10} sizeType="large" />
           <RoomPageRightContentBox>
