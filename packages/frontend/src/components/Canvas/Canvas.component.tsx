@@ -26,6 +26,7 @@ import { toolAtom, paletteAtom, Tool } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
+import { throttle } from "../../utils/throttle";
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
@@ -242,7 +243,13 @@ const Canvas = ({
       height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
       onMouseDown={readonly ? undefined : mouseDownHandler}
-      onMouseMove={readonly ? undefined : mouseMoveHandler}
+      onMouseMove={
+        readonly
+          ? undefined
+          : dataConnections.length
+          ? throttle(mouseMoveHandler, 0)
+          : mouseMoveHandler
+      }
       onMouseUp={readonly ? undefined : mouseUpHandler}
       onKeyDown={readonly ? undefined : keyDownHandler}
       tabIndex={1}
