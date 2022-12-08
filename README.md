@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://user-images.githubusercontent.com/80938577/205789368-1c39693d-ed95-4c31-bcd1-6ad507680f21.png">
+![image](https://user-images.githubusercontent.com/96206089/206539232-e54509b9-7099-4dcb-a73f-ac591fd75e36.png)
 
 내 마음을 읽어봐! ( ु⁎ᴗ_ᴗ⁎)ु.｡oO 다같이 모여서 노는 그림 퀴즈 게임
 </div>
