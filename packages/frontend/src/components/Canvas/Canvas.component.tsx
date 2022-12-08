@@ -247,7 +247,7 @@ const Canvas = ({
         readonly
           ? undefined
           : dataConnections.length
-          ? throttle(mouseMoveHandler, 0)
+          ? throttle(mouseMoveHandler, 4)
           : mouseMoveHandler
       }
       onMouseUp={readonly ? undefined : mouseUpHandler}
