@@ -29,6 +29,7 @@ import {
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
+import { HidableBox } from "../common/HidableBox";
 import Video from "../Video/Video.component";
 
 const CatchMind = () => {
@@ -196,21 +197,19 @@ const CatchMind = () => {
         />
       </GamePageCenterContentBox>
       <GamePageContentBox>
-        {gameState === "drawing" ? (
+        <HidableBox hide={gameState !== "drawing"}>
           <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
-        ) : (
-          <MoonTimer radius={65} secondTime={Infinity} gameState={gameState} />
-        )}
+        </HidableBox>
         <Chat />
-        {gameState === "inputKeyword" && isMyTurn && (
+        <HidableBox hide={!(gameState === "inputKeyword" && isMyTurn)}>
           <Button
-            variant="large"
+            variant="medium-large"
             onClick={onKeywordSubmit}
             disabled={isKeywordEmpty}
           >
             완료
           </Button>
-        )}
+        </HidableBox>
       </GamePageContentBox>
     </>
   );
