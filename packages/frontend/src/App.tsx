@@ -13,8 +13,8 @@ import LandingPage from "./pages/LandingPage/LandingPage.component";
 import RoomPage from "./pages/RoomPage/RoomPage.component";
 import { ratioAtom } from "./store/ratio";
 
-const MAX_HEIGHT = 1166;
-const MAX_WIDTH = 1830;
+const MAX_HEIGHT = 1007;
+const MAX_WIDTH = 1920;
 
 const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
   useAtomsDevtools("demo");
