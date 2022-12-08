@@ -18,11 +18,11 @@ const getAudioMediaStream = () => {
 export let voiceInputMediaStream: MediaStream | null = null;
 
 export const useAudioCommunication = (
-  peer: Peer,
+  peer: Peer | null,
   peerIdList: string[],
   audioDetectListener?: AudioDetectListener
 ) => {
-  if (!peer.id) {
+  if (!peer?.id) {
     console.error(
       "useAudioCommunication에서 connection이 맺어지지 않은 peer를 전달받았습니다!"
     );
@@ -70,11 +70,11 @@ export const useAudioCommunication = (
   };
 
   const initPeer = () => {
-    peer.on("call", handleCall);
+    peer?.on("call", handleCall);
   };
 
   const clearPeer = () => {
-    peer.off("call", handleCall);
+    peer?.off("call", handleCall);
   };
 
   // call to all peers and handle each new MediaConnection
@@ -82,7 +82,7 @@ export const useAudioCommunication = (
     if (!voiceInputMediaStream) return;
 
     for (const peerId of peerIdList) {
-      const mediaConnection = peer.call(peerId, voiceInputMediaStream);
+      const mediaConnection = peer?.call(peerId, voiceInputMediaStream);
       if (!mediaConnection) {
         console.warn(`${peerId}와 audio communication을 맺는데 실패했습니다!`);
         continue;
@@ -103,6 +103,7 @@ export const useAudioCommunication = (
   };
 
   const initMyAudio = async () => {
+    if (!peer) return;
     if (!voiceInputMediaStream) {
       voiceInputMediaStream = await getAudioMediaStream();
     }
@@ -124,6 +125,7 @@ export const useAudioCommunication = (
   };
 
   const clearMyAudio = () => {
+    if (!peer) return;
     if (!voiceInputMediaStream) return;
     voiceInputMediaStream.getTracks().forEach((track) => track.stop());
     voiceInputMediaStream = null;
