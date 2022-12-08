@@ -13,10 +13,10 @@ import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
+import { ratioAtom } from "../../store/ratio";
 import { thicknessAtom } from "../../store/thickness";
 import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
-import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 
 interface CanvasProps {
@@ -32,6 +32,7 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
+  const ratio = useAtomValue(ratioAtom);
 
   useEffect(() => {
     if (!canvasRef.current || !setOutgoingCanvasStream) return;
@@ -52,7 +53,7 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     ctx.lineJoin = "round";
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, width, height);
-  }, [canvasRef]);
+  }, [canvasRef, ratio]);
 
   const captureCanvas = () => {
     const canvas = canvasRef.current;
@@ -88,11 +89,10 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   });
 
   const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+    const currentPoint = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
 
     if (tool === "fill") {
       if (!canvasRef.current) return;
@@ -127,11 +127,10 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     if (!isDrawing.current) return;
 
     const target = shapeList.current.at(-1);
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+    const currentPoint = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
 
     if (target instanceof Line) {
       target.pushPoint(currentPoint);
@@ -157,12 +156,15 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
       const ctx = canvasRef.current?.getContext("2d");
       if (!canvas || !ctx) return;
 
-      const { width, height } = canvas;
       shapeList.current.pop();
       canvasImageData.current = null;
       drawAllShapes();
     }
   };
+
+  useEffect(() => {
+    drawAllShapes();
+  }, [ratio, drawAllShapes]);
 
   return (
     <CanvasLayout
