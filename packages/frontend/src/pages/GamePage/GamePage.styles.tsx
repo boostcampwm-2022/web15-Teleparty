@@ -10,10 +10,11 @@ const GamePageLayout = styled.main`
 `;
 
 const GamePageRoundParagraph = styled.p`
-  font-family: "PoetsenOne", sans-serif;
+  font-family: "Dongle", sans-serif;
   font-size: 4rem;
   font-weight: bold;
   color: ${(props) => props.theme.colors.white};
+  transform: scale(1.4);
 `;
 
 const GamePageContentBox = styled.div`
