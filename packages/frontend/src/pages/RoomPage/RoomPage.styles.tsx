@@ -8,7 +8,6 @@ const RoomPageLayout = styled.main<{ ratio: number }>`
   gap: 1.5rem;
   height: 100vh;
   padding-top: 30px;
-  ${(props) => props.theme.backgrounds.nightCity}
   transform: scale(${({ ratio }) => ratio});
 `;
 
