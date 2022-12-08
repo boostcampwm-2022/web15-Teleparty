@@ -93,6 +93,11 @@ const Canvas = ({
     }
   });
 
+  const redrawAllShapes = debounceByFrame(() => {
+    canvasImageData.current = null;
+    drawAllShapes();
+  });
+
   const drawStart = ({
     point,
     tool,
@@ -196,6 +201,24 @@ const Canvas = ({
       }
     };
   }, [dataConnections]);
+
+  // 백그라운드에 있다 돌아왔을 때 그림을 복원한다
+  // 백그라운드에 있을 때 캔버스에 그림이 그려지지 않아 해당 코드 작성
+  useEffect(() => {
+    console.log("event listener add called!");
+    const visibilityChangeListener = () => {
+      if (!document.hidden) redrawAllShapes();
+    };
+
+    document.addEventListener("visibilitychange", visibilityChangeListener);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        visibilityChangeListener
+      );
+    };
+  }, [redrawAllShapes]);
 
   const mouseDownHandler: React.MouseEventHandler<HTMLCanvasElement> = (
     event
