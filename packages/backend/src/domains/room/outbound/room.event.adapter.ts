@@ -4,6 +4,7 @@ import {
   JoinPlayerTotalInfo,
   RoomEvent,
   PlayerInfo,
+  QuitPlayerInfo,
 } from "./room.port";
 
 export class RoomEventAdapter implements RoomEvent {
@@ -32,7 +33,13 @@ export class RoomEventAdapter implements RoomEvent {
     // socket.emit('mode-change', data);
   }
 
-  quitPlayer(data: JoinPlayerTotalInfo, roomId: string) {
-    this.emitter.broadcastRoom(roomId, "player-quit", data);
+  quitPlayer(roomId: string, peerId: string) {
+    this.emitter.broadcastRoom(roomId, "player-quit", { peerId });
+  }
+
+  sendError(peerId: string, message: string) {
+    this.emitter.emit(peerId, "error", {
+      message,
+    });
   }
 }

@@ -69,7 +69,7 @@ export class RoomApiAdapter implements RoomApiPort {
     gameModeMap[gameMode](roomId, playerId);
   }
 
-  getAllPlayer() {
-    return connecter.call("player/get-all-players");
+  async getAllPlayer() {
+    return await connecter.call("player/get-all-players");
   }
 }

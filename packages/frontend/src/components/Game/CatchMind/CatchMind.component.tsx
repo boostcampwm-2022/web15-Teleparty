@@ -1,64 +1,65 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
-import Canvas from "../../components/Canvas/Canvas.component";
-import { CanvasLayout } from "../../components/Canvas/Canvas.styles";
-import Chat from "../../components/Chat/Chat.component";
-import { Button } from "../../components/common/Button";
-import { Input } from "../../components/common/Input";
-import Icon from "../../components/Icon/Icon";
-import { Logo } from "../../components/Logo/Logo.component";
-import MoonTimer from "../../components/MoonTimer/MoonTimer.component";
-import PaintBoard from "../../components/PaintBoard/PaintBoard.component";
+import { useCatchMind } from "../../../hooks/useCatchMind";
+import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
+import { gameInfoAtom } from "../../../store/game";
+import { playersAtom } from "../../../store/players";
+import { socketAtom } from "../../../store/socket";
+import Canvas from "../../Canvas/Canvas.component";
+import Chat from "../../Chat/Chat.component";
+import { Button } from "../../common/Button";
+import { HidableBox } from "../../common/HidableBox";
+import { Input } from "../../common/Input";
+import Icon from "../../Icon/Icon";
+import { Logo } from "../../Logo/Logo.component";
+import MoonTimer from "../../MoonTimer/MoonTimer.component";
+import PaintBoard from "../../PaintBoard/PaintBoard.component";
 import {
   KeywordInputLayout,
   PaintBoardButtonLayout,
   PaintBoardEmptyCenterElement,
-} from "../../components/PaintBoard/PaintBoard.styles";
-import PaintToolBox from "../../components/PaintToolBox/PaintToolBox.component";
-import PlayerList from "../../components/PlayerList/PlayerList.component";
-import Rank from "../../components/Rank/Rank.component";
-import { useCatchMind } from "../../hooks/useCatchMind";
+} from "../../PaintBoard/PaintBoard.styles";
+import PaintToolBox from "../../PaintToolBox/PaintToolBox.component";
+import PlayerList from "../../PlayerList/PlayerList.component";
+import Rank from "../../Rank/Rank.component";
 import {
-  GamePageContentBox,
-  GamePageRoundParagraph,
-} from "../../pages/GamePage/GamePage.styles";
-import { gameInfoAtom } from "../../store/game";
-import { playersAtom } from "../../store/players";
-import { socketAtom } from "../../store/socket";
-import Video from "../Video/Video.component";
+  GameContentBox,
+  GameRoundParagraph,
+  GameCenterContentBox,
+} from "../Game.styles";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
-  const [keyword, setKeyword] = useState("");
+  const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
+  const keywordRef = useRef("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [outgoingCanvasStream, setOutgoingCanvasStream] =
-    useState<MediaStream | null>(null);
+  const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
 
-  const {
-    gamePlayerList,
-    gameState,
-    isMyTurn,
-    roundEndInfo,
-    roundInfo,
-    incomingCanvasStream,
-  } = useCatchMind(socket, players, gameInfo.roundInfo, outgoingCanvasStream);
-  console.log(incomingCanvasStream);
+  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
+    socket,
+    gameInfo.roundInfo
+  );
+
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
-    return gamePlayerList.find(({ peerId }) => peerId === id)?.userName;
+    return players.find(({ peerId }) => peerId === id)?.userName;
   };
 
   const currentTurnUserName = getUserNameById(turnPlayer);
 
-  const onKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeyword(e.target.value);
+  const onKeywordChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) setIsKeywordEmpty(true);
+    else setIsKeywordEmpty(false);
+    keywordRef.current = value;
   };
 
   const onReady = () => {
@@ -66,11 +67,12 @@ const CatchMind = () => {
   };
 
   const onKeywordSubmit = () => {
-    if (!keyword) return;
-    socket.emit("input-keyword", { keyword });
+    if (!keywordRef.current) return;
+    socket.emit("input-keyword", { keyword: keywordRef.current });
   };
 
   const onGoToRoomClick = () => {
+    socket.emit("quit-game");
     navigate("/room", { replace: true });
   };
 
@@ -82,7 +84,7 @@ const CatchMind = () => {
           : `${currentTurnUserName}님이 제시어를 입력하고 있습니다.`;
       case "drawing":
         return isMyTurn
-          ? `제시어: ${keyword}`
+          ? `제시어: ${keywordRef.current}`
           : "그림을 보고 제시어를 맞춰 주세요";
       case "roundEnd":
         return roundEndInfo?.roundWinner
@@ -104,19 +106,25 @@ const CatchMind = () => {
           return (
             <Canvas
               canvasRef={canvasRef}
-              setOutgoingCanvasStream={setOutgoingCanvasStream}
+              dataConnections={[...dataConnectionMap.values()]}
             />
           );
-        return <Video srcObject={incomingCanvasStream} />;
+        return (
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
+        );
       case "gameEnd":
         return (
           <Rank
-            rankList={gamePlayerList
-              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+            rankList={players
               .map(({ userName, score }) => ({
                 userName,
                 score: score ?? 0,
-              }))}
+              }))
+              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))}
           />
         );
       case "inputKeyword":
@@ -125,10 +133,14 @@ const CatchMind = () => {
         return isMyTurn ? (
           <Canvas
             canvasRef={canvasRef}
-            setOutgoingCanvasStream={setOutgoingCanvasStream}
+            dataConnections={[...dataConnectionMap.values()]}
           />
         ) : (
-          <Video srcObject={incomingCanvasStream} />
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
         );
       default:
         return null;
@@ -173,33 +185,38 @@ const CatchMind = () => {
 
   return (
     <>
-      <GamePageContentBox>
-        <GamePageRoundParagraph>
+      <GameContentBox>
+        <GameRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
-        </GamePageRoundParagraph>
+        </GameRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
-      </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      </GameContentBox>
+      <GameCenterContentBox>
+        <div>
+          <Logo height={70} />
+        </div>
+
         <PaintBoard
           headerText={getHeaderElement()}
           centerElement={getCenterElement()}
           footerElement={getFooterElement()}
         />
-      </GamePageContentBox>
-      <GamePageContentBox>
-        {gameState === "drawing" ? (
-          <MoonTimer radius={50} secondTime={roundTime} />
-        ) : (
-          <MoonTimer radius={50} secondTime={Infinity} />
-        )}
+      </GameCenterContentBox>
+      <GameContentBox>
+        <HidableBox hide={gameState !== "drawing"}>
+          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
+        </HidableBox>
         <Chat />
-        {gameState === "inputKeyword" && isMyTurn && (
-          <Button variant="large" onClick={onKeywordSubmit}>
+        <HidableBox hide={!(gameState === "inputKeyword" && isMyTurn)}>
+          <Button
+            variant="medium-large"
+            onClick={onKeywordSubmit}
+            disabled={isKeywordEmpty}
+          >
             완료
           </Button>
-        )}
-      </GamePageContentBox>
+        </HidableBox>
+      </GameContentBox>
     </>
   );
 };

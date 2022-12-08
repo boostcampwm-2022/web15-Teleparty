@@ -1,5 +1,5 @@
 import { GAME_MODE, Room } from "../entity/room.entity";
-import { Player } from "../../player/entity/player.entitiy";
+import { Player } from "../entity/player.entitiy";
 
 export type PlayerInfo = {
   peerId: string;
@@ -7,6 +7,13 @@ export type PlayerInfo = {
   avataURL: string;
   isHost: boolean;
   isMicOn: boolean;
+};
+
+export type NewPlayer = {
+  peerId: string;
+  userName: string;
+  avata: string;
+  roomId: string;
 };
 
 export type GameMode = {
@@ -18,11 +25,16 @@ export interface JoinPlayerTotalInfo {
   players: PlayerInfo[];
 }
 
+export interface QuitPlayerInfo {
+  peerId: string;
+}
+
 export interface RoomEvent {
   join: (data: JoinPlayerTotalInfo, peerId: string) => void;
   newJoin: (data: PlayerInfo, roomId: string) => void;
   modeChange: (data: GameMode, roomId: string) => void;
-  quitPlayer: (data: JoinPlayerTotalInfo, roomId: string) => void;
+  quitPlayer: (roomId: string, peerId: string) => void;
+  sendError: (peerId: string, message: string) => void;
 }
 
 export interface RoomApiPort {
@@ -36,17 +48,16 @@ export interface RoomApiPort {
   ) => void;
   chatting: (senderId: string, roomId: string, message: string) => void;
   playerQuit: (gameMode: GAME_MODE, roomId: string, playerId: string) => void;
-  getAllPlayer: () => Player[];
 }
 
 export interface RoomRepositoryDataPort {
   create: (roomId: string) => Room;
-  findOneByRoomId: (roomId?: string) => Room | undefined;
-  findOneByPeerId: (peerId: string) => Room | undefined;
-  findAll: () => Room[];
-  updateHostByRoomId: (roomId: string, peerId: string) => void;
-  updateStateByRoomId: (roomId: string, state: boolean) => void;
-  updateGameModeByRoomId: (roomId: string, gameMode: GAME_MODE) => void;
+  createUser: (data: NewPlayer) => Player;
+  save: (roomId: string, room: Room) => void;
+  findAllPlayer: () => string[];
+  findOneByRoomId: (roomId: string) => Promise<Room | undefined>;
+  findOneByPeerId: (roomId: string) => Promise<Room | undefined>;
+  findPlayerByPeerId: (peerId: string) => Promise<Player | undefined>;
   deleteByRoomId: (roomId: string) => void;
-  deletePlayerofRoomByPeerId: (peerId: string) => void;
+  deletePlayer: (peerId: string, room: Room) => void;
 }

@@ -1,40 +1,22 @@
-import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router";
+import { Routes, Route } from "react-router-dom";
 
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
-import {
-  RoomPageButtonBox,
-  RoomPageContentBox,
-  RoomPageLayout,
-  RoomPageRightContentBox,
-} from "./RoomPage.styles";
-
-import Chat from "../../components/Chat/Chat.component";
-import { Button } from "../../components/common/Button";
-import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
-import { Logo } from "../../components/Logo/Logo.component";
-import PlayerList from "../../components/PlayerList/PlayerList.component";
-import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
+import Game from "../../components/Game/Game.components";
+import Lobby from "../../components/Lobby/Lobby.component";
 import { useAudioCommunication } from "../../hooks/useAudioCommunication";
+import { useDataConnectionWithPeers } from "../../hooks/useDataConnectionWithPeers";
 import usePreventClose from "../../hooks/usePreventClose";
-import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
-import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
-import { AudioDetectListener } from "../../utils/audioStreamMap";
-
-import type { GameInfo, Player } from "../../types/game";
+import { AudioDetectListener } from "../../utils/audioStreamManager";
 
 const RoomPage = () => {
-  const roomId = useAtomValue(roomIdAtom);
-  const socket = useAtomValue(socketAtom);
-  const peer = useAtomValue(peerAtom);
   const [players, setPlayers] = useAtom(playersAtom);
-  const setGameInfo = useSetAtom(gameInfoAtom);
-  const navigate = useNavigate();
-  const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  const peer = useAtomValue(peerAtom);
+  const socket = useAtomValue(socketAtom);
+
   usePreventClose();
 
   const changeAudioDetectionStateOfPlayer: AudioDetectListener = (
@@ -50,74 +32,18 @@ const RoomPage = () => {
     );
   };
 
-  useAudioCommunication(
-    peer,
-    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id),
-    changeAudioDetectionStateOfPlayer
-  );
+  const playerIdList = players
+    .map(({ peerId }) => peerId)
+    .filter((id) => id !== socket.id);
 
-  const onInviteClick = () => {
-    const inviteUrl = `${window.location.origin}/?invite=${roomId}`;
-    navigator.clipboard.writeText(inviteUrl);
-  };
+  useAudioCommunication(peer!, playerIdList, changeAudioDetectionStateOfPlayer);
+  useDataConnectionWithPeers(peer!, playerIdList);
 
-  const isHost =
-    socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
-
-  const onGameStartClick = () => {
-    if (!isHost) return;
-    socket.emit("game-start", { gameMode });
-  };
-
-  useEffect(() => {
-    const gameStartListener = (gameStartResponse: GameInfo) => {
-      setGameInfo(gameStartResponse);
-      navigate("/game", { replace: true });
-    };
-    socket.on("game-start", gameStartListener);
-    return () => {
-      socket.off("game-start", gameStartListener);
-    };
-  }, [socket, navigate, setGameInfo]);
-
-  useEffect(() => {
-    const newJoinListener = (player: Player) => {
-      setPlayers((prev) => [...prev, player]);
-    };
-    socket.on("new-join", newJoinListener);
-    return () => {
-      socket.off("new-join", newJoinListener);
-    };
-  }, [socket, setPlayers]);
-
-  return roomId === undefined ? (
-    <Navigate to="/" replace />
-  ) : (
-    <RoomPageLayout>
-      <Logo />
-      <RoomPageContentBox>
-        <PlayerList maxPlayer={10} sizeType="large" />
-        <RoomPageRightContentBox>
-          <GameModeSegmentedControl
-            selectedGameMode={gameMode}
-            setSelectedGameMode={setGameMode}
-          />
-          <RoomPageButtonBox>
-            <Button variant="medium" onClick={onInviteClick}>
-              초대
-            </Button>
-            <Button
-              variant="medium"
-              onClick={onGameStartClick}
-              disabled={!isHost}
-            >
-              게임시작
-            </Button>
-          </RoomPageButtonBox>
-          <Chat variant="horizontal" />
-        </RoomPageRightContentBox>
-      </RoomPageContentBox>
-    </RoomPageLayout>
+  return (
+    <Routes>
+      <Route index element={<Lobby />}></Route>
+      <Route path="game" element={<Game />}></Route>
+    </Routes>
   );
 };
 

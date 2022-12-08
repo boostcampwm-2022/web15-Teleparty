@@ -15,7 +15,7 @@ import { colors } from "../../../global-styles/theme";
 import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
 import { playersAtom } from "../../../store/players";
 import { GamePlayer } from "../../../types/game";
-import { audioStreamManager } from "../../../utils/audioStreamMap";
+import { audioStreamManager } from "../../../utils/audioStreamManager";
 import Icon from "../../Icon/Icon";
 
 interface PlayerListItemProps {
@@ -36,8 +36,15 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     isReady,
     score,
     isAudioDetected,
+    isGameQuit,
   } = player;
-  const playerState = isReady ? "ready" : isCurrentTurn ? "turn" : "normal";
+  const playerState = isReady
+    ? "ready"
+    : isCurrentTurn
+    ? "turn"
+    : isGameQuit
+    ? "quit"
+    : "normal";
 
   const toggleAudio = () => {
     const setAudioStateChangedPlayer = (
@@ -75,7 +82,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     <PlayerListItemLayout sizeType={sizeType} state={playerState}>
       <RightSection>
         <AvatarContainer spotlight={isAudioDetected}>
-          {isHost && <Icon icon="check" size={20} />}
+          {isHost && <Icon icon="crown" size={20} color={colors.primary} />}
           {avatarURL && <Avatar src={avatarURL} />}
         </AvatarContainer>
         <Name>{userName}</Name>

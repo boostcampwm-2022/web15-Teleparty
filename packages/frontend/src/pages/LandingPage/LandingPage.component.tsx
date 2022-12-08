@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -9,11 +10,12 @@ import { LandingPageLayout } from "./LandingPage.styles";
 import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
-import { nicknameAtom, nicknameErrorAtom } from "../../store/nickname";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
+import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
+import { createPeerId } from "../../utils/peer";
 
 import type { Player } from "../../types/game";
 
@@ -26,19 +28,25 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const setRoomId = useSetAtom(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const nickname = useAtomValue(nicknameAtom);
-  const nicknameError = useAtomValue(nicknameErrorAtom);
+
   const setPlayers = useSetAtom(playersAtom);
   const [peer, setPeer] = useAtom(peerAtom);
+  const nicknameRef = useRef<HTMLInputElement>(null);
+  const [nicknameError, setNicknameError] = useState(true);
+  const ratio = useAtomValue(ratioAtom);
 
   const invite = new URLSearchParams(window.location.search).get("invite");
 
   const onEnterClick = () => {
-    if (nickname === "" || nicknameError) return;
+    if (!nicknameRef.current?.value || nicknameError) return;
     setRoomId(invite);
 
     // avatar 추가 필요
-    socket.emit("join", { userName: nickname, avatar: "", roomId: invite });
+    socket.emit("join", {
+      userName: nicknameRef.current.value,
+      avatar: "",
+      roomId: invite,
+    });
   };
 
   const runAfterSocketConnected = (callback: () => void) => {
@@ -53,8 +61,9 @@ const LandingPage = () => {
   useEffect(() => {
     runAfterSocketConnected(() => {
       console.log("my id: ", socket.id);
+
       setPeer(
-        new Peer(socket.id, {
+        new Peer(createPeerId(socket.id), {
           debug: 0,
         })
       );
@@ -85,18 +94,42 @@ const LandingPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const errorListener = ({ message }: { message: string }) => {
+      toast.dismiss();
+      toast.error(message);
+    };
+    socket.on("error", errorListener);
+    return () => {
+      socket.off("error", errorListener);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (invite) {
+      toast.dismiss();
+      toast.success("방에 참여하도록 초대되었습니다!");
+    }
+  }, [invite]);
+
   return (
-    <LandingPageLayout>
-      <Logo />
-      <NicknameInput />
-      <Button
-        variant="medium"
-        onClick={onEnterClick}
-        disabled={nickname === "" || nicknameError}
-      >
-        입장
-      </Button>
-    </LandingPageLayout>
+    <>
+      <Toaster />
+
+      <LandingPageLayout ratio={ratio}>
+        <div>
+          <Logo />
+        </div>
+        <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
+        <Button
+          variant="medium"
+          onClick={onEnterClick}
+          disabled={nicknameError}
+        >
+          {invite ? "입장" : "생성"}
+        </Button>
+      </LandingPageLayout>
+    </>
   );
 };
 

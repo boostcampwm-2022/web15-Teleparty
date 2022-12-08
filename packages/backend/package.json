@@ -27,6 +27,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "@socket.io/cluster-adapter": "^0.2.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "morgan": "^1.10.0",

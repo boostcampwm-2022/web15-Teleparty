@@ -2,6 +2,35 @@ import Crypto from "crypto";
 
 type DataType = "keyword" | "painting";
 
+export interface GarticPlayerData {
+  id: string;
+  isInputEnded: boolean;
+  isExit: boolean;
+  album: AlbumData[];
+}
+
+export interface GarticGameData {
+  players: Player[];
+  roundTime: number;
+  roomId: string;
+  totalRound?: number;
+  currentRound?: number;
+  sendIdx?: number;
+  orderSeed?: number;
+}
+
+export class Timer {
+  roomId: string;
+  timer: NodeJS.Timeout;
+  constructor(roomId: string, id: NodeJS.Timeout) {
+    this.roomId = roomId;
+    this.timer = id;
+  }
+  cancelTimer() {
+    clearTimeout(this.timer);
+  }
+}
+
 export class AlbumData {
   type: DataType;
   ownerId: string;
@@ -61,20 +90,27 @@ export class Garticphone {
   totalRound: number;
   currentRound: number;
   players: Player[];
-  timerId: NodeJS.Timer | undefined;
   roundTime: number;
   roomId: string;
   sendIdx: number;
   orderSeed: number;
 
-  constructor(players: string[], roundTime: number, roomId: string) {
-    this.players = players.map((playerId) => new Player(playerId));
-    this.totalRound = players.length;
+  constructor({
+    players,
+    roundTime,
+    roomId,
+    totalRound,
+    currentRound,
+    sendIdx,
+    orderSeed,
+  }: GarticGameData) {
+    this.players = players;
+    this.totalRound = totalRound || players.length;
     this.roundTime = roundTime;
     this.roomId = roomId;
-    this.currentRound = 1;
-    this.sendIdx = 0;
-    this.orderSeed = getPrime();
+    this.currentRound = currentRound || 1;
+    this.sendIdx = sendIdx || 0;
+    this.orderSeed = orderSeed || getPrime();
     while (this.orderSeed === this.players.length) {
       this.orderSeed = getPrime();
     }
@@ -96,7 +132,10 @@ export class Garticphone {
   }
 
   get isGameEnded() {
-    return this.totalRound === this.currentRound;
+    return (
+      this.totalRound === this.currentRound &&
+      this.players.every((player) => player.isInputEnded)
+    );
   }
 
   get isLastAlbum() {
@@ -154,11 +193,13 @@ export class Garticphone {
 
   roundEnd() {
     this.currentRound++;
-    this.players.forEach((player) => (player.isInputEnded = false));
-  }
-
-  setTimer(timerId: NodeJS.Timer) {
-    this.timerId = timerId;
+    this.players.forEach((player) => {
+      if (!player.isExit) {
+        player.isInputEnded = false;
+      } else {
+        this.setAlbumData("", player.id);
+      }
+    });
   }
 
   exitGame(playerId: string) {
@@ -166,6 +207,7 @@ export class Garticphone {
 
     if (player) {
       player.exitGame();
+      if (!this.isGameEnded) this.setAlbumData("", playerId);
       return true;
     } else return false;
   }

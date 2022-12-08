@@ -8,31 +8,33 @@ import {
   GarticResultLayout,
 } from "./Gartic.styles";
 
-import useGartic from "../../hooks/useGartic";
+import useGartic from "../../../hooks/useGartic";
+import { gameInfoAtom } from "../../../store/game";
+import { playersAtom } from "../../../store/players";
+import { socketAtom } from "../../../store/socket";
+import Album from "../../Album/Album.component";
+import Canvas from "../../Canvas/Canvas.component";
+import { CanvasLayout } from "../../Canvas/Canvas.styles";
+import Chat from "../../Chat/Chat.component";
+import { Button } from "../../common/Button";
+import { HidableBox } from "../../common/HidableBox";
+import { Input } from "../../common/Input";
+import { Logo } from "../../Logo/Logo.component";
+import MoonTimer from "../../MoonTimer/MoonTimer.component";
+import PaintBoard from "../../PaintBoard/PaintBoard.component";
+import { KeywordInputLayout } from "../../PaintBoard/PaintBoard.styles";
+import PaintToolBox from "../../PaintToolBox/PaintToolBox.component";
+import PlayerList from "../../PlayerList/PlayerList.component";
 import {
-  GamePageContentBox,
-  GamePageRoundParagraph,
-} from "../../pages/GamePage/GamePage.styles";
-import { gameInfoAtom } from "../../store/game";
-import { socketAtom } from "../../store/socket";
-import Album from "../Album/Album.component";
-import Canvas from "../Canvas/Canvas.component";
-import { CanvasLayout } from "../Canvas/Canvas.styles";
-import Chat from "../Chat/Chat.component";
-import { Button } from "../common/Button";
-import { Input } from "../common/Input";
-import { Logo } from "../Logo/Logo.component";
-import MoonTimer from "../MoonTimer/MoonTimer.component";
-import PaintBoard from "../PaintBoard/PaintBoard.component";
-import { KeywordInputLayout } from "../PaintBoard/PaintBoard.styles";
-import PaintToolBox from "../PaintToolBox/PaintToolBox.component";
-import PlayerList from "../PlayerList/PlayerList.component";
+  GameContentBox,
+  GameRoundParagraph,
+  GameCenterContentBox,
+} from "../Game.styles";
 
 const Gartic = () => {
   const {
     gameState,
     album,
-    garticPlayerList,
     image,
     isLastAlbum,
     keyword,
@@ -40,10 +42,11 @@ const Gartic = () => {
   } = useGartic();
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
+  const gamePlayerList = useAtomValue(playersAtom);
   const isDone =
-    garticPlayerList.find((player) => player.peerId === socket.id)?.isDone ??
+    gamePlayerList.find((player) => player.peerId === socket.id)?.isReady ??
     false;
-  const [keywordInput, setKeywordInput] = useState("");
+  const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -52,12 +55,15 @@ const Gartic = () => {
       socket.emit("keyword-cancel");
       return;
     }
-    socket.emit("input-keyword", { keyword: keywordInput });
+    socket.emit("input-keyword", { keyword: keywordInputRef.current });
   };
 
-  const onKeywordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setKeywordInput(e.target.value);
-    keywordInputRef.current = e.target.value;
+  const onKeywordInputChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    if (!value) setIsKeywordEmpty(true);
+    else setIsKeywordEmpty(false);
+    keywordInputRef.current = value;
   };
 
   const drawingButtonClick = () => {
@@ -110,10 +116,6 @@ const Gartic = () => {
   };
 
   useEffect(() => {
-    setKeywordInput("");
-  }, [gameState]);
-
-  useEffect(() => {
     const timeOutListener = () => {
       if (gameState === "gameStart" || gameState === "inputKeyword")
         socket.emit("input-keyword", { keyword: keywordInputRef.current });
@@ -131,46 +133,46 @@ const Gartic = () => {
 
   return gameState !== "gameEnd" ? (
     <>
-      <GamePageContentBox>
-        <GamePageRoundParagraph>
+      <GameContentBox>
+        <GameRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
-        </GamePageRoundParagraph>
+        </GameRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
-      </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      </GameContentBox>
+      <GameCenterContentBox>
+        <Logo height={70} />
         <PaintBoard
           headerText={headerElementMap[gameState]}
           centerElement={centerElementMap[gameState]}
           footerElement={footerElementMap[gameState]}
         />
-      </GamePageContentBox>
-      <GamePageContentBox>
-        <MoonTimer radius={60} secondTime={roundTime} />
+      </GameCenterContentBox>
+      <GameContentBox>
+        <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         <Chat />
         <Button
-          variant="large"
+          variant="medium-large"
           onClick={buttonClickMap[gameState]}
           disabled={
             (gameState === "gameStart" || gameState === "inputKeyword") &&
-            !keywordInput
+            isKeywordEmpty
           }
         >
           {isDone ? "편집" : "완료"}
         </Button>
-      </GamePageContentBox>
+      </GameContentBox>
     </>
   ) : (
     <GarticResultLayout>
       <Logo height={80} />
       <GarticResultContentLayout>
-        <GamePageContentBox>
+        <GameContentBox>
           <PlayerList maxPlayer={10} sizeType="large" />
-        </GamePageContentBox>
-        <GamePageContentBox>
+        </GameContentBox>
+        <GameContentBox>
           <Album album={album} isLastAlbum={isLastAlbum} />
           <Chat variant="horizontal" />
-        </GamePageContentBox>
+        </GameContentBox>
       </GarticResultContentLayout>
     </GarticResultLayout>
   );

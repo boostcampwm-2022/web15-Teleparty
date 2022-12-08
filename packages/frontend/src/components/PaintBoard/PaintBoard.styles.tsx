@@ -15,6 +15,7 @@ export const PaintBoardEmptyCenterElement = styled.div`
 export const PaintBoardHeader = styled.header`
   padding: 12px;
   border-radius: 10px;
+  box-shadow: ${(props) => props.theme.shadows.medium};
   font-size: 1.8rem;
   font-weight: bold;
   text-align: center;
@@ -42,6 +43,7 @@ export const PaintBoardCenterElementBox = styled.div`
 export const PaintBoardLayout = styled.div`
   padding: 15px;
   border-radius: 10px;
+  box-shadow: ${(props) => props.theme.shadows.medium};
   background-color: ${(props) => props.theme.colors.primaryLightTransparent};
 
   ${PaintBoardHeader} {
