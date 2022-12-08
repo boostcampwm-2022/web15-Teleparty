@@ -54,10 +54,6 @@ export interface RoomRepositoryDataPort {
   findOneByRoomId: (roomId: string) => Promise<Room | undefined>;
   findOneByPeerId: (roomId: string) => Promise<Room | undefined>;
   findPlayerByPeerId: (peerId: string) => Promise<Player | undefined>;
-  findPlayersByPeerIds: (peerIds: string[]) => Promise<Player[] | undefined>;
-  updateHostByRoomId: (roomId: string, peerId: string) => void;
-  updateStateByRoomId: (roomId: string, state: boolean) => void;
-  updateGameModeByRoomId: (roomId: string, gameMode: GAME_MODE) => void;
   deleteByRoomId: (roomId: string) => void;
   deletePlayer: (peerId: string, room: Room) => void;
 }

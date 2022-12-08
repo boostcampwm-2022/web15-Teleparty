@@ -30,10 +30,6 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   async findOneByRoomId(roomId: string) {
-    console.log("findOneByRoomId ", roomId);
-
-    console.log(makeHashKeyByRoomId(roomId));
-
     const data = await redisCli.get(makeHashKeyByRoomId(roomId));
 
     if (!data) return;
@@ -67,42 +63,6 @@ export class RoomRepository implements RoomRepositoryDataPort {
     return new Player(JSON.parse(playerJson));
   }
 
-  async findPlayersByPeerIds(peerIds: string[]) {
-    const players: Player[] = [];
-
-    for (const peerId of peerIds) {
-      const playerJson = await redisCli.get(makeHashKeyByPeerId(peerId));
-
-      if (playerJson) {
-        const player = new Player(JSON.parse(playerJson));
-        players.push(player);
-      }
-    }
-
-    return players;
-  }
-
-  async updateHostByRoomId(roomId: string, peerId: string) {
-    const room = await this.findOneByRoomId(roomId);
-    if (!room) return;
-    room.host = peerId;
-    this.save(roomId, room);
-  }
-
-  async updateStateByRoomId(roomId: string, state: boolean) {
-    const room = await this.findOneByRoomId(roomId);
-    if (!room) return;
-    room.state = state;
-    this.save(roomId, room);
-  }
-
-  async updateGameModeByRoomId(roomId: string, gameMode: GAME_MODE) {
-    const room = await this.findOneByRoomId(roomId);
-    if (!room) return;
-    room.gameMode = gameMode;
-    this.save(roomId, room);
-  }
-
   async deleteByRoomId(roomId: string) {
     console.log("delete roomId", roomId);
 
@@ -112,9 +72,15 @@ export class RoomRepository implements RoomRepositoryDataPort {
 
   deletePlayer(peerId: string, room: Room) {
     redisCli.unlink(makeHashKeyByPeerId(peerId));
+
+    room.players = room.players.filter((player) => {
+      return player.peerId !== peerId;
+    });
+
     this.save(room.roomId, room);
+
     RoomRepository.players = RoomRepository.players.filter((id) => {
-      id !== peerId;
+      return id !== peerId;
     });
   }
 }

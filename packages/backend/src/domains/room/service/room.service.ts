@@ -81,7 +81,7 @@ export class RoomService implements RoomPort {
       return;
     }
 
-    room.players.push(player.peerId);
+    room.players.push(player);
 
     if (!room.host) {
       // 내가 방에 처음 들어갔을 경우(내가 방을 만든 경우)
@@ -99,26 +99,14 @@ export class RoomService implements RoomPort {
       );
     }
 
-    const players = await this.roomRepository.findPlayersByPeerIds(
-      room.players
-    );
-
-    if (!players) {
-      // 방에 플레이어 정보 없음?
-      this.sendError(player.peerId, "join Error, 플레이어 정보 없음");
-      return;
-    }
-
     console.log(room.players);
-
-    console.log(players);
 
     this.roomRepository.save(room.roomId, room);
 
     this.roomEventEmitter.join(
       {
         roomId: room.roomId,
-        players: players.map((roomPlayer) => {
+        players: room.players.map((roomPlayer) => {
           return {
             peerId: roomPlayer.peerId,
             userName: roomPlayer.userName,
@@ -155,14 +143,17 @@ export class RoomService implements RoomPort {
     // 나밖에 없을 때
     if (room.players.length === 1) {
       this.roomRepository.deleteByRoomId(room.roomId);
+      console.log("나밖에 없어서 방 삭제");
       return;
     }
 
     // 내가 방장일 때
     if (room.host === player.peerId) {
-      const newHost = room.players.find((peerId) => {
-        peerId !== room.host;
+      const newHost = room.players.find((player) => {
+        return player.peerId !== room.host;
       });
+
+      console.log("새로운방장", newHost);
 
       // 내가 방장인데 나밖에 없을 때? -> 위에서 걸러지긴 하는데..
       if (!newHost) {
@@ -170,7 +161,7 @@ export class RoomService implements RoomPort {
         return;
       }
 
-      this.roomRepository.updateHostByRoomId(room.roomId, newHost);
+      room.host = newHost.peerId;
     }
 
     this.roomRepository.deletePlayer(peerId, room);
@@ -193,16 +184,13 @@ export class RoomService implements RoomPort {
 
       this.roomRepository.save(room.roomId, room);
 
-      // this.roomRepository.updateGameModeByRoomId(room.roomId, gameMode);
-
-      // // 게임이 시작하면 못들어오게 막기
-      // this.roomRepository.updateStateByRoomId(room.roomId, false);
+      const playerIds = room.players.map((player) => player.peerId);
 
       // 게임시작 신호 보내기(game한테)
       this.roomApiAdapter.gameStart(
         room.roomId,
         gameMode,
-        room.players,
+        playerIds,
         room.totalRound,
         room.roundTime,
         room.goalScore
@@ -214,7 +202,8 @@ export class RoomService implements RoomPort {
   async chooseMode(peerId: string, gameMode: GAME_MODE) {
     const room = await this.checkHostByPeerId(peerId);
     if (room) {
-      this.roomRepository.updateGameModeByRoomId(room.roomId, gameMode);
+      room.gameMode = gameMode;
+      this.roomRepository.save(room.roomId, room);
 
       // 방에 있는 모든 사람에게 게임 모드 알려주기
       this.roomEventEmitter.modeChange(
@@ -291,7 +280,8 @@ export class RoomService implements RoomPort {
   async endGame(roomId: string) {
     const room = await this.roomRepository.findOneByRoomId(roomId);
     if (room) {
-      this.roomRepository.updateStateByRoomId(room.roomId, true);
+      room.state = true;
+      this.roomRepository.save(room.roomId, room);
     }
     return;
   }

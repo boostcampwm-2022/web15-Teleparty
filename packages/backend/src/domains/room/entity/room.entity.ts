@@ -1,8 +1,10 @@
+import { Player } from "./player.entitiy";
+
 export type GAME_MODE = "CatchMind" | "Garticphone" | "";
 
 export interface RoomData {
   roomId: string;
-  players?: string[];
+  players?: Player[];
   host?: string;
   state?: boolean;
   gameMode?: GAME_MODE;
@@ -14,7 +16,7 @@ export interface RoomData {
 
 export class Room {
   roomId: string;
-  players: string[];
+  players: Player[];
   host: string;
   state: boolean;
   gameMode: GAME_MODE;
