@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
@@ -8,7 +8,6 @@ import { CanvasLayout } from "./Canvas.styles";
 import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
 import Line from "./utils/Line";
-import { Point } from "./utils/Point";
 import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
@@ -22,7 +21,7 @@ import {
 
 import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
-import { toolAtom, paletteAtom, Tool } from "../../store/tool";
+import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
@@ -159,13 +158,11 @@ const Canvas = ({
     const ctx = canvasRef.current?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    const { width, height } = canvas;
     shapeList.current.pop();
-    canvasImageData.current = null;
-    drawAllShapes();
+    redrawAllShapes();
   };
 
-  const sendDataToAllConnections = (event: CanvasEventType, data?: any) => {
+  const sendDataToAllConnections = (event: CanvasEventType, data?: unknown) => {
     if (!dataConnections) return;
 
     for (const dataConnection of dataConnections) {
