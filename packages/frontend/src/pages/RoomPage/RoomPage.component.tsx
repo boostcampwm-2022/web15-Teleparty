@@ -94,7 +94,7 @@ const RoomPage = () => {
     <Navigate to="/" replace />
   ) : (
     <RoomPageLayout>
-      <Logo />
+      <Logo height={100} />
       <RoomPageContentBox>
         <PlayerList maxPlayer={10} sizeType="large" />
         <RoomPageRightContentBox>
