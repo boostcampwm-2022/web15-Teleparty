@@ -114,7 +114,9 @@ const LandingPage = () => {
     <>
       <Toaster />
       <LandingPageLayout>
-        <Logo />
+        <div>
+          <Logo />
+        </div>
         <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
         <Button
           variant="medium"
