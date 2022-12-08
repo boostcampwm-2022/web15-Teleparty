@@ -45,12 +45,21 @@ export const GameModeButtonLayout = styled.li<GameModeButtonLayoutProps>`
   box-shadow: ${(props) => props.theme.shadows.medium};
   color: ${(props) => props.theme.colors.primary};
   background-color: transparent;
+  transition: background-color 80ms ease;
 
   ${(props) =>
     props.selected &&
     css`
       border-color: ${(props) => props.theme.colors.yellow};
       background-color: ${(props) => props.theme.colors.primaryLight};
+    `}
+
+  ${(props) =>
+    !props.selected &&
+    css`
+      &:hover {
+        background-color: ${props.theme.colors.primaryLightTransparent};
+      }
     `}
 
   ${GameModeTitle} {
