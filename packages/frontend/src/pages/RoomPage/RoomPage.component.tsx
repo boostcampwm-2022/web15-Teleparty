@@ -151,6 +151,7 @@ const RoomPage = () => {
             <GameModeSegmentedControl
               selectedGameMode={gameMode}
               setSelectedGameMode={setGameMode}
+              disabled={!isHost}
             />
             <RoomPageButtonBox>
               <Button variant="medium" onClick={onInviteClick}>

@@ -19,6 +19,9 @@ export const GameModeButton = styled.input`
   border-radius: ${GAME_MODE_BUTTON_BORDER_RADIUS};
   opacity: 0;
   cursor: pointer;
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 export const GameModeTitle = styled.h2`
