@@ -7,7 +7,6 @@ import { DataConnection } from "peerjs";
 import { CanvasLayout } from "./Canvas.styles";
 import Ellipse from "./utils/Ellipse";
 import FillShape from "./utils/FillShape";
-import { floodFill } from "./utils/floodfill";
 import Line from "./utils/Line";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
@@ -107,7 +106,7 @@ const Canvas = ({
     if (tool === "fill") {
       const ctx = canvasRef.current?.getContext("2d");
       if (!canvasRef.current || !ctx) return;
-      const fillShape = new FillShape(color, transparency, 0, currentPoint);
+      const fillShape = new FillShape(color, transparency, 0, point);
       fillShape.draw(ctx);
       shapeList.current.push(fillShape);
 

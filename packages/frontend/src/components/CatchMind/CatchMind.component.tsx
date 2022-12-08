@@ -28,7 +28,6 @@ import { dataConnectionMapAtom } from "../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
-import Video from "../Video/Video.component";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -40,8 +39,10 @@ const CatchMind = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
 
-  const { gamePlayerList, gameState, isMyTurn, roundEndInfo, roundInfo } =
-    useCatchMind(socket, players, gameInfo.roundInfo);
+  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
+    socket,
+    gameInfo.roundInfo
+  );
 
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 

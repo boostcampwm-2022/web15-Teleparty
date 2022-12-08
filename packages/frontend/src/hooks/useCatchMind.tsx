@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 import { useAtom } from "jotai";
-import Peer, { MediaConnection } from "peerjs";
 
 import { playersAtom } from "../store/players";
 
@@ -13,7 +12,6 @@ type GameState = "inputKeyword" | "drawing" | "roundEnd" | "gameEnd";
 // socket, player, first round info
 export const useCatchMind = (
   socket: Socket,
-  playerList: Player[],
   initialRoundInfo: CatchMindRoundInfo
 ) => {
   const [roundInfo, setRoundInfo] =
