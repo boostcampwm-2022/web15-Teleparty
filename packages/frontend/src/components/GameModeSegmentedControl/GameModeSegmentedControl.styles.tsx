@@ -42,6 +42,7 @@ export const GameModeButtonLayout = styled.li<GameModeButtonLayoutProps>`
   border: ${GAME_MODE_BUTTON_BORDER_WIDTH} solid
     ${(props) => props.theme.colors.primary};
   border-radius: ${GAME_MODE_BUTTON_BORDER_RADIUS};
+  box-shadow: ${(props) => props.theme.shadows.medium};
   color: ${(props) => props.theme.colors.primary};
   background-color: transparent;
 
@@ -66,4 +67,5 @@ export const GameModeSegmentedControlLayout = styled.ul`
   padding: 30px;
   border-radius: 20px;
   background-color: ${(props) => props.theme.colors.primaryLightTransparent};
+  box-shadow: ${(props) => props.theme.shadows.medium};
 `;

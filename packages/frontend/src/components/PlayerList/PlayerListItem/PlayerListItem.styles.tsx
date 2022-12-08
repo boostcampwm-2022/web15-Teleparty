@@ -17,6 +17,7 @@ export const AvatarContainer = styled.div<AvatarContainerProps>`
     ${(props) =>
       props.spotlight ? props.theme.colors.green : props.theme.colors.primary};
   border-radius: 50%;
+  box-shadow: ${(props) => props.theme.shadows.medium};
   background-color: rgba(255, 255, 255, 0.5);
 
   svg {
@@ -86,6 +87,7 @@ export const PlayerListItemLayout = styled.li<PlayerListItemLayoutProps>`
   height: 52px;
   padding: 4px 6px;
   border-radius: 8px;
+  box-shadow: ${(props) => props.theme.shadows.small};
   font-size: 1.1rem;
   background-color: ${(props) => props.theme.colors.primaryLight};
 
