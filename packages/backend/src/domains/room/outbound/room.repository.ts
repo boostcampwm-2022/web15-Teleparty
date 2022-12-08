@@ -106,7 +106,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   async deleteByRoomId(roomId: string) {
     console.log("delete roomId", roomId);
 
-    if (await redisCli.isExists(makeHashKeyByRoomId(roomId)))
+    if (await redisCli.exists(makeHashKeyByRoomId(roomId)))
       redisCli.del(makeHashKeyByRoomId(roomId));
   }
 

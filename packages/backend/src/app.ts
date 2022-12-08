@@ -12,6 +12,7 @@ import "./domains/chat/inbound/chatIn.controller";
 import "./domains/catchMind/inbound/catchMindAPI.controller";
 import "./domains/room/inbound/room.controller";
 import "./domains/room/inbound/SearchRoom.api.controller";
+import { createAdapter } from "@socket.io/cluster-adapter";
 
 const app = express();
 
@@ -57,6 +58,10 @@ const server = app.listen("8000", () => {
 
 const io = new Server(server, { cors: { origin: "*" } });
 SocketEmitter.setServer(io);
+
+if (process.env.ENV_MODE === "pm2") {
+  io.adapter(createAdapter());
+}
 
 io.on("connection", (socket) => {
   socket.join("hello");
