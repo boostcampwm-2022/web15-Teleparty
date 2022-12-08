@@ -23,6 +23,7 @@ jobs:
         id: changed-files-backend
         uses: tj-actions/changed-files@v34
         with:
+          fetch-depth: 50
           files: |
             ./packages/backend/**
 
@@ -60,6 +61,7 @@ jobs:
         id: changed-files-frontend
         uses: tj-actions/changed-files@v34
         with:
+          fetch-depth: 50
           files: |
             ./packages/frontend/**
 
