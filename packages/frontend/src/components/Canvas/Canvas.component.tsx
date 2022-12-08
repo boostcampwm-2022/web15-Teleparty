@@ -31,7 +31,7 @@ import { throttle } from "../../utils/throttle";
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   readonly?: boolean;
-  dataConnections: DataConnection[];
+  dataConnections?: DataConnection[];
 }
 
 const Canvas = ({
@@ -161,12 +161,16 @@ const Canvas = ({
   };
 
   const sendDataToAllConnections = (event: CanvasEventType, data?: any) => {
+    if (!dataConnections) return;
+
     for (const dataConnection of dataConnections) {
       dataConnection.send({ event, data });
     }
   };
 
   useEffect(() => {
+    if (!dataConnections) return;
+
     for (const dataConnection of dataConnections) {
       dataConnection.on("data", (data) => {
         const { event, data: eventData } = data as CanvasEvent;
@@ -246,7 +250,7 @@ const Canvas = ({
       onMouseMove={
         readonly
           ? undefined
-          : dataConnections.length
+          : dataConnections && dataConnections.length
           ? throttle(mouseMoveHandler, 4)
           : mouseMoveHandler
       }
