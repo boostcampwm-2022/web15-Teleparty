@@ -19,10 +19,10 @@ import {
 } from "./utils/types";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
+import { ratioAtom } from "../../store/ratio";
 import { thicknessAtom } from "../../store/thickness";
 import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
-import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
 import { throttle } from "../../utils/throttle";
 
@@ -44,6 +44,8 @@ const Canvas = ({
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
+  const ratio = useAtomValue(ratioAtom);
+
   console.log("dc: ", dataConnections);
 
   useEffect(() => {
@@ -56,7 +58,7 @@ const Canvas = ({
     ctx.lineJoin = "round";
     ctx.fillStyle = "#fff";
     ctx.fillRect(0, 0, width, height);
-  }, [canvasRef]);
+  }, [canvasRef, ratio]);
 
   const captureCanvas = () => {
     const canvas = canvasRef.current;
@@ -216,11 +218,10 @@ const Canvas = ({
   const mouseDownHandler: React.MouseEventHandler<HTMLCanvasElement> = (
     event
   ) => {
-    const point = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+    const point = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
 
     const drawStartArgument: DrawStartParameter = {
       point,
@@ -239,11 +240,10 @@ const Canvas = ({
   ) => {
     if (!isDrawing.current) return;
 
-    const point = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+    const point = {
+      x: event.nativeEvent.offsetX,
+      y: event.nativeEvent.offsetY,
+    };
 
     const drawArgument: DrawParameter = { point };
     draw(drawArgument);
@@ -264,6 +264,10 @@ const Canvas = ({
     undo();
     sendDataToAllConnections("canvas:undo");
   };
+
+  useEffect(() => {
+    drawAllShapes();
+  }, [ratio, drawAllShapes]);
 
   return (
     <CanvasLayout

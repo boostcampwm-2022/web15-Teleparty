@@ -22,6 +22,7 @@ import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
+import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 import { AudioDetectListener } from "../../utils/audioStreamManager";
@@ -36,6 +37,7 @@ const RoomPage = () => {
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  const ratio = useAtomValue(ratioAtom);
   usePreventClose();
 
   const changeAudioDetectionStateOfPlayer: AudioDetectListener = (
@@ -139,7 +141,7 @@ const RoomPage = () => {
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
-    <RoomPageLayout>
+    <RoomPageLayout ratio={ratio}>
       <Logo />
       <RoomPageContentBox>
         <PlayerList maxPlayer={10} sizeType="large" />

@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
+import { useSetAtom } from "jotai";
 import { useAtomsDevtools } from "jotai/devtools";
 import { ThemeProvider } from "styled-components";
 
@@ -9,6 +11,10 @@ import CanvasPage from "./pages/CanvasPage/CanvasPage.component";
 import GamePage from "./pages/GamePage/GamePage.component";
 import LandingPage from "./pages/LandingPage/LandingPage.component";
 import RoomPage from "./pages/RoomPage/RoomPage.component";
+import { ratioAtom } from "./store/ratio";
+
+const MAX_HEIGHT = 1166;
+const MAX_WIDTH = 1830;
 
 const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
   useAtomsDevtools("demo");
@@ -16,6 +22,26 @@ const AtomsDevtools = ({ children }: { children: React.ReactElement }) => {
 };
 
 const App = () => {
+  const setRatio = useSetAtom(ratioAtom);
+
+  useEffect(() => {
+    const resizeListener = () => {
+      const heightRatio = window.innerHeight / MAX_HEIGHT;
+      const widthRatio = window.innerWidth / MAX_WIDTH;
+      if (heightRatio < widthRatio) {
+        setRatio(heightRatio > 1 ? 1 : heightRatio);
+      } else {
+        setRatio(widthRatio > 1 ? 1 : widthRatio);
+      }
+    };
+
+    resizeListener();
+    window.addEventListener("resize", resizeListener);
+    return () => {
+      window.removeEventListener("resize", resizeListener);
+    };
+  }, [setRatio]);
+
   return (
     <ThemeProvider theme={theme}>
       <AtomsDevtools>

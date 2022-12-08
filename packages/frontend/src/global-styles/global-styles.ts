@@ -14,6 +14,7 @@ const GlobalStyles = createGlobalStyle`
   }
   body{
     font-family: 'Noto Sans KR', sans-serif;
+    ${(props) => props.theme.backgrounds.nightCity}
   }
 `;
 
