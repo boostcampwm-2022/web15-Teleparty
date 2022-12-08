@@ -46,17 +46,7 @@ const Canvas = ({
   const thickness = useAtomValue(thicknessAtom);
   const ratio = useAtomValue(ratioAtom);
 
-  useEffect(() => {
-    if (!canvasRef.current || !setOutgoingCanvasStream) return;
-    setOutgoingCanvasStream(canvasRef.current.captureStream());
-
-    return () => {
-      setOutgoingCanvasStream(null);
-    };
-  }, []);
-
   console.log("dc: ", dataConnections);
-
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -102,7 +92,6 @@ const Canvas = ({
       shapeList.current.at(-1)?.draw(ctx);
     }
   });
-
 
   const redrawAllShapes = debounceByFrame(() => {
     canvasImageData.current = null;
@@ -275,7 +264,7 @@ const Canvas = ({
     undo();
     sendDataToAllConnections("canvas:undo");
   };
-  
+
   useEffect(() => {
     drawAllShapes();
   }, [ratio, drawAllShapes]);
