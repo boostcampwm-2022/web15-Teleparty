@@ -1,4 +1,7 @@
+import { useEffect } from "react";
+
 import { useAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 
 import {
   PaletteColorBox,
@@ -27,9 +30,14 @@ const PALETTE_COLORS = [
 
 const Palette = () => {
   const [color, setColor] = useAtom(paletteAtom);
+  const resetColor = useResetAtom(paletteAtom);
 
   const onColorBoxClick = (color: keyof ColorsType) => () =>
     setColor(theme.colors[color]);
+
+  useEffect(() => {
+    resetColor();
+  }, []);
 
   return (
     <PaletteLayout>

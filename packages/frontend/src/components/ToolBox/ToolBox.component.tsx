@@ -1,4 +1,7 @@
+import { useEffect } from "react";
+
 import { useAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 
 import { ToolBoxLayout, ToolBoxCell } from "./ToolBox.styles";
 
@@ -19,6 +22,11 @@ const TOOL_ICON_MAP: {
 
 const ToolBox = () => {
   const [tool, setTool] = useAtom(toolAtom);
+  const resetTool = useResetAtom(toolAtom);
+
+  useEffect(() => {
+    resetTool();
+  }, []);
 
   return (
     <ToolBoxLayout>
