@@ -11,6 +11,7 @@ const connecter = DomainConnecter.getInstance();
 
 const searchRoom = (id: string) =>
   connecter.call("room/get-by-playerId", { id });
+
 const inputData = (id: string, data: string, type: RoundType) => {
   const room = searchRoom(id);
   if (room) service.setAlbumData(room.roomId, id, data, type);
@@ -63,6 +64,7 @@ connecter.register(
     roundTime: number;
     players: string[];
   }) => {
+    console.log("start-game", roomId);
     service.startGame(roomId, roundTime, players);
   }
 );

@@ -14,6 +14,7 @@ router.get(
     if (!["CatchMind", "Garticphone"].includes(gameMode)) {
       return;
     }
+    // console.log("start-game");
     roomService.gameStart(socket.id, gameMode);
   }
 );

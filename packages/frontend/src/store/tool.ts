@@ -11,7 +11,7 @@ export const TOOL_TYPES = [
 ] as const;
 
 type ToolTypesTuple = typeof TOOL_TYPES;
-type Tool = ToolTypesTuple[number];
+export type Tool = ToolTypesTuple[number];
 
 export const toolAtom = atom<Tool>("pen");
 export const paletteAtom = atom<string>("#000000");

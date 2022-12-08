@@ -17,6 +17,7 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { useAudioCommunication } from "../../hooks/useAudioCommunication";
+import { useDataConnectionWithPeers } from "../../hooks/useDataConnectionWithPeers";
 import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
 import { peerAtom } from "../../store/peer";
@@ -24,7 +25,7 @@ import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
-import { AudioDetectListener } from "../../utils/audioStreamMap";
+import { AudioDetectListener } from "../../utils/audioStreamManager";
 
 import type { GameInfo, Player } from "../../types/game";
 
@@ -52,11 +53,13 @@ const RoomPage = () => {
     );
   };
 
-  useAudioCommunication(
-    peer,
-    players.map(({ peerId }) => peerId).filter((id) => id !== socket.id),
-    changeAudioDetectionStateOfPlayer
-  );
+  const playerIdList = players
+    .map(({ peerId }) => peerId)
+    .filter((id) => id !== socket.id);
+
+  useAudioCommunication(peer!, playerIdList, changeAudioDetectionStateOfPlayer);
+
+  useDataConnectionWithPeers(peer!, playerIdList);
 
   const onInviteClick = () => {
     const inviteUrl = `${window.location.origin}/?invite=${roomId}`;

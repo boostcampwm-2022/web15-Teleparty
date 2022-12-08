@@ -15,7 +15,7 @@ import { colors } from "../../../global-styles/theme";
 import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
 import { playersAtom } from "../../../store/players";
 import { GamePlayer } from "../../../types/game";
-import { audioStreamManager } from "../../../utils/audioStreamMap";
+import { audioStreamManager } from "../../../utils/audioStreamManager";
 import Icon from "../../Icon/Icon";
 
 interface PlayerListItemProps {
