@@ -1,16 +1,22 @@
-import { SetStateAction, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { useAtom } from "jotai";
 import { useAtomValue } from "jotai/utils";
+import { DataConnection } from "peerjs";
 
 import { CanvasLayout } from "./Canvas.styles";
 import Ellipse from "./utils/Ellipse";
 import FillShape from "./utils/FillShape";
-import { floodFill } from "./utils/floodfill";
 import Line from "./utils/Line";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
+import {
+  CanvasEventType,
+  DrawStartParameter,
+  DrawParameter,
+  CanvasEvent,
+} from "./utils/types";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
 import { thicknessAtom } from "../../store/thickness";
@@ -18,13 +24,19 @@ import { toolAtom, paletteAtom } from "../../store/tool";
 import { transparencyAtom } from "../../store/transparency";
 import { getCoordRelativeToElement } from "../../utils/coordinate";
 import { debounceByFrame } from "../../utils/debounce";
+import { throttle } from "../../utils/throttle";
 
 interface CanvasProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  setOutgoingCanvasStream?: React.Dispatch<SetStateAction<MediaStream | null>>;
+  readonly?: boolean;
+  dataConnections?: DataConnection[];
 }
 
-const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
+const Canvas = ({
+  canvasRef,
+  readonly = false,
+  dataConnections,
+}: CanvasProps) => {
   const canvasImageData = useRef<ImageData | null>(null);
   const shapeList = useRef<Shape[]>([]);
   const isDrawing = useRef<boolean>(false);
@@ -32,15 +44,7 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
   const [transparency] = useAtom(transparencyAtom);
   const [color] = useAtom(paletteAtom);
   const thickness = useAtomValue(thicknessAtom);
-
-  useEffect(() => {
-    if (!canvasRef.current || !setOutgoingCanvasStream) return;
-    setOutgoingCanvasStream(canvasRef.current.captureStream());
-
-    return () => {
-      setOutgoingCanvasStream(null);
-    };
-  }, []);
+  console.log("dc: ", dataConnections);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -87,17 +91,22 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     }
   });
 
-  const drawStart: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
+  const redrawAllShapes = debounceByFrame(() => {
+    canvasImageData.current = null;
+    drawAllShapes();
+  });
 
+  const drawStart = ({
+    point,
+    tool,
+    color,
+    transparency,
+    lineWidth,
+  }: DrawStartParameter) => {
     if (tool === "fill") {
       const ctx = canvasRef.current?.getContext("2d");
       if (!canvasRef.current || !ctx) return;
-      const fillShape = new FillShape(color, transparency, 0, currentPoint);
+      const fillShape = new FillShape(color, transparency, 0, point);
       fillShape.draw(ctx);
       shapeList.current.push(fillShape);
 
@@ -105,60 +114,155 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
     }
 
     const shapeCreateFunctionMap = {
-      pen: () => new Line(color, transparency, thickness * 16),
-      fill: () => new Line(color, transparency, thickness * 16),
-      circle: () =>
-        new Ellipse(color, transparency, thickness * 16, currentPoint),
-      erase: () => new Line("#ffffff", 1, thickness * 16),
+      pen: () => new Line(color, transparency, lineWidth),
+      fill: () => new Line(color, transparency, lineWidth),
+      circle: () => new Ellipse(color, transparency, lineWidth, point),
+      erase: () => new Line("#ffffff", 1, lineWidth),
       straightLine: () =>
-        new straightLine(color, transparency, thickness * 16, currentPoint),
-      rectangle: () =>
-        new Rectangle(color, transparency, thickness * 16, currentPoint),
+        new straightLine(color, transparency, lineWidth, point),
+      rectangle: () => new Rectangle(color, transparency, lineWidth, point),
     };
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
+
     captureCanvas();
+    draw({ point });
   };
 
-  const draw: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    if (!isDrawing.current) return;
-
+  const draw = ({ point }: DrawParameter) => {
     const target = shapeList.current.at(-1);
-    const currentPoint = getCoordRelativeToElement(
-      event.clientX,
-      event.clientY,
-      event.target as Element
-    );
 
     if (target instanceof Line) {
-      target.pushPoint(currentPoint);
+      target.pushPoint(point);
     } else if (target instanceof Rectangle) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     } else if (target instanceof Ellipse) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     } else if (target instanceof straightLine) {
-      target.point2 = currentPoint;
+      target.point2 = point;
     }
 
     drawAllShapes();
   };
 
-  const drawEnd: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
-    draw(event);
+  const drawEnd = () => {
     isDrawing.current = false;
   };
 
-  const undo = (e: React.KeyboardEvent<HTMLCanvasElement>) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-      const canvas = canvasRef.current;
-      const ctx = canvasRef.current?.getContext("2d");
-      if (!canvas || !ctx) return;
+  const undo = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvasRef.current?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-      const { width, height } = canvas;
-      shapeList.current.pop();
-      canvasImageData.current = null;
-      drawAllShapes();
+    shapeList.current.pop();
+    redrawAllShapes();
+  };
+
+  const sendDataToAllConnections = (event: CanvasEventType, data?: unknown) => {
+    if (!dataConnections) return;
+
+    for (const dataConnection of dataConnections) {
+      dataConnection.send({ event, data });
     }
+  };
+
+  const dataEventHandler = (data: unknown) => {
+    const { event, data: eventData } = data as CanvasEvent;
+
+    switch (event) {
+      case "canvas:draw-start":
+        return drawStart(eventData as DrawStartParameter);
+      case "canvas:draw":
+        return draw(eventData as DrawParameter);
+      case "canvas:draw-end":
+        return drawEnd();
+      case "canvas:undo":
+        return undo();
+    }
+  };
+
+  useEffect(() => {
+    if (!dataConnections) return;
+
+    for (const dataConnection of dataConnections) {
+      dataConnection.on("data", dataEventHandler);
+    }
+
+    return () => {
+      for (const dataConnection of dataConnections) {
+        dataConnection.off("data", dataEventHandler);
+      }
+    };
+  }, [dataConnections]);
+
+  // 백그라운드에 있다 돌아왔을 때 그림을 복원한다
+  // 백그라운드에 있을 때 캔버스에 그림이 그려지지 않아 해당 코드 작성
+  useEffect(() => {
+    console.log("event listener add called!");
+    const visibilityChangeListener = () => {
+      if (!document.hidden) redrawAllShapes();
+    };
+
+    document.addEventListener("visibilitychange", visibilityChangeListener);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        visibilityChangeListener
+      );
+    };
+  }, [redrawAllShapes]);
+
+  const mouseDownHandler: React.MouseEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    const point = getCoordRelativeToElement(
+      event.clientX,
+      event.clientY,
+      event.target as Element
+    );
+
+    const drawStartArgument: DrawStartParameter = {
+      point,
+      tool,
+      color,
+      transparency,
+      lineWidth: thickness * 16,
+    };
+    drawStart(drawStartArgument);
+    sendDataToAllConnections("canvas:draw-start", drawStartArgument);
+    isDrawing.current = true;
+  };
+
+  const mouseMoveHandler: React.MouseEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    if (!isDrawing.current) return;
+
+    const point = getCoordRelativeToElement(
+      event.clientX,
+      event.clientY,
+      event.target as Element
+    );
+
+    const drawArgument: DrawParameter = { point };
+    draw(drawArgument);
+    sendDataToAllConnections("canvas:draw", drawArgument);
+  };
+
+  const mouseUpHandler: React.MouseEventHandler<HTMLCanvasElement> = () => {
+    drawEnd();
+    sendDataToAllConnections("canvas:draw-end");
+    isDrawing.current = false;
+  };
+
+  const keyDownHandler: React.KeyboardEventHandler<HTMLCanvasElement> = (
+    event
+  ) => {
+    if (!((event.metaKey || event.ctrlKey) && event.key === "z")) return;
+
+    undo();
+    sendDataToAllConnections("canvas:undo");
   };
 
   return (
@@ -166,10 +270,16 @@ const Canvas = ({ canvasRef, setOutgoingCanvasStream }: CanvasProps) => {
       width={CANVAS_SIZE.WIDTH}
       height={CANVAS_SIZE.HEIGHT}
       ref={canvasRef}
-      onMouseDown={drawStart}
-      onMouseMove={draw}
-      onMouseUp={drawEnd}
-      onKeyDown={undo}
+      onMouseDown={readonly ? undefined : mouseDownHandler}
+      onMouseMove={
+        readonly
+          ? undefined
+          : dataConnections && dataConnections.length
+          ? throttle(mouseMoveHandler, 10)
+          : mouseMoveHandler
+      }
+      onMouseUp={readonly ? undefined : mouseUpHandler}
+      onKeyDown={readonly ? undefined : keyDownHandler}
       tabIndex={1}
     />
   );

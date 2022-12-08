@@ -24,10 +24,10 @@ import {
   GamePageContentBox,
   GamePageRoundParagraph,
 } from "../../pages/GamePage/GamePage.styles";
+import { dataConnectionMapAtom } from "../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
-import Video from "../Video/Video.component";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -37,12 +37,13 @@ const CatchMind = () => {
   const keywordRef = useRef("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [outgoingCanvasStream, setOutgoingCanvasStream] =
-    useState<MediaStream | null>(null);
+  const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
 
-  const { gameState, isMyTurn, roundEndInfo, roundInfo, incomingCanvasStream } =
-    useCatchMind(socket, gameInfo.roundInfo, outgoingCanvasStream);
-  console.log(incomingCanvasStream);
+  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
+    socket,
+    gameInfo.roundInfo
+  );
+
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
@@ -103,10 +104,16 @@ const CatchMind = () => {
           return (
             <Canvas
               canvasRef={canvasRef}
-              setOutgoingCanvasStream={setOutgoingCanvasStream}
+              dataConnections={[...dataConnectionMap.values()]}
             />
           );
-        return <Video srcObject={incomingCanvasStream} />;
+        return (
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
+        );
       case "gameEnd":
         return (
           <Rank
@@ -124,10 +131,14 @@ const CatchMind = () => {
         return isMyTurn ? (
           <Canvas
             canvasRef={canvasRef}
-            setOutgoingCanvasStream={setOutgoingCanvasStream}
+            dataConnections={[...dataConnectionMap.values()]}
           />
         ) : (
-          <Video srcObject={incomingCanvasStream} />
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
         );
       default:
         return null;
