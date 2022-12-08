@@ -94,7 +94,10 @@ const RoomPage = () => {
 
   useEffect(() => {
     const newJoinListener = (player: Player) => {
-      setPlayers((prev) => [...prev, player]);
+      setPlayers((prev) => [
+        ...prev,
+        { ...player, isMicOn: true, isAudioDetected: false },
+      ]);
     };
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
       setPlayers((prev) => {
