@@ -1,79 +1,94 @@
 import { GAME_MODE, Room } from "../entity/room.entity";
-import { RoomRepositoryDataPort } from "./room.port";
+import { NewPlayer, RoomRepositoryDataPort } from "./room.port";
+import { redisCli } from "../../../config/redis";
+import { Player } from "../entity/player.entitiy";
 
 export class RoomRepository implements RoomRepositoryDataPort {
-  private static rooms: Room[] = [];
+  private static players: string[] = [];
 
   create(roomId: string) {
-    const room = new Room(roomId);
+    const room = new Room({ roomId });
 
-    RoomRepository.rooms.push(room);
+    this.save(roomId, room);
     return room;
   }
 
-  savePlayers(roomId: string, players: string[]) {
-    RoomRepository.rooms.forEach((room) => {
-      if (room.roomId === roomId) {
-        room.players = players;
-      }
-    });
+  createUser(data: NewPlayer) {
+    const { peerId } = data;
+    const newPlayer = new Player(data);
+    RoomRepository.players.push(peerId);
+    redisCli.set(makeHashKeyByPeerId(peerId), JSON.stringify(newPlayer));
+    return newPlayer;
   }
 
-  findOneByRoomId(roomId?: string) {
-    const room = RoomRepository.rooms.find((room) => room.roomId === roomId);
+  save(roomId: string, room: Room) {
+    redisCli.set(makeHashKeyByRoomId(roomId), JSON.stringify(room));
+  }
+
+  findAllPlayer() {
+    return RoomRepository.players;
+  }
+
+  async findOneByRoomId(roomId: string) {
+    const data = await redisCli.get(makeHashKeyByRoomId(roomId));
+
+    if (!data) return;
+    console.log(data);
+    const room = new Room(JSON.parse(data));
     return room;
   }
 
-  findOneByPeerId(peerId: string) {
-    const room = RoomRepository.rooms.find((room) => {
-      return room.players.includes(peerId);
-    });
+  async findOneByPeerId(peerId: string) {
+    const player = await this.findPlayerByPeerId(peerId);
+    if (!player) {
+      return undefined;
+    }
+    const roomJson = await redisCli.get(makeHashKeyByRoomId(player.roomId));
+    if (!roomJson) {
+      return undefined;
+    }
+
+    const room = new Room(JSON.parse(roomJson));
 
     return room;
   }
 
-  findAll() {
-    return [...RoomRepository.rooms];
+  async findPlayerByPeerId(peerId: string) {
+    const playerJson = await redisCli.get(makeHashKeyByPeerId(peerId));
+
+    if (!playerJson) {
+      return undefined;
+    }
+
+    return new Player(JSON.parse(playerJson));
   }
 
-  updateHostByRoomId(roomId: string, peerId: string) {
-    RoomRepository.rooms.forEach((room) => {
-      if (room.roomId === roomId) {
-        room.host = peerId;
-      }
-      return room;
+  async deleteByRoomId(roomId: string) {
+    console.log("delete roomId", roomId);
+
+    if (await redisCli.exists(makeHashKeyByRoomId(roomId)))
+      redisCli.del(makeHashKeyByRoomId(roomId));
+  }
+
+  deletePlayer(peerId: string, room: Room) {
+    redisCli.unlink(makeHashKeyByPeerId(peerId));
+
+    room.players = room.players.filter((player) => {
+      return player.peerId !== peerId;
     });
-  }
 
-  updateStateByRoomId(roomId: string, state: boolean) {
-    RoomRepository.rooms.forEach((room) => {
-      if (room.roomId === roomId) {
-        room.state = state;
-      }
-      return room;
-    });
-  }
+    this.save(room.roomId, room);
 
-  updateGameModeByRoomId(roomId: string, gameMode: GAME_MODE) {
-    RoomRepository.rooms.forEach((room) => {
-      if (room.roomId === roomId) {
-        room.gameMode = gameMode;
-      }
-      return room;
-    });
-  }
-
-  deleteByRoomId(roomId: string) {
-    RoomRepository.rooms = RoomRepository.rooms.filter(
-      (room) => room.roomId !== roomId
-    );
-  }
-
-  deletePlayerofRoomByPeerId(peerId: string) {
-    RoomRepository.rooms.forEach((room) => {
-      room.players = room.players.filter((id) => {
-        return id !== peerId;
-      });
+    RoomRepository.players = RoomRepository.players.filter((id) => {
+      return id !== peerId;
     });
   }
 }
+
+const makeHashKeyByPeerId = (peerId: string): string => {
+  return `player/${peerId}`;
+};
+
+const makeHashKeyByRoomId = (roomId: string): string => {
+  return `room/${roomId}`;
+};

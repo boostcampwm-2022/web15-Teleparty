@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
-import * as redis from "redis";
+import { createClient } from "redis";
 
 dotenv.config();
 
-const redisClient = redis.createClient({
+const redisClient = createClient({
   url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
   legacyMode: true,
 });
