@@ -105,6 +105,8 @@ const Canvas = ({
     transparency,
     lineWidth,
   }: DrawStartParameter) => {
+    captureCanvas();
+
     if (tool === "fill") {
       const ctx = canvasRef.current?.getContext("2d");
       if (!canvasRef.current || !ctx) return;
@@ -127,7 +129,6 @@ const Canvas = ({
     shapeList.current.push(shapeCreateFunctionMap[tool]());
     isDrawing.current = true;
 
-    captureCanvas();
     draw({ point });
   };
 
