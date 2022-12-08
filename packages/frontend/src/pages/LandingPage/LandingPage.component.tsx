@@ -115,8 +115,11 @@ const LandingPage = () => {
   return (
     <>
       <Toaster />
+
       <LandingPageLayout ratio={ratio}>
-        <Logo />
+        <div>
+          <Logo />
+        </div>
         <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
         <Button
           variant="medium"

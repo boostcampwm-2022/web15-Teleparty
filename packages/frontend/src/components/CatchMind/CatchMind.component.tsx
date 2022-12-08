@@ -192,7 +192,10 @@ const CatchMind = () => {
         <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
       <GamePageCenterContentBox>
-        <Logo height={70} />
+        <div>
+          <Logo height={70} />
+        </div>
+
         <PaintBoard
           headerText={getHeaderElement()}
           centerElement={getCenterElement()}
