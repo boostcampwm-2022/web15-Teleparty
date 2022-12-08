@@ -12,6 +12,7 @@ import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
+import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 import { createPeerId } from "../../utils/peer";
@@ -32,6 +33,7 @@ const LandingPage = () => {
   const [peer, setPeer] = useAtom(peerAtom);
   const nicknameRef = useRef<HTMLInputElement>(null);
   const [nicknameError, setNicknameError] = useState(true);
+  const ratio = useAtomValue(ratioAtom);
 
   const invite = new URLSearchParams(window.location.search).get("invite");
 
@@ -113,7 +115,8 @@ const LandingPage = () => {
   return (
     <>
       <Toaster />
-      <LandingPageLayout>
+
+      <LandingPageLayout ratio={ratio}>
         <div>
           <Logo />
         </div>
