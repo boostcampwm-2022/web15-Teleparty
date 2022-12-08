@@ -12,6 +12,7 @@ import useGartic from "../../hooks/useGartic";
 import {
   GamePageContentBox,
   GamePageRoundParagraph,
+  GamePageCenterContentBox,
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { socketAtom } from "../../store/socket";
@@ -136,14 +137,14 @@ const Gartic = () => {
         </GamePageRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      <GamePageCenterContentBox>
+        <Logo height={70} />
         <PaintBoard
           headerText={headerElementMap[gameState]}
           centerElement={centerElementMap[gameState]}
           footerElement={footerElementMap[gameState]}
         />
-      </GamePageContentBox>
+      </GamePageCenterContentBox>
       <GamePageContentBox>
         <MoonTimer radius={60} secondTime={roundTime} gameState={gameState} />
         <Chat />

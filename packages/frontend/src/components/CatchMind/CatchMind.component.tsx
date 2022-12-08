@@ -24,6 +24,7 @@ import { useCatchMind } from "../../hooks/useCatchMind";
 import {
   GamePageContentBox,
   GamePageRoundParagraph,
+  GamePageCenterContentBox,
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
@@ -186,14 +187,14 @@ const CatchMind = () => {
         </GamePageRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      <GamePageCenterContentBox>
+        <Logo height={70} />
         <PaintBoard
           headerText={getHeaderElement()}
           centerElement={getCenterElement()}
           footerElement={getFooterElement()}
         />
-      </GamePageContentBox>
+      </GamePageCenterContentBox>
       <GamePageContentBox>
         {gameState === "drawing" ? (
           <MoonTimer radius={50} secondTime={roundTime} gameState={gameState} />
