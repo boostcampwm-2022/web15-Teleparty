@@ -14,7 +14,7 @@ router.get(
   (socket: Socket, { keyword }: { keyword: string }) => {
     const room = connecter.call("room/get-by-playerId", { id: socket.id });
 
-    if (room) gameService.drawStart(room.roomId, keyword);
+    if (room) gameService.drawStart(room.roomId, keyword, socket.id);
   }
 );
 
