@@ -9,7 +9,8 @@ const GarticResultLayout = styled.div`
 
 const GarticResultContentLayout = styled.div`
   display: flex;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 3rem;
 `;
 
 const GarticDrawImage = styled.img`

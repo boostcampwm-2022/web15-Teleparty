@@ -13,7 +13,7 @@ const RoomPageLayout = styled.main`
 
 const RoomPageContentBox = styled.div`
   display: flex;
-  gap: 8rem;
+  gap: 3rem;
   height: 60rem;
 `;
 
