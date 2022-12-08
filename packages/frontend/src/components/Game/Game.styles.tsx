@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const GamePageLayout = styled.main<{ ratio: number }>`
+const GameLayout = styled.main<{ ratio: number }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,7 +9,7 @@ const GamePageLayout = styled.main<{ ratio: number }>`
   transform: scale(${({ ratio }) => ratio});
 `;
 
-const GamePageRoundParagraph = styled.p`
+const GameRoundParagraph = styled.p`
   font-family: "Dongle", sans-serif;
   font-size: 4rem;
   font-weight: bold;
@@ -17,7 +17,7 @@ const GamePageRoundParagraph = styled.p`
   transform: scale(1.4);
 `;
 
-const GamePageContentBox = styled.div`
+const GameContentBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -25,7 +25,7 @@ const GamePageContentBox = styled.div`
   align-items: center;
 `;
 
-const GamePageCenterContentBox = styled.div`
+const GameCenterContentBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -35,9 +35,4 @@ const GamePageCenterContentBox = styled.div`
   padding-top: 1rem;
 `;
 
-export {
-  GamePageLayout,
-  GamePageRoundParagraph,
-  GamePageContentBox,
-  GamePageCenterContentBox,
-};
+export { GameLayout, GameRoundParagraph, GameContentBox, GameCenterContentBox };
