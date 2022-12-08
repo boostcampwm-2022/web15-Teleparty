@@ -1,11 +1,12 @@
 import styled from "styled-components";
 
-const GamePageLayout = styled.main`
+const GamePageLayout = styled.main<{ ratio: number }>`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3rem;
   height: 100vh;
+  transform: scale(${({ ratio }) => ratio});
 `;
 
 const GamePageRoundParagraph = styled.p`

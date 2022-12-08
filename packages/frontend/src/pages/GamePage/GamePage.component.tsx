@@ -10,6 +10,7 @@ import Gartic from "../../components/Gartic/Gartic.component";
 import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
+import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 
@@ -18,6 +19,7 @@ const GamePage = () => {
   const socket = useAtomValue(socketAtom);
   const setPlayers = useSetAtom(playersAtom);
   const roomId = useAtomValue(roomIdAtom);
+  const ratio = useAtomValue(ratioAtom);
   usePreventClose();
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const GamePage = () => {
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
-    <GamePageLayout>
+    <GamePageLayout ratio={ratio}>
       {gameInfo.gameMode === "CatchMind" ? <CatchMind /> : <Gartic />}
     </GamePageLayout>
   );
