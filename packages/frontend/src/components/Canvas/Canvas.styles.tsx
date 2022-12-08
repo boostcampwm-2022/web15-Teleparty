@@ -8,5 +8,3 @@ export const CanvasLayout = styled.canvas`
   box-shadow: ${(props) => props.theme.shadows.medium};
   background-color: ${(props) => props.theme.colors.white};
 `;
-
-const Button = styled.button``;

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
 import Canvas from "../../components/Canvas/Canvas.component";
-import { CanvasLayout } from "../../components/Canvas/Canvas.styles";
 import Chat from "../../components/Chat/Chat.component";
 import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
@@ -26,11 +25,11 @@ import {
   GamePageRoundParagraph,
   GamePageCenterContentBox,
 } from "../../pages/GamePage/GamePage.styles";
+import { dataConnectionMapAtom } from "../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { HidableBox } from "../common/HidableBox";
-import Video from "../Video/Video.component";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -40,22 +39,17 @@ const CatchMind = () => {
   const keywordRef = useRef("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [outgoingCanvasStream, setOutgoingCanvasStream] =
-    useState<MediaStream | null>(null);
+  const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
 
-  const {
-    gamePlayerList,
-    gameState,
-    isMyTurn,
-    roundEndInfo,
-    roundInfo,
-    incomingCanvasStream,
-  } = useCatchMind(socket, players, gameInfo.roundInfo, outgoingCanvasStream);
-  console.log(incomingCanvasStream);
+  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
+    socket,
+    gameInfo.roundInfo
+  );
+
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
-    return gamePlayerList.find(({ peerId }) => peerId === id)?.userName;
+    return players.find(({ peerId }) => peerId === id)?.userName;
   };
 
   const currentTurnUserName = getUserNameById(turnPlayer);
@@ -80,7 +74,6 @@ const CatchMind = () => {
   const onGoToRoomClick = () => {
     socket.emit("quit-game");
     navigate("/room", { replace: true });
-    socket.emit("quit-game");
   };
 
   const getHeaderElement = () => {
@@ -113,19 +106,25 @@ const CatchMind = () => {
           return (
             <Canvas
               canvasRef={canvasRef}
-              setOutgoingCanvasStream={setOutgoingCanvasStream}
+              dataConnections={[...dataConnectionMap.values()]}
             />
           );
-        return <Video srcObject={incomingCanvasStream} />;
+        return (
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
+        );
       case "gameEnd":
         return (
           <Rank
-            rankList={gamePlayerList
-              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+            rankList={players
               .map(({ userName, score }) => ({
                 userName,
                 score: score ?? 0,
-              }))}
+              }))
+              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))}
           />
         );
       case "inputKeyword":
@@ -134,10 +133,14 @@ const CatchMind = () => {
         return isMyTurn ? (
           <Canvas
             canvasRef={canvasRef}
-            setOutgoingCanvasStream={setOutgoingCanvasStream}
+            dataConnections={[...dataConnectionMap.values()]}
           />
         ) : (
-          <Video srcObject={incomingCanvasStream} />
+          <Canvas
+            canvasRef={canvasRef}
+            readonly={true}
+            dataConnections={[...dataConnectionMap.values()]}
+          />
         );
       default:
         return null;

@@ -2,7 +2,7 @@ import styled, { css } from "styled-components";
 
 interface PlayerListItemLayoutProps {
   sizeType: "medium" | "large";
-  state: "normal" | "ready" | "turn";
+  state: "normal" | "ready" | "turn" | "quit";
 }
 
 interface AvatarContainerProps {
@@ -115,5 +115,10 @@ export const PlayerListItemLayout = styled.li<PlayerListItemLayoutProps>`
     props.state === "turn" &&
     css`
       background-color: ${(props) => props.theme.colors.yellow};
+    `}
+  ${(props) =>
+    props.state === "quit" &&
+    css`
+      background-color: ${(props) => props.theme.colors.grey1};
     `}
 `;

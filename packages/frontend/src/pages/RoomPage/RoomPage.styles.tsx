@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const RoomPageLayout = styled.main`
+const RoomPageLayout = styled.main<{ ratio: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,6 +9,7 @@ const RoomPageLayout = styled.main`
   height: 100vh;
   padding-top: 30px;
   ${(props) => props.theme.backgrounds.nightCity}
+  transform: scale(${({ ratio }) => ratio});
 `;
 
 const RoomPageContentBox = styled.div`

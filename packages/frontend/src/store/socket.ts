@@ -6,6 +6,7 @@ const serverUrl = isDev ? "http://localhost:8000" : "https://teleparty.tk";
 
 const socket = io(serverUrl, {
   transports: ["websocket"],
+  closeOnBeforeunload: false,
 });
 
 export const socketAtom = atom<Socket>(socket);
