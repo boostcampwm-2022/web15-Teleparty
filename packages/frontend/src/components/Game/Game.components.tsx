@@ -3,24 +3,22 @@ import { Navigate } from "react-router-dom";
 
 import { useAtomValue, useSetAtom } from "jotai";
 
-import { GamePageLayout } from "./GamePage.styles";
+import CatchMind from "./CatchMind/CatchMind.component";
+import { GameLayout } from "./Game.styles";
+import Gartic from "./Gartic/Gartic.component";
 
-import CatchMind from "../../components/CatchMind/CatchMind.component";
-import Gartic from "../../components/Gartic/Gartic.component";
-import usePreventClose from "../../hooks/usePreventClose";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
 
-const GamePage = () => {
+const Game = () => {
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
   const setPlayers = useSetAtom(playersAtom);
   const roomId = useAtomValue(roomIdAtom);
   const ratio = useAtomValue(ratioAtom);
-  usePreventClose();
 
   useEffect(() => {
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
@@ -59,10 +57,10 @@ const GamePage = () => {
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
-    <GamePageLayout ratio={ratio}>
+    <GameLayout ratio={ratio}>
       {gameInfo.gameMode === "CatchMind" ? <CatchMind /> : <Gartic />}
-    </GamePageLayout>
+    </GameLayout>
   );
 };
 
-export default GamePage;
+export default Game;

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const RoomPageLayout = styled.main<{ ratio: number }>`
+const LobbyLayout = styled.main<{ ratio: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,28 +11,23 @@ const RoomPageLayout = styled.main<{ ratio: number }>`
   transform: scale(${({ ratio }) => ratio});
 `;
 
-const RoomPageContentBox = styled.div`
+const LobbyContentBox = styled.div`
   display: flex;
   gap: 3rem;
   height: 60rem;
 `;
 
-const RoomPageRightContentBox = styled.div`
+const LobbyRightContentBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
 `;
 
-const RoomPageButtonBox = styled.div`
+const LobbyButtonBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
 `;
 
-export {
-  RoomPageLayout,
-  RoomPageContentBox,
-  RoomPageRightContentBox,
-  RoomPageButtonBox,
-};
+export { LobbyLayout, LobbyContentBox, LobbyRightContentBox, LobbyButtonBox };
