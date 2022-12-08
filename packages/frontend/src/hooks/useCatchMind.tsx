@@ -39,7 +39,6 @@ export const useCatchMind = (
   // socket for game logic
   useEffect(() => {
     const roundStartListener = (roundInfo: CatchMindRoundInfo) => {
-      console.log("round start!!: ", roundInfo);
       const { turnPlayer } = roundInfo;
       setGameState("inputKeyword");
       setRoundInfo(roundInfo);

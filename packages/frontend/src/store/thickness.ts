@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atomWithReset } from "jotai/utils";
 
 const THICKNESS = {
   X_SMALL: 0.375,
@@ -10,4 +10,4 @@ const THICKNESS = {
 
 export const THICKNESS_VALUES = Object.values(THICKNESS);
 
-export const thicknessAtom = atom<number>(THICKNESS.MEDIUM);
+export const thicknessAtom = atomWithReset<number>(THICKNESS.MEDIUM);
