@@ -30,6 +30,8 @@ const Chat = ({ variant }: ChatProps) => {
   const onChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!chatInputRef.current || !chatInputRef.current.value) return;
+    const trimmedText = chatInputRef.current.value.trim();
+    if (!trimmedText) return;
 
     const newChat = {
       id: socket.id,
