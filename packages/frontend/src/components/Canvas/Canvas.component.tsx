@@ -5,10 +5,10 @@ import { useAtomValue } from "jotai/utils";
 import { DataConnection } from "peerjs";
 
 import { CanvasLayout } from "./Canvas.styles";
-import { findEdgePoints } from "./utils/canvas";
 import Ellipse from "./utils/Ellipse";
+import FillShape from "./utils/FillShape";
+import { floodFill } from "./utils/floodfill";
 import Line from "./utils/Line";
-import Polygon from "./utils/Polygon";
 import Rectangle from "./utils/Rectangle";
 import Shape from "./utils/Shape";
 import straightLine from "./utils/StraightLine";
@@ -105,15 +105,12 @@ const Canvas = ({
     lineWidth,
   }: DrawStartParameter) => {
     if (tool === "fill") {
-      if (!canvasRef.current) return;
-      const polygon = new Polygon(
-        color,
-        transparency,
-        10,
-        findEdgePoints(canvasRef.current, point)
-      );
-      shapeList.current.push(polygon);
-      drawAllShapes();
+      const ctx = canvasRef.current?.getContext("2d");
+      if (!canvasRef.current || !ctx) return;
+      const fillShape = new FillShape(color, transparency, 0, currentPoint);
+      fillShape.draw(ctx);
+      shapeList.current.push(fillShape);
+
       return;
     }
 

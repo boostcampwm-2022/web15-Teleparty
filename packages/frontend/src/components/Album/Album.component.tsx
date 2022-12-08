@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import {
   AlbumLayout,
@@ -32,6 +32,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const players = useAtomValue(playersAtom);
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
+  const setPlayers = useSetAtom(playersAtom);
 
   const getUserNameById = (id: string) => {
     return players.find(({ peerId }) => peerId === id)?.userName;
@@ -51,6 +52,15 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       if (!albumItem) {
         clearInterval(interval);
         setShowNext(true);
+        if (isLastAlbum) {
+          setPlayers((prev) =>
+            prev.map((player) => ({
+              ...player,
+              isReady: true,
+              isCurrentTurn: false,
+            }))
+          );
+        }
         return;
       }
       setRenderedAlbum((prev) => [...prev, albumItem]);
@@ -60,7 +70,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album]);
+  }, [album, isLastAlbum, setPlayers]);
 
   const onNextClick = () => {
     socket.emit("request-album");

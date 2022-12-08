@@ -30,7 +30,7 @@ export class RoomService implements RoomPort {
     // 생성된 방이 없는 경우
     if (!room) {
       const newRoom = this.roomRepository.create(roomId);
-      console.log("room.service newRoom", newRoom.roomId);
+      console.log("\x1b[32mroom.service newRoom\x1b[37m", newRoom.roomId);
 
       newRoom.host = peerId;
 
@@ -56,10 +56,10 @@ export class RoomService implements RoomPort {
         peerId
       );
 
-      console.log(
-        "room.service 새로운방 생성 완료",
-        this.roomRepository.findOneByRoomId(roomId)?.roomId
-      );
+      // console.log(
+      //   "room.service 새로운방 생성 완료",
+      //   this.roomRepository.findOneByRoomId(roomId)?.roomId
+      // );
 
       this.roomRepository.savePlayers(newRoom.roomId, newRoom.players);
 
@@ -68,7 +68,11 @@ export class RoomService implements RoomPort {
 
     room.players.push(peerId);
 
-    console.log("room.service oldRoom", room.roomId);
+    console.log(
+      "\x1b[32mroom.service oldRoom\x1b[37m",
+      room.roomId,
+      room.players.length
+    );
     this.roomEventEmitter.join(
       {
         roomId: room.roomId,
@@ -115,16 +119,14 @@ export class RoomService implements RoomPort {
     if (!room) {
       return;
     }
-    console.log("room.service leaveRoom", room.roomId, peerId);
+    console.log("\x1b[31mroom.service leaveRoom\x1b[37m", room.roomId, peerId);
 
     if (room && !room.state) {
       this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
     }
 
     if (room.players.length === 1) {
-      console.log("플레이어 정보", room.players);
-
-      console.log("room.service 방삭제", room.roomId);
+      console.log("\x1b[31mroom.service 방삭제\x1b[37m", room.roomId);
       this.roomRepository.deleteByRoomId(room.roomId);
       return;
     }
@@ -137,27 +139,7 @@ export class RoomService implements RoomPort {
 
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
 
-    const players = this.roomApiAdapter.getAllPlayer();
-
-    this.roomEventEmitter.quitPlayer(
-      {
-        roomId: room.roomId as string,
-        players: room.players.map((peerId) => {
-          const player = players.find((player) => {
-            return player.peerId === peerId;
-          }) as Player;
-
-          return {
-            peerId: player.peerId,
-            userName: player.userName,
-            avataURL: player.avata,
-            isHost: player.peerId === room.host,
-            isMicOn: player.isMicOn,
-          };
-        }),
-      },
-      room.roomId
-    );
+    this.roomEventEmitter.quitPlayer({ peerId }, room.roomId);
 
     return;
   }
@@ -208,7 +190,7 @@ export class RoomService implements RoomPort {
         return room;
       }
     }
-    console.log("방 없거나 권한 없음");
+    // console.log("\x1b[41m방 없거나 권한 없음\x1b[40m");
 
     return undefined;
   }
