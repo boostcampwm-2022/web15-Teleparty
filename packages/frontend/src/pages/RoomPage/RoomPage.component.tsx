@@ -74,6 +74,10 @@ const RoomPage = () => {
 
   const onGameStartClick = () => {
     if (!isHost) return;
+    if (players.some((player) => player.isGameQuit)) {
+      toast.dismiss();
+      toast.error("모든 플레이어가 방에 입장해야 합니다!");
+    }
     socket.emit("game-start", { gameMode });
   };
 
