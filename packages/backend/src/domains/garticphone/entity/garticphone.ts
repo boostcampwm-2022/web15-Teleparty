@@ -132,7 +132,10 @@ export class Garticphone {
   }
 
   get isGameEnded() {
-    return this.totalRound === this.currentRound;
+    return (
+      this.totalRound === this.currentRound &&
+      this.players.every((player) => player.isInputEnded)
+    );
   }
 
   get isLastAlbum() {
