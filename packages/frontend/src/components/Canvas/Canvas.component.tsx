@@ -168,26 +168,34 @@ const Canvas = ({
     }
   };
 
+  const dataEventHandler = (data: unknown) => {
+    const { event, data: eventData } = data as CanvasEvent;
+
+    switch (event) {
+      case "canvas:draw-start":
+        return drawStart(eventData as DrawStartParameter);
+      case "canvas:draw":
+        return draw(eventData as DrawParameter);
+      case "canvas:draw-end":
+        return drawEnd();
+      case "canvas:undo":
+        return undo();
+    }
+  };
+
   useEffect(() => {
     if (!dataConnections) return;
 
     for (const dataConnection of dataConnections) {
-      dataConnection.on("data", (data) => {
-        const { event, data: eventData } = data as CanvasEvent;
-
-        switch (event) {
-          case "canvas:draw-start":
-            return drawStart(eventData as DrawStartParameter);
-          case "canvas:draw":
-            return draw(eventData as DrawParameter);
-          case "canvas:draw-end":
-            return drawEnd();
-          case "canvas:undo":
-            return undo();
-        }
-      });
+      dataConnection.on("data", dataEventHandler);
     }
-  }, []);
+
+    return () => {
+      for (const dataConnection of dataConnections) {
+        dataConnection.off("data", dataEventHandler);
+      }
+    };
+  }, [dataConnections]);
 
   const mouseDownHandler: React.MouseEventHandler<HTMLCanvasElement> = (
     event
