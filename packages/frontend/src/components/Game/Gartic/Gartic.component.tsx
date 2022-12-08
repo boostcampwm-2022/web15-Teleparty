@@ -148,9 +148,7 @@ const Gartic = () => {
         />
       </GameCenterContentBox>
       <GameContentBox>
-        <HidableBox hide={gameState !== "drawing"}>
-          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
-        </HidableBox>
+        <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         <Chat />
         <Button
           variant="medium-large"
