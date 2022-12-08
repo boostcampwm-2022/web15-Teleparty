@@ -112,7 +112,6 @@ class AudioStreamManager {
     const realTimeAudio = this.realTimeAudioMap.get(id);
     if (!realTimeAudio) return false;
     const { stream } = realTimeAudio;
-
     stream.getAudioTracks()[0].enabled = !stream.getAudioTracks()[0].enabled;
 
     return true;
@@ -123,7 +122,7 @@ class AudioStreamManager {
     if (!realTimeAudio) return false;
     const { stream } = realTimeAudio;
 
-    return !stream.getAudioTracks()[0].enabled;
+    return stream.getAudioTracks()[0].enabled;
   }
 
   addAudioDetectListener(id: string, listener: AudioDetectListener) {
