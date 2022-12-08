@@ -146,7 +146,7 @@ const Gartic = () => {
         />
       </GamePageCenterContentBox>
       <GamePageContentBox>
-        <MoonTimer radius={60} secondTime={roundTime} gameState={gameState} />
+        <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         <Chat />
         <Button
           variant="large"

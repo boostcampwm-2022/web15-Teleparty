@@ -197,9 +197,9 @@ const CatchMind = () => {
       </GamePageCenterContentBox>
       <GamePageContentBox>
         {gameState === "drawing" ? (
-          <MoonTimer radius={50} secondTime={roundTime} gameState={gameState} />
+          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         ) : (
-          <MoonTimer radius={50} secondTime={Infinity} gameState={gameState} />
+          <MoonTimer radius={65} secondTime={Infinity} gameState={gameState} />
         )}
         <Chat />
         {gameState === "inputKeyword" && isMyTurn && (
