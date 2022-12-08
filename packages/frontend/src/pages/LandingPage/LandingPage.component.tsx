@@ -58,6 +58,7 @@ const LandingPage = () => {
   useEffect(() => {
     runAfterSocketConnected(() => {
       console.log("my id: ", socket.id);
+
       setPeer(
         new Peer(createPeerId(socket.id), {
           debug: 0,
