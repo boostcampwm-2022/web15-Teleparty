@@ -5,14 +5,16 @@ const RoomPageLayout = styled.main<{ ratio: number }>`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5rem;
+  gap: 1.5rem;
   height: 100vh;
+  padding-top: 30px;
+  ${(props) => props.theme.backgrounds.nightCity}
   transform: scale(${({ ratio }) => ratio});
 `;
 
 const RoomPageContentBox = styled.div`
   display: flex;
-  gap: 8rem;
+  gap: 3rem;
   height: 60rem;
 `;
 

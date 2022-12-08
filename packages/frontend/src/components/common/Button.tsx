@@ -1,7 +1,13 @@
 import styled, { css } from "styled-components";
 
 interface ButtonProps {
-  variant: "small" | "medium" | "large" | "icon" | "transparent";
+  variant:
+    | "small"
+    | "medium"
+    | "medium-large"
+    | "large"
+    | "icon"
+    | "transparent";
 }
 
 const Button = styled.button<ButtonProps>`
@@ -57,6 +63,15 @@ const Button = styled.button<ButtonProps>`
       padding: 0.5rem;
       font-size: 16px;
       line-height: 22px;
+    `};
+  ${({ variant }) =>
+    variant === "medium-large" &&
+    css`
+      width: 18rem;
+      padding: 1.5rem;
+      font-size: 32px;
+      line-height: 22px;
+      border-radius: 20px;
     `};
   ${({ variant }) =>
     variant === "large" &&

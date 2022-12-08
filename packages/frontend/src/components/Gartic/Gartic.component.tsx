@@ -12,6 +12,7 @@ import useGartic from "../../hooks/useGartic";
 import {
   GamePageContentBox,
   GamePageRoundParagraph,
+  GamePageCenterContentBox,
 } from "../../pages/GamePage/GamePage.styles";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
@@ -21,6 +22,7 @@ import Canvas from "../Canvas/Canvas.component";
 import { CanvasLayout } from "../Canvas/Canvas.styles";
 import Chat from "../Chat/Chat.component";
 import { Button } from "../common/Button";
+import { HidableBox } from "../common/HidableBox";
 import { Input } from "../common/Input";
 import { Logo } from "../Logo/Logo.component";
 import MoonTimer from "../MoonTimer/MoonTimer.component";
@@ -137,19 +139,21 @@ const Gartic = () => {
         </GamePageRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      <GamePageCenterContentBox>
+        <Logo height={70} />
         <PaintBoard
           headerText={headerElementMap[gameState]}
           centerElement={centerElementMap[gameState]}
           footerElement={footerElementMap[gameState]}
         />
-      </GamePageContentBox>
+      </GamePageCenterContentBox>
       <GamePageContentBox>
-        <MoonTimer radius={60} secondTime={roundTime} gameState={gameState} />
+        <HidableBox hide={gameState !== "drawing"}>
+          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
+        </HidableBox>
         <Chat />
         <Button
-          variant="large"
+          variant="medium-large"
           onClick={buttonClickMap[gameState]}
           disabled={
             (gameState === "gameStart" || gameState === "inputKeyword") &&

@@ -7,6 +7,7 @@ interface TextInputProps {
 export const TextInput = styled.input<TextInputProps>`
   border: 1px solid ${(props) => props.theme.colors.primary};
   color: ${(props) => props.theme.colors.primary};
+  box-shadow: ${(props) => props.theme.shadows.small};
   opacity: 0.6;
 
   ${(props) =>

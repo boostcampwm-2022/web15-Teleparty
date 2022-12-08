@@ -10,10 +10,11 @@ const GamePageLayout = styled.main<{ ratio: number }>`
 `;
 
 const GamePageRoundParagraph = styled.p`
-  font-family: "PoetsenOne", sans-serif;
+  font-family: "Dongle", sans-serif;
   font-size: 4rem;
   font-weight: bold;
   color: ${(props) => props.theme.colors.white};
+  transform: scale(1.4);
 `;
 
 const GamePageContentBox = styled.div`
@@ -24,4 +25,19 @@ const GamePageContentBox = styled.div`
   align-items: center;
 `;
 
-export { GamePageLayout, GamePageRoundParagraph, GamePageContentBox };
+const GamePageCenterContentBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-top: 1rem;
+`;
+
+export {
+  GamePageLayout,
+  GamePageRoundParagraph,
+  GamePageContentBox,
+  GamePageCenterContentBox,
+};

@@ -23,11 +23,13 @@ import { useCatchMind } from "../../hooks/useCatchMind";
 import {
   GamePageContentBox,
   GamePageRoundParagraph,
+  GamePageCenterContentBox,
 } from "../../pages/GamePage/GamePage.styles";
 import { dataConnectionMapAtom } from "../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../store/game";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
+import { HidableBox } from "../common/HidableBox";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -189,30 +191,28 @@ const CatchMind = () => {
         </GamePageRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
       </GamePageContentBox>
-      <GamePageContentBox>
-        <Logo height={80} />
+      <GamePageCenterContentBox>
+        <Logo height={70} />
         <PaintBoard
           headerText={getHeaderElement()}
           centerElement={getCenterElement()}
           footerElement={getFooterElement()}
         />
-      </GamePageContentBox>
+      </GamePageCenterContentBox>
       <GamePageContentBox>
-        {gameState === "drawing" ? (
-          <MoonTimer radius={50} secondTime={roundTime} gameState={gameState} />
-        ) : (
-          <MoonTimer radius={50} secondTime={Infinity} gameState={gameState} />
-        )}
+        <HidableBox hide={gameState !== "drawing"}>
+          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
+        </HidableBox>
         <Chat />
-        {gameState === "inputKeyword" && isMyTurn && (
+        <HidableBox hide={!(gameState === "inputKeyword" && isMyTurn)}>
           <Button
-            variant="large"
+            variant="medium-large"
             onClick={onKeywordSubmit}
             disabled={isKeywordEmpty}
           >
             완료
           </Button>
-        )}
+        </HidableBox>
       </GamePageContentBox>
     </>
   );
