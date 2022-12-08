@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -89,14 +90,39 @@ const LandingPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const errorListener = ({ message }: { message: string }) => {
+      toast.dismiss();
+      toast.error(message);
+    };
+    socket.on("error", errorListener);
+    return () => {
+      socket.off("error", errorListener);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (invite) {
+      toast.dismiss();
+      toast.success("방에 참여하도록 초대되었습니다!");
+    }
+  }, [invite]);
+
   return (
-    <LandingPageLayout>
-      <Logo />
-      <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
-      <Button variant="medium" onClick={onEnterClick} disabled={nicknameError}>
-        입장
-      </Button>
-    </LandingPageLayout>
+    <>
+      <Toaster />
+      <LandingPageLayout>
+        <Logo />
+        <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
+        <Button
+          variant="medium"
+          onClick={onEnterClick}
+          disabled={nicknameError}
+        >
+          {invite ? "입장" : "생성"}
+        </Button>
+      </LandingPageLayout>
+    </>
   );
 };
 
