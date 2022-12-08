@@ -10,21 +10,8 @@ export const TOOL_TYPES = [
   "rectangle",
 ] as const;
 
-export const PALETTE_COLORS = [
-  "black",
-  "white",
-  "red",
-  "pink",
-  "orange",
-  "yellow-palette",
-  "green-palette",
-  "blue",
-  "indigo",
-  "violet",
-] as const;
-
 type ToolTypesTuple = typeof TOOL_TYPES;
 type Tool = ToolTypesTuple[number];
 
 export const toolAtom = atom<Tool>("pen");
-export const paletteAtom = atom<string>("pink");
+export const paletteAtom = atom<string>("#000000");
