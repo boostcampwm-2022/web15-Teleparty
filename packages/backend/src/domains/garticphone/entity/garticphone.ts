@@ -207,7 +207,7 @@ export class Garticphone {
 
     if (player) {
       player.exitGame();
-      this.setAlbumData("", playerId);
+      if (!this.isGameEnded) this.setAlbumData("", playerId);
       return true;
     } else return false;
   }

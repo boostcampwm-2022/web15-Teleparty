@@ -85,13 +85,13 @@ export class GarticphoneService implements GarticphonePort {
       return;
     }
 
-    // console.log(
-    //   `\x1b[35mset album setRate: ${
-    //     game.players.filter((p) => p.isInputEnded).length
-    //   }/${game.players.length}\x1b[37m`,
-    //   roomId,
-    //   playerId
-    // );
+    console.log(
+      `\x1b[35mset album setRate: ${
+        game.players.filter((p) => p.isInputEnded).length
+      }/${game.players.length}\x1b[37m`,
+      roomId,
+      playerId
+    );
     game.setAlbumData(data, playerId);
 
     if (game.currentRoundType === "keyword") {
@@ -183,11 +183,12 @@ export class GarticphoneService implements GarticphonePort {
       return;
     }
 
+    const prevState = game.isGameEnded;
     const result = game.exitGame(playerId);
 
     if (result) {
       this.eventEmitter.playerExit(game.roomId, playerId);
-      this.checkRoundEnd(game);
+      if (!prevState) this.checkRoundEnd(game);
     }
 
     if (game.isAllExit) {
