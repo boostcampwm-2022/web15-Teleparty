@@ -16,7 +16,7 @@ router.get(
       id: socket.id,
     });
 
-    if (room) gameService.drawStart(room.roomId, keyword);
+    if (room) gameService.drawStart(room.roomId, keyword, socket.id);
   }
 );
 

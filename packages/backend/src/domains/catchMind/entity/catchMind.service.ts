@@ -1,4 +1,4 @@
-import { CatchMind, Player } from "./catchMind";
+import { CatchMind, Player, Timer } from "./catchMind";
 import { CatchMindEventAdapter } from "../outbound/CatchMindEvent.Adapter";
 import { CatchMindEventPort } from "../outbound/catchMindEvent.port";
 import { CatchMindRepositoryDataPort } from "../outbound/catchMind.repository.port";
@@ -6,28 +6,31 @@ import { CatchMindInputPort } from "../inbound/CatchMindInput.port";
 import { CatchMindRepository } from "../outbound/catchMind.repository";
 import { CatchMindToRoomAdapter } from "../outbound/catchMindToRoom.adapter";
 import { CatchMindToRoom } from "../outbound/catchMindToRoom.port";
+import { TimerRepository } from "../outbound/timer.repository";
+import { TimerRepositoryDataPort } from "../outbound/timer.repository.port";
 
 const MSEC_PER_SEC = 1000;
 
 export class CatchMindService implements CatchMindInputPort {
   eventEmitter: CatchMindEventPort = new CatchMindEventAdapter();
-  repository: CatchMindRepositoryDataPort = new CatchMindRepository();
+  gameRepository: CatchMindRepositoryDataPort = new CatchMindRepository();
+  timerRepository: TimerRepositoryDataPort = new TimerRepository();
   roomAPI: CatchMindToRoom = new CatchMindToRoomAdapter();
 
-  gameStart(
+  async gameStart(
     goalScore: number,
     players: string[],
     roundTime: number,
     roomId: string,
     totalRound: number
   ) {
-    const game = new CatchMind(
+    const game = new CatchMind({
       goalScore,
-      players,
+      players: players.map((id) => new Player(id)),
       roundTime,
       roomId,
-      totalRound
-    );
+      totalRound,
+    });
 
     const { roundInfo } = game;
     this.eventEmitter.gameStart(game.roomId, {
@@ -35,108 +38,127 @@ export class CatchMindService implements CatchMindInputPort {
       roundInfo,
     });
 
-    this.repository.save(game);
+    this.gameRepository.save(game);
   }
 
-  drawStart(id: string, keyword: string) {
-    const game = this.repository.findById(id);
-    if (!game) return;
+  async drawStart(roomId: string, keyword: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
+    const game = await this.gameRepository.findById(roomId);
+    if (!game || !game.isTurnPlayer(playerId)) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+
+    console.log("catch input keyword", roomId, keyword);
 
     game.keyword = keyword;
     this.eventEmitter.drawStart(game.roomId, game.turnPlayer);
 
-    game.timerId = setTimeout(() => {
+    const timerId = setTimeout(() => {
       this.roundEnd(game, null);
     }, game.roundTime * MSEC_PER_SEC);
 
-    this.repository.save(game);
+    const timer = new Timer(roomId, timerId);
+
+    this.timerRepository.save(game.roomId, timer);
+    this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
   }
 
-  roundEnd(game: CatchMind, winner: string | null) {
-    const playerScoreMap: { [K: string]: number } = {};
-    game.players.forEach((player: Player) => {
-      playerScoreMap[player.id] = player.score;
-    });
+  async roundEnd(game: CatchMind, winner: string | null) {
+    console.log("\x1b[36mround End catch\x1b[37m", game.roomId, winner);
+    if (winner) game.addScore(winner);
 
     this.eventEmitter.roundEnd(game.roomId, {
       isLastRound: game.isGameEnded,
       suggestedWord: game.keyword,
-      playerScoreMap: playerScoreMap,
+      playerScoreMap: game.scoreMap,
       roundWinner: winner,
     });
 
-    if (game.isGameEnded) {
-      this.roomAPI.gameEnded(game.roomId);
-    } else {
-      this.repository.save(game);
-    }
+    game.clearKeyword();
+
+    this.gameRepository.save(game);
   }
 
-  checkAnswer(id: string, answer: string, playerId: string) {
-    const game = this.repository.findById(id);
-    if (!game) return;
+  async checkAnswer(roomId: string, answer: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
+    const game = await this.gameRepository.findById(roomId);
+    if (!game) {
+      this.gameRepository.release(roomId);
+      return;
+    }
 
     if (game.isRightAnswer(answer, playerId)) {
-      game.addScore(playerId);
+      this.cancelTimer(roomId);
       this.roundEnd(game, playerId);
-      game.clearKeyword();
-      clearTimeout(game.timerId);
-      if (!game.isGameEnded) {
-        this.repository.save(game);
-      }
     }
+    this.gameRepository.release(roomId);
   }
 
-  roundReady(id: string, playerId: string) {
-    const game = this.repository.findById(id);
-    if (!game) return;
+  async roundReady(roomId: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
+    const game = await this.gameRepository.findById(roomId);
+    if (!game) {
+      await this.gameRepository.getLock(roomId);
+      return;
+    }
 
     const player = game.findPlayer(playerId);
 
     if (player && !player.isReady) {
       this.eventEmitter.roundReady(game.roomId, player);
       game.ready(playerId);
-      this.repository.save(game);
     }
 
     if (game.isAllReady) {
       this.roundStart(game);
     }
+    this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
   }
 
   roundStart(game: CatchMind) {
     game.nextTurn();
     this.eventEmitter.roundStart(game.roomId, game.roundInfo);
-    this.repository.save(game);
   }
 
-  exitGame(roomId: string, playerId: string) {
-    const game = this.repository.findById(roomId);
-    if (!game) return;
+  async exitGame(roomId: string, playerId: string) {
+    await this.gameRepository.getLock(roomId);
+    const game = await this.gameRepository.findById(roomId);
+    if (!game) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+
+    if (game.isTurnPlayer(playerId)) {
+      this.roundEnd(game, null);
+      this.cancelTimer(roomId);
+    }
 
     const result = game.exitGame(playerId);
 
     if (result) {
-      this.eventEmitter.playerExit(game.roomId, playerId);
+      this.eventEmitter.playerExit(roomId, playerId);
     }
 
     if (game.isAllExit) {
-      this.roomAPI.gameEnded(game.roomId);
-      this.repository.delete(game.roomId);
+      console.log("\x1b[33mend game\x1b[37m", roomId);
+      this.roomAPI.gameEnded(roomId);
+      this.gameRepository.delete(roomId);
     } else {
-      this.repository.save(game);
+      this.gameRepository.save(game);
     }
+
+    this.gameRepository.release(roomId);
   }
-  quitDuringGame(roomId: string, playerId: string) {
-    const game = this.repository.findById(roomId);
-    if (!game) return;
 
-    if (game.turnPlayer.id === playerId) {
-      clearTimeout(game.timerId);
-      this.roundEnd(game, null);
-    }
-    game.removePlayer(playerId);
+  cancelTimer(roomId: string) {
+    const timer = this.timerRepository.findById(roomId);
+    if (!timer) return;
 
-    this.repository.save(game);
+    clearTimeout(timer.timer);
+
+    this.timerRepository.delete(roomId);
   }
 }

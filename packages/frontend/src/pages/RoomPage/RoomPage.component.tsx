@@ -23,7 +23,7 @@ import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
-import { AudioDetectListener } from "../../utils/audioStreamMap";
+import { AudioDetectListener } from "../../utils/audioStreamManager";
 
 import type { GameInfo, Player } from "../../types/game";
 
@@ -51,7 +51,7 @@ const RoomPage = () => {
   };
 
   useAudioCommunication(
-    peer,
+    peer!,
     players.map(({ peerId }) => peerId).filter((id) => id !== socket.id),
     changeAudioDetectionStateOfPlayer
   );

@@ -17,6 +17,7 @@ const gameService: CatchMindInputPort = new CatchMindService();
 connecter.register(
   "catchMind/game-start",
   ({ goalScore, players, roundTime, roomId, totalRound }: StartData) => {
+    console.log("game start", roomId);
     gameService.gameStart(goalScore, players, roundTime, roomId, totalRound);
   }
 );
@@ -24,6 +25,6 @@ connecter.register(
 connecter.register(
   "catchMind/player-quit",
   ({ roomId, playerId }: { roomId: string; playerId: string }) => {
-    gameService.quitDuringGame(roomId, playerId);
+    gameService.exitGame(roomId, playerId);
   }
 );

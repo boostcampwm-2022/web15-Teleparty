@@ -63,6 +63,7 @@ connecter.register(
     roundTime: number;
     players: string[];
   }) => {
+    console.log("start-game", roomId);
     service.startGame(roomId, roundTime, players);
   }
 );
