@@ -85,7 +85,6 @@ export class CatchMindService implements CatchMindInputPort {
     game.clearKeyword();
 
     this.gameRepository.save(game);
-    this.gameRepository.release(roomId);
   }
 
   async checkAnswer(roomId: string, answer: string, playerId: string) {
