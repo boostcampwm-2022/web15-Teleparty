@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router";
 
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -62,8 +63,10 @@ const RoomPage = () => {
   useDataConnectionWithPeers(peer!, playerIdList);
 
   const onInviteClick = () => {
+    toast.dismiss();
     const inviteUrl = `${window.location.origin}/?invite=${roomId}`;
     navigator.clipboard.writeText(inviteUrl);
+    toast.success("초대 링크가 복사되었습니다.");
   };
 
   const isHost =
@@ -141,31 +144,34 @@ const RoomPage = () => {
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
-    <RoomPageLayout ratio={ratio}>
-      <Logo />
-      <RoomPageContentBox>
-        <PlayerList maxPlayer={10} sizeType="large" />
-        <RoomPageRightContentBox>
-          <GameModeSegmentedControl
-            selectedGameMode={gameMode}
-            setSelectedGameMode={setGameMode}
-          />
-          <RoomPageButtonBox>
-            <Button variant="medium" onClick={onInviteClick}>
-              초대
-            </Button>
-            <Button
-              variant="medium"
-              onClick={onGameStartClick}
-              disabled={!isHost}
-            >
-              게임시작
-            </Button>
-          </RoomPageButtonBox>
-          <Chat variant="horizontal" />
-        </RoomPageRightContentBox>
-      </RoomPageContentBox>
-    </RoomPageLayout>
+    <>
+      <Toaster />
+      <RoomPageLayout ratio={ratio}>
+        <Logo />
+        <RoomPageContentBox>
+          <PlayerList maxPlayer={10} sizeType="large" />
+          <RoomPageRightContentBox>
+            <GameModeSegmentedControl
+              selectedGameMode={gameMode}
+              setSelectedGameMode={setGameMode}
+            />
+            <RoomPageButtonBox>
+              <Button variant="medium" onClick={onInviteClick}>
+                초대
+              </Button>
+              <Button
+                variant="medium"
+                onClick={onGameStartClick}
+                disabled={!isHost}
+              >
+                게임시작
+              </Button>
+            </RoomPageButtonBox>
+            <Chat variant="horizontal" />
+          </RoomPageRightContentBox>
+        </RoomPageContentBox>
+      </RoomPageLayout>
+    </>
   );
 };
 
