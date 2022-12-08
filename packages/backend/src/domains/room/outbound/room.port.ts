@@ -25,6 +25,10 @@ export interface JoinPlayerTotalInfo {
   players: PlayerInfo[];
 }
 
+export interface QuitPlayerInfo {
+  peerId: string;
+}
+
 export interface RoomEvent {
   join: (data: JoinPlayerTotalInfo, peerId: string) => void;
   newJoin: (data: PlayerInfo, roomId: string) => void;

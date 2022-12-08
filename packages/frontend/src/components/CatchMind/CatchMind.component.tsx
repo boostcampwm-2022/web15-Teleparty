@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
 import Canvas from "../../components/Canvas/Canvas.component";
-import { CanvasLayout } from "../../components/Canvas/Canvas.styles";
 import Chat from "../../components/Chat/Chat.component";
 import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
@@ -41,19 +40,13 @@ const CatchMind = () => {
   const [outgoingCanvasStream, setOutgoingCanvasStream] =
     useState<MediaStream | null>(null);
 
-  const {
-    gamePlayerList,
-    gameState,
-    isMyTurn,
-    roundEndInfo,
-    roundInfo,
-    incomingCanvasStream,
-  } = useCatchMind(socket, players, gameInfo.roundInfo, outgoingCanvasStream);
+  const { gameState, isMyTurn, roundEndInfo, roundInfo, incomingCanvasStream } =
+    useCatchMind(socket, gameInfo.roundInfo, outgoingCanvasStream);
   console.log(incomingCanvasStream);
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
   const getUserNameById = (id: string | undefined | null) => {
-    return gamePlayerList.find(({ peerId }) => peerId === id)?.userName;
+    return players.find(({ peerId }) => peerId === id)?.userName;
   };
 
   const currentTurnUserName = getUserNameById(turnPlayer);
@@ -78,7 +71,6 @@ const CatchMind = () => {
   const onGoToRoomClick = () => {
     socket.emit("quit-game");
     navigate("/room", { replace: true });
-    socket.emit("quit-game");
   };
 
   const getHeaderElement = () => {
@@ -118,12 +110,12 @@ const CatchMind = () => {
       case "gameEnd":
         return (
           <Rank
-            rankList={gamePlayerList
-              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+            rankList={players
               .map(({ userName, score }) => ({
                 userName,
                 score: score ?? 0,
-              }))}
+              }))
+              .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))}
           />
         );
       case "inputKeyword":

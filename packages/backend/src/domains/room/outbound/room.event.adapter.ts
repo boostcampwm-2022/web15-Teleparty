@@ -4,6 +4,7 @@ import {
   JoinPlayerTotalInfo,
   RoomEvent,
   PlayerInfo,
+  QuitPlayerInfo,
 } from "./room.port";
 
 export class RoomEventAdapter implements RoomEvent {

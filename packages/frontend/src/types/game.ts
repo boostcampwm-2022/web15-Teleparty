@@ -5,6 +5,7 @@ export interface Player {
   isHost: boolean;
   isMicOn: boolean;
   isAudioDetected: boolean;
+  isGameQuit?: boolean;
 }
 
 export interface GamePlayer extends Player {
@@ -39,11 +40,6 @@ export interface CatchMindRoundEndInfo {
   suggestedWord: string;
   playerScoreMap: PlayerScoreMap;
   isLastRound: boolean;
-}
-
-export interface GarticPlayer extends Player {
-  isDone: boolean;
-  isMyResult: boolean;
 }
 
 export interface AlbumType {
