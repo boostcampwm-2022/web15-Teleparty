@@ -21,7 +21,7 @@ jobs:
 
       - name: Get Backend File Change
         id: changed-files-backend
-        uses: tj-actions/changed-files@v34
+        uses: tj-actions/changed-files@v34.5.1
         with:
           files: |
             ./packages/backend/**
@@ -58,7 +58,7 @@ jobs:
 
       - name: Get Frontend File Change
         id: changed-files-frontend
-        uses: tj-actions/changed-files@v34
+        uses: tj-actions/changed-files@v34.5.1
         with:
           files: |
             ./packages/frontend/**

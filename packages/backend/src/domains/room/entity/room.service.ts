@@ -139,27 +139,7 @@ export class RoomService implements RoomPort {
 
     this.roomRepository.deletePlayerofRoomByPeerId(peerId);
 
-    const players = this.roomApiAdapter.getAllPlayer();
-
-    this.roomEventEmitter.quitPlayer(
-      {
-        roomId: room.roomId as string,
-        players: room.players.map((peerId) => {
-          const player = players.find((player) => {
-            return player.peerId === peerId;
-          }) as Player;
-
-          return {
-            peerId: player.peerId,
-            userName: player.userName,
-            avataURL: player.avata,
-            isHost: player.peerId === room.host,
-            isMicOn: player.isMicOn,
-          };
-        }),
-      },
-      room.roomId
-    );
+    this.roomEventEmitter.quitPlayer({ peerId }, room.roomId);
 
     return;
   }

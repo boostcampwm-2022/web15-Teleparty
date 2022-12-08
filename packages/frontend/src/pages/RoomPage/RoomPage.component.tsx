@@ -84,11 +84,54 @@ const RoomPage = () => {
     const newJoinListener = (player: Player) => {
       setPlayers((prev) => [...prev, player]);
     };
+    const playerQuitListener = ({ peerId }: { peerId: string }) => {
+      setPlayers((prev) => {
+        const newPlayerList = [...prev];
+        const quitPlayerIndex = newPlayerList.findIndex(
+          (player) => player.peerId === peerId
+        );
+        if (quitPlayerIndex === -1) return prev;
+        newPlayerList.splice(quitPlayerIndex, 1);
+        return newPlayerList;
+      });
+    };
+    const quitGameListener = ({ peerId }: { peerId: string }) => {
+      setPlayers((prev) => {
+        const newPlayerList = [...prev];
+        const quitGamePlayerIndex = newPlayerList.findIndex(
+          (player) => player.peerId === peerId
+        );
+        if (quitGamePlayerIndex === -1) return prev;
+
+        newPlayerList[quitGamePlayerIndex].isGameQuit = false;
+        delete newPlayerList[quitGamePlayerIndex].isCurrentTurn;
+        delete newPlayerList[quitGamePlayerIndex].isReady;
+        return newPlayerList;
+      });
+    };
     socket.on("new-join", newJoinListener);
+    socket.on("player-quit", playerQuitListener);
+    socket.on("quit-game", quitGameListener);
     return () => {
       socket.off("new-join", newJoinListener);
+      socket.off("player-quit", playerQuitListener);
+      socket.off("quit-game", quitGameListener);
     };
   }, [socket, setPlayers]);
+
+  useEffect(() => {
+    setPlayers((prev) =>
+      prev.map((player) => {
+        delete player.isReady;
+        delete player.isCurrentTurn;
+        delete player.score;
+        if (player.isGameQuit !== undefined) {
+          player.isGameQuit = !player.isGameQuit;
+        }
+        return player;
+      })
+    );
+  }, [setPlayers]);
 
   return roomId === undefined ? (
     <Navigate to="/" replace />
