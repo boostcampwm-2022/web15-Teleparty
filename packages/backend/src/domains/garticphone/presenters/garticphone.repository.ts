@@ -7,33 +7,32 @@ import {
 } from "../entity/garticphone";
 import { GarticphoneRepositoryDataPort } from "../useCases/garitcphone.repository.port";
 import { redisCli } from "../../../config/redis";
+import { RedisLock } from "../../../utils/redisLock";
 
-export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
+export class GarticphoneRepository
+  extends RedisLock
+  implements GarticphoneRepositoryDataPort
+{
   async save(game: Garticphone) {
-    const gameData = this.stringify(game);
-    await redisCli.set(`Gartic/${game.roomId}`, gameData);
+    const gameData = JSON.stringify(game);
+    return await redisCli.set(this.getDataKey(game.roomId), gameData);
   }
 
   async findById(id: string) {
-    console.log("\x1b[32mgetLock\x1b[37m", id);
-    await redisCli.blPop(`Gartic-lock/${id}`, 10);
-    const data = await redisCli.get(`Gartic/${id}`);
+    await super.tryLock(this.getLockKey(id));
+    const data = await redisCli.get(this.getDataKey(id));
     if (!data) return;
 
     return this.parse(JSON.parse(data));
   }
 
   async release(id: string) {
-    if (await redisCli.exists(`Gartic/${id}`)) {
-      console.log("\x1b[32mrelease\x1b[37m", id);
-
-      await redisCli.lPush(`Gartic-lock/${id}`, "lock");
-    }
+    await super.release(this.getDataKey(id), this.getLockKey(id));
   }
 
   async delete(roomId: string) {
-    if (await redisCli.exists(`Gartic/${roomId}`)) {
-      await redisCli.del(`Gartic/${roomId}`);
+    if (await redisCli.exists(this.getDataKey(roomId))) {
+      await redisCli.del(this.getDataKey(roomId));
     }
   }
 
@@ -53,8 +52,11 @@ export class GarticphoneRepository implements GarticphoneRepositoryDataPort {
     return new Garticphone(data);
   }
 
-  stringify(game: Garticphone): string {
-    const gameData: GarticGameData = game;
-    return JSON.stringify(gameData);
+  getDataKey(id: string) {
+    return `Gartic/${id}`;
+  }
+
+  getLockKey(id: string) {
+    return `Gartic-lock/${id}`;
   }
 }

@@ -16,7 +16,7 @@ export class GarticphoneService implements GarticphonePort {
   eventEmitter: GarticphoneEventPort = new GarticphoneEventPresenter();
   roomAPI: GarticphoneToRoom = new GarticphoneToRoomPresenter();
 
-  startGame(roomId: string, roundTime: number, playerIds: string[]) {
+  async startGame(roomId: string, roundTime: number, playerIds: string[]) {
     const players = playerIds.map((playerId) => new Player(playerId));
     const game = new Garticphone({ players, roundTime, roomId });
 
@@ -33,7 +33,7 @@ export class GarticphoneService implements GarticphonePort {
 
     this.timerRepository.save(roomId, new Timer(roomId, timerId));
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
@@ -65,7 +65,7 @@ export class GarticphoneService implements GarticphonePort {
 
     this.eventEmitter.sendAlbum(roomId, AlbumData);
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
@@ -101,11 +101,11 @@ export class GarticphoneService implements GarticphonePort {
       this.eventEmitter.drawInput(roomId, playerId);
     }
 
-    this.checkRoundEnd(game);
+    await this.checkRoundEnd(game);
     this.gameRepository.release(roomId);
   }
 
-  checkRoundEnd(game: Garticphone) {
+  async checkRoundEnd(game: Garticphone) {
     const timer = this.timerRepository.findById(game.roomId);
 
     if (game.isAllInputed) {
@@ -118,17 +118,17 @@ export class GarticphoneService implements GarticphonePort {
       if (game.isGameEnded) {
         console.log("\x1b[46mgame end\x1b[40m", game.roomId);
         this.eventEmitter.gameEnd(game.roomId);
-        this.gameRepository.save(game);
+        await this.gameRepository.save(game);
       } else {
         game.roundEnd();
-        this.roundStart(game);
+        await this.roundStart(game);
       }
     } else {
-      this.gameRepository.save(game);
+      await this.gameRepository.save(game);
     }
   }
 
-  roundStart(game: Garticphone) {
+  async roundStart(game: Garticphone) {
     const players = game.getPlayerList();
     const roundInfo = game.roundData;
     players.forEach((player) => {
@@ -154,7 +154,7 @@ export class GarticphoneService implements GarticphonePort {
 
     this.timerRepository.save(game.roomId, new Timer(game.roomId, timerId));
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
   }
 
   async cancelAlbumData(roomId: string, playerId: string) {
@@ -172,7 +172,7 @@ export class GarticphoneService implements GarticphonePort {
       this.eventEmitter.drawCancel(roomId, playerId);
     }
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
@@ -204,7 +204,7 @@ export class GarticphoneService implements GarticphonePort {
       return;
     }
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 }
