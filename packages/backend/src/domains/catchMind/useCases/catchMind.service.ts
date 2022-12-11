@@ -47,12 +47,6 @@ export class CatchMindService implements CatchMindInputPort {
   async drawStart(roomId: string, keyword: string, playerId: string) {
     const game = await this.gameRepository.findById(roomId);
     if (!game || !game.isTurnPlayer(playerId) || game.keyword) {
-      console.log(
-        "canceled",
-        roomId,
-        game?.isTurnPlayer(playerId),
-        game?.keyword
-      );
       this.gameRepository.release(roomId);
       return;
     }

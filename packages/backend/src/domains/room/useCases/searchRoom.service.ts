@@ -10,10 +10,12 @@ export class SerchRoomApiService implements SearchRoomApiPort {
     const room = await this.repository.findOneByPeerId(id);
     if (!room) return;
 
+    this.repository.release(room.roomId);
     return { ...room };
   }
 
-  getRoomByRoomId(roomId: string) {
-    return this.repository.findOneByRoomId(roomId);
-  }
+  // getRoomByRoomId(roomId: string) {
+
+  //   return this.repository.findOneByRoomId(roomId);
+  // }
 }

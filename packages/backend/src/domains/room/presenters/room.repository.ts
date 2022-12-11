@@ -34,6 +34,7 @@ export class RoomRepository
   }
 
   async findOneByRoomId(roomId: string) {
+    await this.tryLock(makeLockKeyByRoomId(roomId));
     const data = await redisCli.get(makeHashKeyByRoomId(roomId));
 
     if (!data) return;
@@ -47,8 +48,10 @@ export class RoomRepository
     if (!player) {
       return undefined;
     }
+    await this.tryLock(makeLockKeyByRoomId(player.roomId));
     const roomJson = await redisCli.get(makeHashKeyByRoomId(player.roomId));
     if (!roomJson) {
+      this.release(player.roomId);
       return undefined;
     }
 
@@ -88,8 +91,8 @@ export class RoomRepository
     });
   }
 
-  async release(id: string) {
-    await super.release(makeLockKeyByRoomId(id));
+  release(id: string): void {
+    super.release(makeLockKeyByRoomId(id));
   }
 }
 
@@ -102,5 +105,5 @@ const makeHashKeyByRoomId = (roomId: string): string => {
 };
 
 const makeLockKeyByRoomId = (roomId: string) => {
-  return `room/${roomId}`;
+  return `room-lock/${roomId}`;
 };

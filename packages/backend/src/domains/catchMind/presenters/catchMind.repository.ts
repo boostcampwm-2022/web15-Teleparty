@@ -23,7 +23,7 @@ export class CatchMindRepository
     await super.tryLock(this.getLockKey(id));
     const data = await redisCli.get(`CatchMind/${id}`);
     if (!data) return;
-    console.log(this.parse(JSON.parse(data)));
+
     return this.parse(JSON.parse(data));
   }
 

@@ -10,13 +10,13 @@ connecter.register("room/get-by-playerId", async ({ id }: { id: string }) => {
   return await roomAPI.searchById(id);
 });
 
-connecter.register(
-  "room/get-by-roomId",
-  async ({ roomId }: { roomId: string }) => {
-    if (roomId) {
-      return await roomAPI.getRoomByRoomId(roomId);
-    }
+// connecter.register(
+//   "room/get-by-roomId",
+//   async ({ roomId }: { roomId: string }) => {
+//     if (roomId) {
+//       return await roomAPI.getRoomByRoomId(roomId);
+//     }
 
-    return undefined;
-  }
-);
+//     return undefined;
+//   }
+// );

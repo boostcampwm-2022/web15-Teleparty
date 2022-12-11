@@ -39,6 +39,7 @@ export class RoomService implements RoomPort {
         // 유효하지 않는 방 번호
         room = await this.createRoom(roomId);
       }
+      this.roomRepository.release(roomId);
 
       if (room.players.length === room.maxPlayer) {
         // 가득 참
@@ -101,6 +102,7 @@ export class RoomService implements RoomPort {
 
     // console.log(room.players);
 
+    console.log("join", room.roomId, player.peerId, room.players.length);
     this.roomRepository.save(room.roomId, room);
 
     this.roomEventEmitter.join(
@@ -119,6 +121,7 @@ export class RoomService implements RoomPort {
       player.peerId
     );
 
+    this.roomRepository.release(room.roomId);
     return;
   }
 
@@ -130,6 +133,7 @@ export class RoomService implements RoomPort {
     }
 
     const room = await this.roomRepository.findOneByRoomId(player.roomId);
+    this.roomRepository.release(player.roomId);
     if (!room) {
       this.sendError(peerId, "leave Error, 방 정보 없음");
       return;
@@ -145,7 +149,7 @@ export class RoomService implements RoomPort {
     // 나밖에 없을 때
     if (room.players.length === 1) {
       this.roomRepository.deleteByRoomId(room.roomId);
-      // console.log("나밖에 없어서 방 삭제");
+      console.log("나밖에 없어서 방 삭제");
       return;
     }
 
@@ -167,7 +171,6 @@ export class RoomService implements RoomPort {
     }
 
     this.roomEventEmitter.quitPlayer(room.roomId, peerId);
-
     return;
   }
   async gameStart(peerId: string, gameMode: GAME_MODE) {
@@ -183,6 +186,7 @@ export class RoomService implements RoomPort {
       room.state = false;
 
       this.roomRepository.save(room.roomId, room);
+      this.roomRepository.release(room.roomId);
 
       const playerIds = room.players.map((player) => player.peerId);
 
@@ -213,7 +217,9 @@ export class RoomService implements RoomPort {
         },
         room.roomId
       );
+      this.roomRepository.release(room.roomId);
     }
+
     return;
   }
 
@@ -235,6 +241,7 @@ export class RoomService implements RoomPort {
     // console.log("방 없거나 권한 없음");
     this.sendError(peerId, "방장체크 중 Error, 방장 아님");
 
+    this.roomRepository.release(player.roomId);
     return undefined;
   }
 
@@ -248,7 +255,7 @@ export class RoomService implements RoomPort {
     }
 
     this.roomApiAdapter.chatting(peerId, room.roomId, message);
-
+    this.roomRepository.release(room.roomId);
     return;
   }
 
@@ -267,12 +274,12 @@ export class RoomService implements RoomPort {
   }
 
   async createUUID() {
-    let uuid = randomUUID();
+    const uuid = randomUUID();
 
-    while (await this.roomRepository.findOneByRoomId(uuid)) {
-      uuid = randomUUID();
-      // console.log("uuid 무한");
-    }
+    // while (await this.roomRepository.findOneByRoomId(uuid)) {
+    //   uuid = randomUUID();
+    //   // console.log("uuid 무한");
+    // }
 
     return uuid;
   }
@@ -283,6 +290,7 @@ export class RoomService implements RoomPort {
       room.state = true;
       this.roomRepository.save(room.roomId, room);
     }
+    this.roomRepository.release(roomId);
     return;
   }
 }
