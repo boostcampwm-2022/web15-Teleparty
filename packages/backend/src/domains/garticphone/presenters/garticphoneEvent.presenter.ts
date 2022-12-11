@@ -5,11 +5,11 @@ import {
   GarticStartData,
   GarticAlbum,
   GarticRoundData,
-} from "./garticphoneEvent.port";
+} from "../useCases/garticphoneEvent.port";
 
 const EVENT_NAME = { painting: "draw-start", keyword: "keyword-input-start" };
 
-export class GarticphoneEventAdapter implements GarticphoneEventPort {
+export class GarticphoneEventPresenter implements GarticphoneEventPort {
   emitter: SocketEmitter = new SocketEmitter();
 
   gameStart(roomId: string, data: GarticStartData) {

@@ -1,5 +1,16 @@
-import { Timer } from "../entity/garticphone";
-import { TimerRepositoryDataPort } from "./timer.repository.port";
+import { TimerRepositoryDataPort } from "../domains/garticphone/useCases/timer.repository.port";
+
+export class Timer {
+  roomId: string;
+  timer: NodeJS.Timeout;
+  constructor(roomId: string, id: NodeJS.Timeout) {
+    this.roomId = roomId;
+    this.timer = id;
+  }
+  cancelTimer() {
+    clearTimeout(this.timer);
+  }
+}
 
 export class TimerRepository implements TimerRepositoryDataPort {
   static timers: Map<string, Timer> = new Map();

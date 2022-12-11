@@ -5,7 +5,7 @@ import {
   GarticGameData,
   GarticPlayerData,
 } from "../entity/garticphone";
-import { GarticphoneRepositoryDataPort } from "./garitcphone.repository.port";
+import { GarticphoneRepositoryDataPort } from "../useCases/garitcphone.repository.port";
 import { redisCli } from "../../../config/redis";
 
 export class GarticphoneRepository implements GarticphoneRepositoryDataPort {

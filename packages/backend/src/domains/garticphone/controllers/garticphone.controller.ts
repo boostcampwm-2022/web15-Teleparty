@@ -1,5 +1,8 @@
-import { GarticphonePort, RoundType } from "./garticphone.port";
-import { GarticphoneService } from "../entity/garticphone.service";
+import {
+  GarticphonePort,
+  RoundType,
+} from "../useCases/garticphoneController.port";
+import { GarticphoneService } from "../useCases/garticphone.service";
 
 import { SocketRouter } from "../../../utils/socketRouter";
 import { DomainConnecter } from "../../../utils/domainConnecter";

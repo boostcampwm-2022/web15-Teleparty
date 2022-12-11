@@ -1,6 +1,6 @@
-import { SearchRoomApiPort } from "../inbound/searchRoom.api.port";
-import { RoomRepository } from "../outbound/room.repository";
-import { RoomRepositoryDataPort } from "../outbound/room.port";
+import { SearchRoomApiPort } from "../controllers/searchRoom.api.port";
+import { RoomRepository } from "../presenters/room.repository";
+import { RoomRepositoryDataPort } from "../presenters/room.port";
 
 export class SerchRoomApiService implements SearchRoomApiPort {
   repository: RoomRepositoryDataPort = new RoomRepository();

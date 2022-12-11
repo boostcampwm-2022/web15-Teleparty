@@ -1,5 +1,5 @@
-import { CatchMindInputPort } from "./CatchMindInput.port";
-import { CatchMindService } from "../entity/catchMind.service";
+import { CatchMindInputPort } from "../useCases/CatchMindInput.port";
+import { CatchMindService } from "../useCases/catchMind.service";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 

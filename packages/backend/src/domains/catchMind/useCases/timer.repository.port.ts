@@ -1,4 +1,4 @@
-import { Timer } from "../entity/catchMind";
+import { Timer } from "../../../utils/timer";
 
 export interface TimerRepositoryDataPort {
   save: (roomId: string, timer: Timer) => void;

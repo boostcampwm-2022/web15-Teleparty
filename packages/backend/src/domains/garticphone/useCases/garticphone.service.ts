@@ -1,20 +1,20 @@
-import { GarticphonePort, RoundType } from "../inbound/garticphone.port";
-import { GarticphoneRepository } from "../outbound/garticphone.repository";
-import { GarticphoneRepositoryDataPort } from "../outbound/garitcphone.repository.port";
-import { Garticphone, Player, Timer } from "./garticphone";
-import { GarticphoneEventPort } from "../outbound/garticphoneEvent.port";
-import { GarticphoneEventAdapter } from "../outbound/garticphoneEvent.adapter";
-import { GarticphoneToRoom } from "../outbound/garticphoneToRoom.port";
-import { GarticphoneToRoomAdapter } from "../outbound/garticphoneToRoom.adapter";
-import { TimerRepository } from "../outbound/timer.repository";
-import { TimerRepositoryDataPort } from "../outbound/timer.repository.port";
+import { GarticphonePort, RoundType } from "./garticphoneController.port";
+import { GarticphoneRepository } from "../presenters/garticphone.repository";
+import { GarticphoneRepositoryDataPort } from "./garitcphone.repository.port";
+import { Garticphone, Player } from "../entity/garticphone";
+import { GarticphoneEventPort } from "./garticphoneEvent.port";
+import { GarticphoneEventPresenter } from "../presenters/garticphoneEvent.presenter";
+import { GarticphoneToRoom } from "./garticphoneToRoom.port";
+import { GarticphoneToRoomPresenter } from "../presenters/garticphoneToRoom.presenter";
+import { TimerRepository, Timer } from "../../../utils/timer";
+import { TimerRepositoryDataPort } from "./timer.repository.port";
 
 const MSEC_PER_SEC = 1000;
 export class GarticphoneService implements GarticphonePort {
   gameRepository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
   timerRepository: TimerRepositoryDataPort = new TimerRepository();
-  eventEmitter: GarticphoneEventPort = new GarticphoneEventAdapter();
-  roomAPI: GarticphoneToRoom = new GarticphoneToRoomAdapter();
+  eventEmitter: GarticphoneEventPort = new GarticphoneEventPresenter();
+  roomAPI: GarticphoneToRoom = new GarticphoneToRoomPresenter();
 
   startGame(roomId: string, roundTime: number, playerIds: string[]) {
     const players = playerIds.map((playerId) => new Player(playerId));
