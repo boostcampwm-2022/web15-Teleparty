@@ -33,7 +33,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
     const data = await redisCli.get(makeHashKeyByRoomId(roomId));
 
     if (!data) return;
-    console.log(data);
+    // console.log(data);
     const room = new Room(JSON.parse(data));
     return room;
   }
@@ -64,7 +64,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   async deleteByRoomId(roomId: string) {
-    console.log("delete roomId", roomId);
+    // console.log("delete roomId", roomId);
 
     if (await redisCli.exists(makeHashKeyByRoomId(roomId)))
       redisCli.del(makeHashKeyByRoomId(roomId));

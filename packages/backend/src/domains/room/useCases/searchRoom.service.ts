@@ -5,7 +5,7 @@ import { RoomRepositoryDataPort } from "../presenters/room.port";
 export class SerchRoomApiService implements SearchRoomApiPort {
   repository: RoomRepositoryDataPort = new RoomRepository();
   async searchById(id: string) {
-    console.log("SerchRoomApiService", id);
+    // console.log("SerchRoomApiService", id);
 
     const room = await this.repository.findOneByPeerId(id);
     if (!room) return;

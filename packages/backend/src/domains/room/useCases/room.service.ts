@@ -53,7 +53,7 @@ export class RoomService implements RoomPort {
       }
     } else {
       room = await this.createRoom();
-      console.log(room);
+      // console.log(room);
     }
 
     const player = this.roomRepository.createUser({
@@ -99,7 +99,7 @@ export class RoomService implements RoomPort {
       );
     }
 
-    console.log(room.players);
+    // console.log(room.players);
 
     this.roomRepository.save(room.roomId, room);
 
@@ -143,7 +143,7 @@ export class RoomService implements RoomPort {
     // 나밖에 없을 때
     if (room.players.length === 1) {
       this.roomRepository.deleteByRoomId(room.roomId);
-      console.log("나밖에 없어서 방 삭제");
+      // console.log("나밖에 없어서 방 삭제");
       return;
     }
 
@@ -153,7 +153,7 @@ export class RoomService implements RoomPort {
         return player.peerId !== room.host;
       });
 
-      console.log("새로운방장", newHost);
+      // console.log("새로운방장", newHost);
 
       // 내가 방장인데 나밖에 없을 때? -> 위에서 걸러지긴 하는데..
       if (!newHost) {
@@ -271,7 +271,7 @@ export class RoomService implements RoomPort {
 
     while (await this.roomRepository.findOneByRoomId(uuid)) {
       uuid = randomUUID();
-      console.log("uuid 무한");
+      // console.log("uuid 무한");
     }
 
     return uuid;

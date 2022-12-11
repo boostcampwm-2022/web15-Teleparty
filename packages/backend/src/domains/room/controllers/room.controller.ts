@@ -34,7 +34,7 @@ router.get(
       return;
     }
 
-    console.log("새로운 플레이어", player);
+    // console.log("새로운 플레이어", player);
 
     socket.join(player.roomId); // 소캣 방에 넣기
 

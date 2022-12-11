@@ -8,7 +8,7 @@ const redisClient = createClient({
   legacyMode: true,
 });
 
-redisClient.on("connect", () => {
+redisClient.on("connect", async () => {
   console.info("Redis conntect");
 });
 
@@ -18,6 +18,7 @@ redisClient.on("error", (error) => {
 
 const connectionRedis = async () => {
   await redisClient.connect();
+  // redisClient.blPop
 };
 
 connectionRedis();
