@@ -1,33 +1,43 @@
-import { redisCli, redisClient } from "../config/redis";
-
 export class RedisLock {
-  async createLock(id: string) {
-    await redisCli.sAdd("lock", id);
+  static lock: Map<string, ((value: unknown) => void)[]> = new Map();
+
+  tryLock(id: string) {
+    if (!RedisLock.lock.has(id)) {
+      RedisLock.lock.set(id, []);
+      return new Promise((resolve) => resolve(true));
+    } else {
+      return new Promise((resolve) => {
+        RedisLock.lock.get(id)?.push(resolve);
+      });
+    }
   }
 
-  async getLock(id: string) {
-    const result = await redisCli.sRem("lock", id);
-    if (result) return;
+  release(id: string) {
+    if (RedisLock.lock.has(id)) {
+      const blockedList = RedisLock.lock.get(id);
 
-    const subscriber = redisClient.duplicate();
+      if (blockedList!.length <= 1) {
+        RedisLock.lock.delete(id);
+      } else {
+        RedisLock.lock.set(id, blockedList!.slice(1));
+      }
 
-    return new Promise((resolve) => {
-      const callback = async () => {
-        const result = await redisCli.sRem("lock", id);
-        console.log("try", id, result);
-        if (result) {
-          resolve(1);
-        } else {
-          subscriber.subscribe(id, callback);
-        }
-      };
-
-      subscriber.subscribe(id, callback);
-    });
+      if (blockedList![0]) {
+        blockedList![0](1);
+      }
+    }
   }
+  // async tryLock(dataId: string, lockId: string) {
+  //   redisClient.executeIsolated(async (client) => {
+  //     if (await redisCli.exists(dataId)) {
+  //       await redisCli.blPop(lockId, 10);
+  //     }
+  //   });
+  // }
 
-  async release(id: string) {
-    const result = await redisCli.sAdd("lock", id);
-    if (result === "OK") await redisClient.publish(id, "");
-  }
+  // async release(dataId: string, lockId: string) {
+  //   if (await redisCli.exists(dataId)) {
+  //     await redisCli.lPush(lockId, "lock");
+  //   }
+  // }
 }

@@ -179,9 +179,11 @@ export class GarticphoneService implements GarticphonePort {
   async exitGame(roomId: string, playerId: string) {
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
+      console.log("why canceled?", roomId);
       this.gameRepository.release(roomId);
       return;
     }
+
     console.log(
       game.roomId,
       game.players.map((p) => p.isExit),

@@ -60,4 +60,5 @@ export interface RoomRepositoryDataPort {
   findPlayerByPeerId: (peerId: string) => Promise<Player | undefined>;
   deleteByRoomId: (roomId: string) => void;
   deletePlayer: (peerId: string, room: Room) => void;
+  release: (id: string) => void;
 }

@@ -2,8 +2,12 @@ import { GAME_MODE, Room } from "../entity/room.entity";
 import { NewPlayer, RoomRepositoryDataPort } from "./room.port";
 import { redisCli } from "../../../config/redis";
 import { Player } from "../entity/player.entitiy";
+import { RedisLock } from "../../../utils/redisLock";
 
-export class RoomRepository implements RoomRepositoryDataPort {
+export class RoomRepository
+  extends RedisLock
+  implements RoomRepositoryDataPort
+{
   private static players: string[] = [];
 
   create(roomId: string) {
@@ -21,8 +25,8 @@ export class RoomRepository implements RoomRepositoryDataPort {
     return newPlayer;
   }
 
-  save(roomId: string, room: Room) {
-    redisCli.set(makeHashKeyByRoomId(roomId), JSON.stringify(room));
+  async save(roomId: string, room: Room) {
+    await redisCli.set(makeHashKeyByRoomId(roomId), JSON.stringify(room));
   }
 
   findAllPlayer() {
@@ -71,7 +75,7 @@ export class RoomRepository implements RoomRepositoryDataPort {
   }
 
   deletePlayer(peerId: string, room: Room) {
-    redisCli.unlink(makeHashKeyByPeerId(peerId));
+    redisCli.del(makeHashKeyByPeerId(peerId));
 
     room.players = room.players.filter((player) => {
       return player.peerId !== peerId;
@@ -83,6 +87,10 @@ export class RoomRepository implements RoomRepositoryDataPort {
       return id !== peerId;
     });
   }
+
+  async release(id: string) {
+    await super.release(makeLockKeyByRoomId(id));
+  }
 }
 
 const makeHashKeyByPeerId = (peerId: string): string => {
@@ -90,5 +98,9 @@ const makeHashKeyByPeerId = (peerId: string): string => {
 };
 
 const makeHashKeyByRoomId = (roomId: string): string => {
+  return `room/${roomId}`;
+};
+
+const makeLockKeyByRoomId = (roomId: string) => {
   return `room/${roomId}`;
 };

@@ -20,6 +20,7 @@ export class GarticphoneRepository
 
   async findById(id: string) {
     await super.tryLock(this.getLockKey(id));
+    // await super.tryLock(this.getDataKey(id), this.getLockKey(id));
     const data = await redisCli.get(this.getDataKey(id));
     if (!data) return;
 
@@ -27,7 +28,8 @@ export class GarticphoneRepository
   }
 
   async release(id: string) {
-    await super.release(this.getDataKey(id), this.getLockKey(id));
+    await super.release(this.getLockKey(id));
+    // await super.release(this.getDataKey(id), this.getLockKey(id));
   }
 
   async delete(roomId: string) {

@@ -1,3 +1,9 @@
+export interface PlayerData {
+  id: string;
+  score?: number;
+  isReady?: boolean;
+}
+
 export interface CatchMindData {
   goalScore: number;
   players: Player[];
@@ -14,7 +20,7 @@ export class Player {
   score: number;
   isReady: boolean;
 
-  constructor(id: string, score?: number, isReady?: boolean) {
+  constructor({ id, score, isReady }: PlayerData) {
     this.id = id;
     this.score = score || 0;
     this.isReady = isReady || false;

@@ -1,4 +1,4 @@
-import { ChatService } from "../entity/chat.service";
+import { ChatService } from "../useCases/chat.service";
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
 // export class ChatInController {

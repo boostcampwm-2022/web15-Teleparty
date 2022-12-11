@@ -26,7 +26,7 @@ export class CatchMindService implements CatchMindInputPort {
   ) {
     const game = new CatchMind({
       goalScore,
-      players: players.map((id) => new Player(id)),
+      players: players.map((id) => new Player({ id })),
       roundTime,
       roomId,
       totalRound,
@@ -38,13 +38,21 @@ export class CatchMindService implements CatchMindInputPort {
       roundInfo,
     });
 
-    this.gameRepository.save(game);
+    console.log("\x1b[32mstart CatchMind\x1b[37m", roomId);
+
+    await this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
   }
 
   async drawStart(roomId: string, keyword: string, playerId: string) {
-    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game || !game.isTurnPlayer(playerId)) {
+    if (!game || !game.isTurnPlayer(playerId) || game.keyword) {
+      console.log(
+        "canceled",
+        roomId,
+        game?.isTurnPlayer(playerId),
+        game?.keyword
+      );
       this.gameRepository.release(roomId);
       return;
     }
@@ -54,14 +62,22 @@ export class CatchMindService implements CatchMindInputPort {
     game.keyword = keyword;
     this.eventEmitter.drawStart(game.roomId, game.turnPlayer);
 
-    const timerId = setTimeout(() => {
-      this.roundEnd(game, null);
+    const timerId = setTimeout(async () => {
+      const game = await this.gameRepository.findById(roomId);
+      if (!game) {
+        this.gameRepository.release(roomId);
+        return;
+      }
+
+      await this.roundEnd(game, null);
+
+      this.gameRepository.release(roomId);
     }, game.roundTime * MSEC_PER_SEC);
 
     const timer = new Timer(roomId, timerId);
 
     this.timerRepository.save(game.roomId, timer);
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
@@ -78,11 +94,10 @@ export class CatchMindService implements CatchMindInputPort {
 
     game.clearKeyword();
 
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
   }
 
   async checkAnswer(roomId: string, answer: string, playerId: string) {
-    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
       this.gameRepository.release(roomId);
@@ -91,16 +106,15 @@ export class CatchMindService implements CatchMindInputPort {
 
     if (game.isRightAnswer(answer, playerId)) {
       this.cancelTimer(roomId);
-      this.roundEnd(game, playerId);
+      await this.roundEnd(game, playerId);
     }
     this.gameRepository.release(roomId);
   }
 
   async roundReady(roomId: string, playerId: string) {
-    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
-      await this.gameRepository.getLock(roomId);
+      this.gameRepository.release(roomId);
       return;
     }
 
@@ -114,7 +128,7 @@ export class CatchMindService implements CatchMindInputPort {
     if (game.isAllReady) {
       this.roundStart(game);
     }
-    this.gameRepository.save(game);
+    await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
@@ -124,7 +138,6 @@ export class CatchMindService implements CatchMindInputPort {
   }
 
   async exitGame(roomId: string, playerId: string) {
-    await this.gameRepository.getLock(roomId);
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
       this.gameRepository.release(roomId);
@@ -132,7 +145,7 @@ export class CatchMindService implements CatchMindInputPort {
     }
 
     if (game.isTurnPlayer(playerId)) {
-      this.roundEnd(game, null);
+      await this.roundEnd(game, null);
       this.cancelTimer(roomId);
     }
 
@@ -146,8 +159,9 @@ export class CatchMindService implements CatchMindInputPort {
       console.log("\x1b[33mend game\x1b[37m", roomId);
       this.roomAPI.gameEnded(roomId);
       this.gameRepository.delete(roomId);
+      return;
     } else {
-      this.gameRepository.save(game);
+      await this.gameRepository.save(game);
     }
 
     this.gameRepository.release(roomId);

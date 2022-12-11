@@ -29,7 +29,7 @@ export class Room {
     this.roomId = data.roomId;
     this.players = data.players || [];
     this.host = data.host || "";
-    this.state = data.state || true; // 방 입장 여부
+    this.state = data.state !== undefined ? data.state : true; // 방 입장 여부
     this.gameMode = data.gameMode || "";
     this.totalRound = data.totalRound || 10;
     this.roundTime = data.roundTime || 60;
