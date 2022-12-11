@@ -1,7 +1,7 @@
 import { CatchMind, Player } from "../entity/catchMind";
 import { CatchMindEventPresenter } from "../presenters/CatchMindEvent.presenter";
 import { CatchMindEventPort } from "./catchMindEvent.port";
-import { CatchMindRepositoryDataPort } from "../presenters/catchMind.repository.port";
+import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
 import { CatchMindInputPort } from "./CatchMindInput.port";
 import { CatchMindRepository } from "../presenters/catchMind.repository";
 import { CatchMindToRoomPresenter } from "../presenters/catchMindToRoom.presenter";

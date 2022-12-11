@@ -1,5 +1,5 @@
 import { CatchMind, Player } from "../entity/catchMind";
-import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
+import { CatchMindRepositoryDataPort } from "../useCases/catchMind.repository.port";
 import { redisCli } from "../../../config/redis";
 
 interface PlayerData {
