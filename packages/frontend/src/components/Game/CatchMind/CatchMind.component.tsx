@@ -10,6 +10,7 @@ import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../../store/game";
 import { playersAtom } from "../../../store/players";
 import { socketAtom } from "../../../store/socket";
+import { getCurrentDateTimeFormat } from "../../../utils/date";
 import Canvas from "../../Canvas/Canvas.component";
 import Chat from "../../Chat/Chat.component";
 import { Button } from "../../common/Button";
@@ -114,7 +115,7 @@ const CatchMind = () => {
     const url = downloadCanvasRef.current.toDataURL();
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `Teleparty-${keyword}-${Date.now()}.png`;
+    anchor.download = `Teleparty_${keyword}_${getCurrentDateTimeFormat()}.png`;
     anchor.click();
     downloadCanvasContext.clearRect(
       0,
