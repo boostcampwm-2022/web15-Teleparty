@@ -188,17 +188,12 @@ export class RoomService implements RoomPort {
       this.roomRepository.save(room.roomId, room);
       this.roomRepository.release(room.roomId);
 
-      const playerIds = room.players.map((player) => player.peerId);
-
+      const gameData =
+        gameMode === "Garticphone"
+          ? room.garticGameData
+          : room.catchMindGameData;
       // 게임시작 신호 보내기(game한테)
-      this.roomApiAdapter.gameStart(
-        room.roomId,
-        gameMode,
-        playerIds,
-        room.totalRound,
-        room.roundTime,
-        room.goalScore
-      );
+      this.roomApiAdapter.gameStart(gameData);
     }
 
     return;
