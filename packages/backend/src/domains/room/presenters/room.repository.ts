@@ -1,8 +1,9 @@
-import { GAME_MODE, Room } from "../entity/room.entity";
-import { NewPlayer, RoomRepositoryDataPort } from "./room.port";
+import { Room } from "../entity/room.entity";
+import { RoomRepositoryDataPort } from "./room.port";
 import { redisCli } from "../../../config/redis";
 import { Player } from "../entity/player.entitiy";
 import { RedisLock } from "../../../utils/redisLock";
+import { NewPlayer } from "../../../types/room";
 
 export class RoomRepository
   extends RedisLock

@@ -1,33 +1,12 @@
-import { GAME_MODE, Room } from "../entity/room.entity";
+import { Room } from "../entity/room.entity";
 import { Player } from "../entity/player.entitiy";
-
-export type PlayerInfo = {
-  peerId: string;
-  userName: string;
-  avataURL: string;
-  isHost: boolean;
-  isMicOn: boolean;
-};
-
-export type NewPlayer = {
-  peerId: string;
-  userName: string;
-  avata: string;
-  roomId: string;
-};
-
-export type GameMode = {
-  roomId: string;
-  gameMode: string;
-};
-export interface JoinPlayerTotalInfo {
-  roomId: string;
-  players: PlayerInfo[];
-}
-
-export interface QuitPlayerInfo {
-  peerId: string;
-}
+import {
+  GameMode,
+  GAME_MODE,
+  JoinPlayerTotalInfo,
+  NewPlayer,
+  PlayerInfo,
+} from "../../../types/room";
 
 export interface RoomEvent {
   join: (data: JoinPlayerTotalInfo, peerId: string) => void;

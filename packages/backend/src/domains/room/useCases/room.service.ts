@@ -8,8 +8,9 @@ import {
   RoomEvent,
 } from "../presenters/room.port";
 import { RoomRepository } from "../presenters/room.repository";
-import { GAME_MODE, Room } from "../entity/room.entity";
+import { Room } from "../entity/room.entity";
 import { randomUUID } from "crypto";
+import { GAME_MODE } from "../../../types/room";
 
 export class RoomService implements RoomPort {
   roomRepository: RoomRepositoryDataPort;
