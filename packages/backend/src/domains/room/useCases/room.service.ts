@@ -106,6 +106,7 @@ export class RoomService implements RoomPort {
     this.roomEventEmitter.join(
       {
         roomId: room.roomId,
+        gameMode: room.gameMode,
         players: room.players.map((roomPlayer) => {
           return {
             peerId: roomPlayer.peerId,

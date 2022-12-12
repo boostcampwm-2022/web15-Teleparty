@@ -17,7 +17,7 @@ export class Room {
     this.players = data.players || [];
     this.host = data.host || "";
     this.state = data.state !== undefined ? data.state : true; // 방 입장 여부
-    this.gameMode = data.gameMode || "";
+    this.gameMode = data.gameMode || "CatchMind"; // 방 생성시 기본 모드 캐치마인드
     this.totalRound = data.totalRound || 10;
     this.roundTime = data.roundTime || 60;
     this.goalScore = data.goalScore || 3;

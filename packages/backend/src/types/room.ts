@@ -35,6 +35,7 @@ export type GameMode = {
 };
 export interface JoinPlayerTotalInfo {
   roomId: string;
+  gameMode: GAME_MODE;
   players: PlayerInfo[];
 }
 
