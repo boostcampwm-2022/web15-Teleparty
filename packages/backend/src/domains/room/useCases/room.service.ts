@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid/non-secure";
+
 import { Player } from "../entity/player.entitiy";
 import { RoomPort } from "../controllers/room.port";
 import { RoomApiAdapter } from "../presenters/room.api.adapter";
@@ -9,7 +11,6 @@ import {
 } from "../presenters/room.port";
 import { RoomRepository } from "../presenters/room.repository";
 import { Room } from "../entity/room.entity";
-import { randomUUID } from "crypto";
 import { GAME_MODE } from "../../../types/room";
 
 export class RoomService implements RoomPort {
@@ -263,7 +264,7 @@ export class RoomService implements RoomPort {
   }
 
   async createUUID() {
-    const uuid = randomUUID();
+    const uuid = nanoid();
 
     return uuid;
   }
