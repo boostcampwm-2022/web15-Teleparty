@@ -1,11 +1,6 @@
+import { GameMode, JoinPlayerTotalInfo, PlayerInfo } from "../../../types/room";
 import { SocketEmitter } from "../../../utils/socketEmitter";
-import {
-  GameMode,
-  JoinPlayerTotalInfo,
-  RoomEvent,
-  PlayerInfo,
-  QuitPlayerInfo,
-} from "./room.port";
+import { RoomEvent } from "./room.port";
 
 export class RoomEventAdapter implements RoomEvent {
   emitter: SocketEmitter;
