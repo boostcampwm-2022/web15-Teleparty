@@ -143,13 +143,6 @@ export class RoomService implements RoomPort {
       this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
     }
 
-    // 나밖에 없을 때
-    if (room.players.length === 1) {
-      this.roomRepository.deleteByRoomId(room.roomId);
-      console.log("나밖에 없어서 방 삭제");
-      return;
-    }
-
     room.leavePlayer(player.peerId);
 
     // 여전히 나간 사람이 방장일 때
@@ -159,6 +152,13 @@ export class RoomService implements RoomPort {
     }
 
     this.roomRepository.deletePlayer(peerId, room);
+
+    // 나밖에 없었을 때
+    if (room.players.length === 0) {
+      this.roomRepository.deleteByRoomId(room.roomId);
+      console.log("나밖에 없어서 방 삭제");
+      return;
+    }
 
     this.roomEventEmitter.quitPlayer(room.roomId, peerId);
     return;
