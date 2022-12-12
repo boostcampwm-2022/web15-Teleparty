@@ -63,7 +63,8 @@ export class CatchMind {
   get isGameEnded() {
     return (
       this.currentRound === this.totalRound ||
-      this.players.some((player) => player.score >= this.goalScore)
+      this.players.some((player) => player.score >= this.goalScore) ||
+      this.leftPlayerNum <= 1
     );
   }
 
@@ -71,8 +72,8 @@ export class CatchMind {
     return this.players.every((player) => player.isReady);
   }
 
-  get isAllExit() {
-    return this.players.length === 0;
+  get leftPlayerNum() {
+    return this.players.length;
   }
 
   get scoreMap() {
