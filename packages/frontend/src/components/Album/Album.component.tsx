@@ -42,7 +42,9 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
 
   useEffect(() => {
-    albumEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      albumEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 50);
   }, [renderedAlbum, showNext]);
 
   useEffect(() => {
