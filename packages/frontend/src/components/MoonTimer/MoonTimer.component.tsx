@@ -10,7 +10,7 @@ interface MoonTimerProps {
   gameState: string;
 }
 
-const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
+const MoonTimer = ({ secondTime, radius, gameState }: MoonTimerProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const startTimeRef = useRef(new Date());
   const requestAnimationFrameIdRef = useRef(0);
@@ -78,7 +78,7 @@ const MoonTimer = ({ secondTime, radius }: MoonTimerProps) => {
     startMoonAnimation();
 
     return stopMoonAnimation;
-  });
+  }, [gameState]);
 
   return (
     <MoonTimerLayout ref={canvasRef} width={radius * 2} height={radius * 2} />
