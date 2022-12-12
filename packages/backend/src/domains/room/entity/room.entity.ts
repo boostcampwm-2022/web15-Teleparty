@@ -36,4 +36,49 @@ export class Room {
     this.goalScore = data.goalScore || 3;
     this.maxPlayer = data.maxPlayer || 10;
   }
+
+  getPlayerId() {
+    return this.players.map((player) => player.peerId);
+  }
+
+  addPlayer(player: Player) {
+    this.players.push(player);
+  }
+
+  leavePlayer(peerId: string) {
+    if (this.players.length === 1) {
+      return;
+    }
+
+    this.players = this.players.filter((player) => player.peerId !== peerId);
+
+    if (this.host === peerId) {
+      this.changeHost();
+    }
+  }
+
+  changeHost() {
+    const newHost = this.players.find((player) => player.peerId !== this.host);
+    if (!newHost) {
+      return;
+    }
+
+    this.host = newHost.peerId;
+  }
+
+  changeGameMode(gameMode: GAME_MODE) {
+    this.gameMode = gameMode;
+  }
+
+  changeState(state: boolean) {
+    this.state = state;
+  }
+
+  checkMaxPlayer() {
+    return this.players.length === this.maxPlayer;
+  }
+
+  checkHost(peerId: string) {
+    return this.host === peerId;
+  }
 }

@@ -41,20 +41,19 @@ export class RoomService implements RoomPort {
       }
       this.roomRepository.release(roomId);
 
-      if (room.players.length === room.maxPlayer) {
+      if (room.checkMaxPlayer()) {
         // 가득 참
         this.sendError(peerId, "이미 방이 가득 찼습니다.");
-        return undefined;
+        return;
       }
 
       if (!room.state) {
         // 게임중
         this.sendError(peerId, "이미 게임이 시작한 방입니다.");
-        return undefined;
+        return;
       }
     } else {
       room = await this.createRoom();
-      // console.log(room);
     }
 
     const player = this.roomRepository.createUser({
@@ -82,7 +81,7 @@ export class RoomService implements RoomPort {
       return;
     }
 
-    room.players.push(player);
+    room.addPlayer(player);
 
     if (!room.host) {
       // 내가 방에 처음 들어갔을 경우(내가 방을 만든 경우)
@@ -99,8 +98,6 @@ export class RoomService implements RoomPort {
         room.roomId
       );
     }
-
-    // console.log(room.players);
 
     console.log("join", room.roomId, player.peerId, room.players.length);
     this.roomRepository.save(room.roomId, room);
@@ -144,8 +141,6 @@ export class RoomService implements RoomPort {
       this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
     }
 
-    this.roomRepository.deletePlayer(peerId, room);
-
     // 나밖에 없을 때
     if (room.players.length === 1) {
       this.roomRepository.deleteByRoomId(room.roomId);
@@ -153,22 +148,15 @@ export class RoomService implements RoomPort {
       return;
     }
 
-    // 내가 방장일 때
+    room.leavePlayer(player.peerId);
+
+    // 여전히 나간 사람이 방장일 때
     if (room.host === player.peerId) {
-      const newHost = room.players.find((player) => {
-        return player.peerId !== room.host;
-      });
-
-      // console.log("새로운방장", newHost);
-
-      // 내가 방장인데 나밖에 없을 때? -> 위에서 걸러지긴 하는데..
-      if (!newHost) {
-        this.sendError(peerId, "leave Error, 방에 혼자 있는데 방장임");
-        return;
-      }
-
-      room.host = newHost.peerId;
+      this.sendError(peerId, "방장변경에러, 방장 변경안됨");
+      return;
     }
+
+    this.roomRepository.deletePlayer(peerId, room);
 
     this.roomEventEmitter.quitPlayer(room.roomId, peerId);
     return;
@@ -182,13 +170,13 @@ export class RoomService implements RoomPort {
     }
 
     if (room.state) {
-      room.gameMode = gameMode;
-      room.state = false;
+      room.changeGameMode(gameMode);
+      room.changeState(false);
 
       this.roomRepository.save(room.roomId, room);
       this.roomRepository.release(room.roomId);
 
-      const playerIds = room.players.map((player) => player.peerId);
+      const playerIds = room.getPlayerId();
 
       // 게임시작 신호 보내기(game한테)
       this.roomApiAdapter.gameStart(
@@ -206,7 +194,7 @@ export class RoomService implements RoomPort {
   async chooseMode(peerId: string, gameMode: GAME_MODE) {
     const room = await this.checkHostByPeerId(peerId);
     if (room) {
-      room.gameMode = gameMode;
+      room.changeGameMode(gameMode);
       this.roomRepository.save(room.roomId, room);
 
       // 방에 있는 모든 사람에게 게임 모드 알려주기
@@ -227,13 +215,13 @@ export class RoomService implements RoomPort {
     const player = await this.roomRepository.findPlayerByPeerId(peerId);
     if (!player) {
       this.sendError(peerId, "방장체크 중 Error, 플레이어 정보 없음");
-      return undefined;
+      return;
     }
 
     const room = await this.roomRepository.findOneByRoomId(player.roomId);
 
     if (room) {
-      if (room.host === peerId) {
+      if (room.checkHost(peerId)) {
         // 호스트만 가능
         return room;
       }
@@ -242,12 +230,11 @@ export class RoomService implements RoomPort {
     this.sendError(peerId, "방장체크 중 Error, 방장 아님");
 
     this.roomRepository.release(player.roomId);
-    return undefined;
+    return;
   }
 
   async chatting(peerId: string, message: string) {
     const room = await this.roomRepository.findOneByPeerId(peerId);
-    // console.log("채팅하는 방", room);
 
     if (!room) {
       this.sendError(peerId, "chatting Error, 방 없음");
@@ -276,18 +263,13 @@ export class RoomService implements RoomPort {
   async createUUID() {
     const uuid = randomUUID();
 
-    // while (await this.roomRepository.findOneByRoomId(uuid)) {
-    //   uuid = randomUUID();
-    //   // console.log("uuid 무한");
-    // }
-
     return uuid;
   }
 
   async endGame(roomId: string) {
     const room = await this.roomRepository.findOneByRoomId(roomId);
     if (room) {
-      room.state = true;
+      room.changeState(true);
       this.roomRepository.save(room.roomId, room);
     }
     this.roomRepository.release(roomId);
