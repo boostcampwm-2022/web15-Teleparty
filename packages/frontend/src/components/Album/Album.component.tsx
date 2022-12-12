@@ -94,7 +94,9 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       ))}
       {showNext && (
         <AlbumNextLayout>
-          <AlbumNextText>OOO님의 앨범</AlbumNextText>
+          <AlbumNextText>
+            {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
+          </AlbumNextText>
           <AlbumNextButtonBox>
             <Button variant="icon">
               <Icon icon="download" size={36} />
