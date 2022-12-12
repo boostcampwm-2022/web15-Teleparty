@@ -1,5 +1,4 @@
-import { atom } from "jotai";
-
+import { atomWithReset } from "jotai/utils";
 // ToolBox 컴포넌트 렌더링에 사용
 export const TOOL_TYPES = [
   "pen",
@@ -13,5 +12,5 @@ export const TOOL_TYPES = [
 type ToolTypesTuple = typeof TOOL_TYPES;
 export type Tool = ToolTypesTuple[number];
 
-export const toolAtom = atom<Tool>("pen");
-export const paletteAtom = atom<string>("#000000");
+export const toolAtom = atomWithReset<Tool>("pen");
+export const paletteAtom = atomWithReset<string>("#000000");
