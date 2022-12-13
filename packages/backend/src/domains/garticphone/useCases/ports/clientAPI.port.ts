@@ -21,7 +21,7 @@ export interface GarticRoundData {
   roundInfo: GarticRoundInfo;
 }
 
-export interface GarticphoneEventPort {
+export interface ClientAPIPort {
   gameStart: (roomId: string, data: GarticStartData) => void;
   keywordInput: (roomId: string, playerId: string) => void;
   keywordCancel: (roomId: string, playerId: string) => void;

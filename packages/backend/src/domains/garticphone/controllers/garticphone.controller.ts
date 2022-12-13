@@ -1,7 +1,7 @@
 import {
   GarticphonePort,
   RoundType,
-} from "../useCases/garticphoneController.port";
+} from "../useCases/ports/garticphoneController.port";
 import { GarticphoneService } from "../useCases/garticphone.service";
 
 import { SocketRouter } from "../../../utils/socketRouter";

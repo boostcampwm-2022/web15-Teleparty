@@ -1,71 +1,7 @@
 import Crypto from "crypto";
-
-type DataType = "keyword" | "painting";
-
-export interface GarticPlayerData {
-  id: string;
-  isInputEnded: boolean;
-  isExit: boolean;
-  album: AlbumData[];
-}
-
-export interface GarticGameData {
-  players: Player[];
-  drawTime: number;
-  keywordTime: number;
-  roomId: string;
-  totalRound?: number;
-  currentRound?: number;
-  sendIdx?: number;
-  orderSeed?: number;
-}
-
-export class AlbumData {
-  type: DataType;
-  ownerId: string;
-  data: string;
-
-  constructor(type: DataType, ownerId: string, data: string) {
-    this.type = type;
-    this.ownerId = ownerId;
-    this.data = data;
-  }
-}
-
-export class Player {
-  id: string;
-  isInputEnded: boolean;
-  isExit: boolean;
-  album: AlbumData[] = [];
-
-  constructor(id: string) {
-    this.id = id;
-    this.isInputEnded = false;
-    this.isExit = false;
-  }
-
-  setAlbumData(index: number, data: AlbumData) {
-    this.album[index] = data;
-  }
-
-  cancelAlbumData(index: number) {
-    if (this.album[index]) {
-      this.album.pop();
-    }
-  }
-
-  getLastAlbumData() {
-    return this.album.at(-1)?.data || "";
-  }
-
-  getAlbum() {
-    return this.album;
-  }
-
-  exitGame() {
-    this.isExit = true;
-  }
-}
+import { GarticGameData } from "../../../types/gartic.type";
+import { AlbumData } from "./albumData";
+import { Player } from "./player";
 
 const getPrime = () => {
   const primeArrayBuffer = Crypto.generatePrimeSync(
@@ -85,24 +21,15 @@ export class Garticphone {
   sendIdx: number;
   orderSeed: number;
 
-  constructor({
-    players,
-    drawTime,
-    keywordTime,
-    roomId,
-    totalRound,
-    currentRound,
-    sendIdx,
-    orderSeed,
-  }: GarticGameData) {
-    this.players = players;
-    this.totalRound = totalRound || players.length;
-    this.drawTime = drawTime || 90;
-    this.keywordTime = keywordTime || 45;
-    this.roomId = roomId;
-    this.currentRound = currentRound || 1;
-    this.sendIdx = sendIdx || 0;
-    this.orderSeed = orderSeed || getPrime();
+  constructor(data: GarticGameData) {
+    this.players = data.players;
+    this.totalRound = data.totalRound || data.players.length;
+    this.drawTime = data.drawTime || 90;
+    this.keywordTime = data.keywordTime || 45;
+    this.roomId = data.roomId;
+    this.currentRound = data.currentRound || 1;
+    this.sendIdx = data.sendIdx || 0;
+    this.orderSeed = data.orderSeed || getPrime();
     while (this.orderSeed === this.players.length) {
       this.orderSeed = getPrime();
     }
@@ -182,7 +109,8 @@ export class Garticphone {
   }
 
   nextPlayer() {
-    return this.players[this.sendIdx++];
+    if (!this.isGameEnded) return this.players[this.sendIdx++];
+    else return null;
   }
 
   getPlayerList() {

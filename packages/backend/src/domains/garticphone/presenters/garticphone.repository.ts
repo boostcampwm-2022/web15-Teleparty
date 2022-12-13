@@ -1,13 +1,10 @@
-import {
-  Garticphone,
-  AlbumData,
-  Player,
-  GarticGameData,
-  GarticPlayerData,
-} from "../entity/garticphone";
-import { GarticphoneRepositoryDataPort } from "../useCases/garitcphone.repository.port";
+import { Garticphone } from "../entity/garticphone";
+import { GarticphoneRepositoryDataPort } from "../useCases/ports/garitcphone.repository.port";
 import { redisCli } from "../../../config/redis";
 import { RedisLock } from "../../../utils/redisLock";
+import { GarticGameData, GarticPlayerData } from "../../../types/gartic.type";
+import { Player } from "../entity/player";
+import { AlbumData } from "../entity/albumData";
 
 export class GarticphoneRepository
   extends RedisLock

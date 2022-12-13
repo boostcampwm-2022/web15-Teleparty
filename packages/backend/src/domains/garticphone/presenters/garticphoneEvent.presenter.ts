@@ -1,15 +1,15 @@
 import { SocketEmitter } from "../../../utils/socketEmitter";
 
 import {
-  GarticphoneEventPort,
+  ClientAPIPort,
   GarticStartData,
   GarticAlbum,
   GarticRoundData,
-} from "../useCases/garticphoneEvent.port";
+} from "../useCases/ports/clientAPI.port";
 
 const EVENT_NAME = { painting: "draw-start", keyword: "keyword-input-start" };
 
-export class GarticphoneEventPresenter implements GarticphoneEventPort {
+export class GarticphoneEventPresenter implements ClientAPIPort {
   emitter: SocketEmitter = new SocketEmitter();
 
   gameStart(roomId: string, data: GarticStartData) {

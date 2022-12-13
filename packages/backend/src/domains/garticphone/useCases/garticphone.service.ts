@@ -1,20 +1,21 @@
-import { GarticphonePort, RoundType } from "./garticphoneController.port";
+import { GarticphonePort, RoundType } from "./ports/garticphoneController.port";
 import { GarticphoneRepository } from "../presenters/garticphone.repository";
-import { GarticphoneRepositoryDataPort } from "./garitcphone.repository.port";
-import { Garticphone, Player } from "../entity/garticphone";
-import { GarticphoneEventPort } from "./garticphoneEvent.port";
+import { GarticphoneRepositoryDataPort } from "./ports/garitcphone.repository.port";
+import { Garticphone } from "../entity/garticphone";
+import { ClientAPIPort } from "./ports/clientAPI.port";
 import { GarticphoneEventPresenter } from "../presenters/garticphoneEvent.presenter";
-import { GarticphoneToRoom } from "./garticphoneToRoom.port";
-import { GarticphoneToRoomPresenter } from "../presenters/garticphoneToRoom.presenter";
+import { RoomAPIPort } from "./ports/roomAPI.port";
+import { RoomAPIPresenter } from "../presenters/roomAPI.presenter";
 import { TimerRepository, Timer } from "../../../utils/timer";
-import { TimerRepositoryDataPort } from "./timer.repository.port";
+import { TimerRepositoryDataPort } from "./ports/timer.repository.port";
+import { Player } from "../entity/player";
 
 const MSEC_PER_SEC = 1000;
 export class GarticphoneService implements GarticphonePort {
   gameRepository: GarticphoneRepositoryDataPort = new GarticphoneRepository();
   timerRepository: TimerRepositoryDataPort = new TimerRepository();
-  eventEmitter: GarticphoneEventPort = new GarticphoneEventPresenter();
-  roomAPI: GarticphoneToRoom = new GarticphoneToRoomPresenter();
+  eventEmitter: ClientAPIPort = new GarticphoneEventPresenter();
+  roomAPI: RoomAPIPort = new RoomAPIPresenter();
 
   async startGame(
     roomId: string,
@@ -31,41 +32,39 @@ export class GarticphoneService implements GarticphonePort {
       roundInfo: game.roundData,
     });
 
-    console.log(
-      {
-        gameMode: "Garticphone",
-        totalRound: game.players.length,
-        roundInfo: game.roundData,
-      },
-      game.currentRoundType
-    );
-
-    const timerId = setTimeout(
-      () => this.timeOut(roomId),
-      game.currentRoundTime * MSEC_PER_SEC
-    );
-
-    this.timerRepository.save(roomId, new Timer(roomId, timerId));
+    this.setTimer(roomId, game.currentRoundTime);
 
     await this.gameRepository.save(game);
     this.gameRepository.release(roomId);
   }
 
   async sendAlbum(roomId: string, playerId: string) {
-    // await this.gameRepository.getLock(roomId, playerId);
     const game = await this.gameRepository.findById(roomId);
-    if (!game || !game.isHost(playerId) || !game.isGameEnded) {
+    if (!game || !game.isHost(playerId)) {
       this.gameRepository.release(roomId);
       return;
     }
+
+    const albumData = this.parseAlbum(game);
+    if (!albumData) {
+      this.gameRepository.release(roomId);
+      return;
+    }
+
+    this.eventEmitter.sendAlbum(roomId, albumData);
+
+    await this.gameRepository.save(game);
+    this.gameRepository.release(roomId);
+  }
+
+  parseAlbum(game: Garticphone) {
     const player = game.nextPlayer();
 
     if (!player) {
-      this.gameRepository.release(roomId);
       return;
     }
 
-    const AlbumData = {
+    return {
       peerId: player.id,
       isLast: game.isLastAlbum,
       result: player.getAlbum().map((data) => {
@@ -76,15 +75,15 @@ export class GarticphoneService implements GarticphonePort {
         };
       }),
     };
-
-    this.eventEmitter.sendAlbum(roomId, AlbumData);
-
-    await this.gameRepository.save(game);
-    this.gameRepository.release(roomId);
   }
 
-  timeOut(roomId: string) {
-    this.eventEmitter.timeOut(roomId);
+  setTimer(roomId: string, time: number) {
+    const timerId = setTimeout(
+      () => this.eventEmitter.timeOut(roomId),
+      time * MSEC_PER_SEC
+    );
+
+    this.timerRepository.save(roomId, new Timer(roomId, timerId));
   }
 
   async setAlbumData(
@@ -161,12 +160,7 @@ export class GarticphoneService implements GarticphonePort {
       this.eventEmitter.roundstart(player.id, type, data);
     });
 
-    const timerId = setTimeout(
-      () => this.timeOut(game.roomId),
-      game.currentRoundTime * MSEC_PER_SEC
-    );
-
-    this.timerRepository.save(game.roomId, new Timer(game.roomId, timerId));
+    this.setTimer(game.roomId, game.currentRoundTime);
 
     await this.gameRepository.save(game);
   }

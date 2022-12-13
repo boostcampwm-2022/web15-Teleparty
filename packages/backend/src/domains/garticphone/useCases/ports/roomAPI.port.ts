@@ -1,3 +1,3 @@
-export interface GarticphoneToRoom {
+export interface RoomAPIPort {
   gameEnded: (roomId: string) => void;
 }
