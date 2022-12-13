@@ -24,8 +24,8 @@ const MoonTimer = ({ secondTime, radius, gameState }: MoonTimerProps) => {
   const requestAnimationFrameIdRef = useRef(0);
   const tickTockAudio = useRef(new Audio(ticktockAudioSrc));
 
-  const remainMinute = Math.floor(remainSecondTime / 60);
-  const remainSecond = remainSecondTime - remainMinute * 60;
+  const remainMinute = Math.max(Math.floor(remainSecondTime / 60), 0);
+  const remainSecond = Math.max(remainSecondTime - remainMinute * 60, 0);
 
   const getCanvasContext = () => {
     return canvasRef.current?.getContext("2d");
@@ -69,8 +69,12 @@ const MoonTimer = ({ secondTime, radius, gameState }: MoonTimerProps) => {
     // draw moon animation frame
     moonAnimationFrame(progress);
 
-    if (remainSecondTime && remainSecondTime <= MOON_TIMER_TICKTOCK_START_TIME)
+    if (
+      remainSecondTime > 0 &&
+      remainSecondTime <= MOON_TIMER_TICKTOCK_START_TIME
+    )
       startTicktockSound();
+    else stopTicktockSound();
 
     if (progress >= 1) return;
     requestAnimationFrameIdRef.current = requestAnimationFrame(
