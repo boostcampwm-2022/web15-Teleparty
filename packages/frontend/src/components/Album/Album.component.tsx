@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import gifshot from "gifshot";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import {
@@ -11,8 +13,10 @@ import {
 } from "./Album.styles";
 import AlbumBubble from "./AlbumBubble.component";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
+import { getCurrentDateTimeFormat } from "../../utils/date";
 import { Button } from "../common/Button";
 import Icon from "../Icon/Icon";
 
@@ -33,6 +37,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
   const setPlayers = useSetAtom(playersAtom);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const getUserNameById = (id: string) => {
     return players.find(({ peerId }) => peerId === id)?.userName;
@@ -81,6 +86,76 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     navigate("/room", { replace: true });
   };
 
+  const onDownloadClick = async () => {
+    const canvas = canvasRef.current;
+    const context = canvasRef.current?.getContext("2d");
+    if (!canvas || !context || !renderedAlbum.length) {
+      toast.dismiss();
+      toast.error("다운로드에 실패했습니다.");
+      return;
+    }
+
+    const drawUsername = (peerId: string) => {
+      const username = getUserNameById(peerId) ?? "";
+      context.font = "bold 36px 'Noto Sans KR', sans-serif";
+      context.textAlign = "center";
+      const textSize = context.measureText(username);
+      context.fillStyle = "white";
+      context.fillRect(
+        canvas.width / 2 - textSize.actualBoundingBoxLeft - 5,
+        canvas.height * 0.95 - textSize.actualBoundingBoxAscent - 5,
+        textSize.width + 10,
+        textSize.actualBoundingBoxAscent +
+          textSize.actualBoundingBoxDescent +
+          10
+      );
+      context.fillStyle = "black";
+      context.fillText(username, canvas.width / 2, canvas.height * 0.95);
+    };
+    const drawKeyword = (keyword: string) => {
+      context.fillStyle = "white";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "black";
+      context.font = "bold 48px 'Noto Sans KR', sans-serif";
+      context.textAlign = "center";
+      context.fillText(keyword ?? "", canvas.width / 2, canvas.height / 2);
+    };
+
+    const imagePromises = renderedAlbum.map(({ peerId, img, keyword }) => {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      if (img) {
+        return new Promise<string>((resolve) => {
+          const image = new Image();
+          image.onload = () => {
+            context.drawImage(image, 0, 0);
+            drawUsername(peerId);
+            resolve(canvas.toDataURL() ?? "");
+          };
+          image.src = img;
+        });
+      }
+      drawKeyword(keyword ?? "");
+      drawUsername(peerId);
+      const image = canvas.toDataURL();
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      return new Promise<string>((resolve) => resolve(image));
+    });
+    const images = await Promise.all(imagePromises);
+    const options = {
+      images,
+      interval: 2,
+      gifWidth: canvas.width,
+      gifHeight: canvas.height,
+    };
+    gifshot.createGIF(options, ({ image }) => {
+      const a = document.createElement("a");
+      a.href = image;
+      a.download = `Teleparty_album_${getCurrentDateTimeFormat()}.gif`;
+      a.click();
+      toast.success("다운로드가 완료되었습니다.");
+    });
+  };
+
   return (
     <AlbumLayout>
       {renderedAlbum.map(({ peerId, img, keyword }, index) => (
@@ -96,7 +171,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         <AlbumNextLayout>
           <AlbumNextText>OOO님의 앨범</AlbumNextText>
           <AlbumNextButtonBox>
-            <Button variant="icon">
+            <Button variant="icon" onClick={onDownloadClick}>
               <Icon icon="download" size={36} />
             </Button>
             {isLastAlbum ? (
@@ -113,6 +188,12 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           </AlbumNextButtonBox>
         </AlbumNextLayout>
       )}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_SIZE.WIDTH}
+        height={CANVAS_SIZE.HEIGHT}
+        hidden
+      />
       <div ref={albumEndRef}></div>
     </AlbumLayout>
   );
