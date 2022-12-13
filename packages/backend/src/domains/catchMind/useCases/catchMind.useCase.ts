@@ -93,6 +93,8 @@ export class CatchMindUseCase implements CatchMindControllerPort {
       playerScoreMap: game.scoreMap,
       roundWinner: winner,
     });
+
+    game.clearKeyword();
   }
 
   async checkAnswer(roomId: string, answer: string, playerId: string) {

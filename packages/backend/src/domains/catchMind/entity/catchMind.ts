@@ -75,6 +75,10 @@ export class CatchMind {
     return true;
   }
 
+  clearKeyword() {
+    this.keyword = "";
+  }
+
   nextTurn() {
     this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
     this.currentRound++;
@@ -87,9 +91,8 @@ export class CatchMind {
   }
 
   challengeAnswer(keyword: string, playerId: string) {
-    if (this.isRightAnswer(keyword) && this.turnPlayer.id === playerId) {
+    if (this.isRightAnswer(keyword) && this.turnPlayer.id !== playerId) {
       this.addScore(playerId);
-      this.keyword = "";
       return true;
     } else return false;
   }
