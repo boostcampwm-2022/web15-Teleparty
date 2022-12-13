@@ -42,10 +42,14 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
 
   useEffect(() => {
-    setTimeout(() => {
-      albumEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, 50);
-  }, [renderedAlbum, showNext]);
+    albumEndRef.current?.scrollIntoView();
+  }, [showNext]);
+
+  useEffect(() => {
+    if (renderedAlbum.at(-1)?.keyword) {
+      albumEndRef.current?.scrollIntoView();
+    }
+  }, [renderedAlbum]);
 
   useEffect(() => {
     setShowNext(false);
@@ -74,6 +78,10 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     };
   }, [album, isLastAlbum, setPlayers]);
 
+  const onImageLoad = () => {
+    albumEndRef.current?.scrollIntoView();
+  };
+
   const onNextClick = () => {
     socket.emit("request-album");
   };
@@ -91,7 +99,11 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           isRightSide={!img}
           username={getUserNameById(peerId) ?? ""}
         >
-          {img ? <img src={img} alt="result" width={460} /> : keyword}
+          {img ? (
+            <img src={img} alt="result" width={460} onLoad={onImageLoad} />
+          ) : (
+            keyword
+          )}
         </AlbumBubble>
       ))}
       {showNext && (

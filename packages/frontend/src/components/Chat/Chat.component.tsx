@@ -56,7 +56,7 @@ const Chat = ({ variant }: ChatProps) => {
   }, [socket, setChats]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    chatEndRef.current?.scrollIntoView();
   }, [chats]);
 
   return (
