@@ -1,14 +1,14 @@
-import {
-  CatchMindEventPort,
-  CatchMindInfo,
-  RoundEndData,
-  StartGameData,
-} from "../useCases/catchMindEvent.port";
+import { ClientAPIPort } from "../useCases/ports/clientAPI.port";
 
 import { SocketEmitter } from "../../../utils/socketEmitter";
 import { Player } from "../entity/player";
+import {
+  CatchMindInfo,
+  RoundEndData,
+  StartGameData,
+} from "../../../types/catchMind.type";
 
-export class CatchMindEventPresenter implements CatchMindEventPort {
+export class ClientEventPresenter implements ClientAPIPort {
   emitter: SocketEmitter;
   constructor() {
     this.emitter = new SocketEmitter();

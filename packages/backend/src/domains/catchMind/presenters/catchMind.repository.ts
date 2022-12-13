@@ -1,9 +1,8 @@
 import { CatchMind } from "../entity/catchMind";
-import { CatchMindRepositoryDataPort } from "../useCases/catchMind.repository.port";
+import { CatchMindRepositoryDataPort } from "../useCases/ports/catchMind.repository.port";
 import { redisCli } from "../../../config/redis";
 import { RedisLock } from "../../../utils/redisLock";
-import { CatchMindData, PlayerData } from "../../../types/catchMind.type";
-import { Player } from "../entity/player";
+import { CatchMindData } from "../../../types/catchMind.type";
 import { CatchMindFactory } from "../entity/catchMind.factory";
 
 export class CatchMindRepository

@@ -1,24 +1,23 @@
 import { CatchMind } from "../entity/catchMind";
-import { Player } from "../entity/player";
 
-import { CatchMindEventPresenter } from "../presenters/CatchMindEvent.presenter";
-import { CatchMindEventPort } from "./catchMindEvent.port";
-import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
-import { CatchMindInputPort } from "./CatchMindInput.port";
+import { ClientEventPresenter } from "../presenters/clientAPI.presenter";
+import { ClientAPIPort } from "./ports/clientAPI.port";
+import { CatchMindRepositoryDataPort } from "./ports/catchMind.repository.port";
+import { CatchMindControllerPort } from "./ports/CatchMind.controller.port";
 import { CatchMindRepository } from "../presenters/catchMind.repository";
-import { CatchMindToRoomPresenter } from "../presenters/catchMindToRoom.presenter";
-import { CatchMindToRoom } from "./catchMindToRoom.port";
+import { RoomAPIPresenter } from "../presenters/roomAPI.presenter";
+import { RoomAPI } from "./ports/roomAPI.port";
 import { TimerRepository, Timer } from "../../../utils/timer";
-import { TimerRepositoryDataPort } from "./timer.repository.port";
+import { TimerRepositoryDataPort } from "./ports/timer.repository.port";
 import { CatchMindFactory } from "../entity/catchMind.factory";
 
 const MSEC_PER_SEC = 1000;
 
-export class CatchMindService implements CatchMindInputPort {
-  eventEmitter: CatchMindEventPort = new CatchMindEventPresenter();
+export class CatchMindService implements CatchMindControllerPort {
+  eventEmitter: ClientAPIPort = new ClientEventPresenter();
   gameRepository: CatchMindRepositoryDataPort = new CatchMindRepository();
   timerRepository: TimerRepositoryDataPort = new TimerRepository();
-  roomAPI: CatchMindToRoom = new CatchMindToRoomPresenter();
+  roomAPI: RoomAPI = new RoomAPIPresenter();
 
   async gameStart(
     goalScore: number,

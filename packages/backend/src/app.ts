@@ -4,7 +4,7 @@ import morgan from "morgan";
 import { Server } from "socket.io";
 
 import { SocketEmitter } from "./utils/socketEmitter";
-import { catchMindRouter } from "./domains/catchMind/controllers/catchMindInput.controller";
+import { catchMindRouter } from "./domains/catchMind/controllers/catchMind.controller";
 import { RoomController } from "./domains/room/controllers/room.controller";
 import { garticRouter } from "./domains/garticphone/controllers/garticphone.controller";
 

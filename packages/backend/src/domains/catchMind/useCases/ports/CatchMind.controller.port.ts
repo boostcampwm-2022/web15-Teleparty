@@ -1,4 +1,4 @@
-export interface CatchMindInputPort {
+export interface CatchMindControllerPort {
   gameStart: (
     goalScore: number,
     players: string[],

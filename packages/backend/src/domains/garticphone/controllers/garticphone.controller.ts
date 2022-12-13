@@ -14,6 +14,7 @@ const connecter = DomainConnecter.getInstance();
 
 const searchRoom = async (id: string) =>
   await connecter.call("room/get-by-playerId", { id });
+
 const inputData = async (id: string, data: string, type: RoundType) => {
   const room = await searchRoom(id);
   if (room) service.setAlbumData(room.roomId, id, data, type);
