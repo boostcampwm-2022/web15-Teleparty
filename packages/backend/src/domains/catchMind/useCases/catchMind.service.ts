@@ -1,4 +1,6 @@
-import { CatchMind, Player } from "../entity/catchMind";
+import { CatchMind } from "../entity/catchMind";
+import { Player } from "../entity/player";
+
 import { CatchMindEventPresenter } from "../presenters/CatchMindEvent.presenter";
 import { CatchMindEventPort } from "./catchMindEvent.port";
 import { CatchMindRepositoryDataPort } from "./catchMind.repository.port";
@@ -8,6 +10,7 @@ import { CatchMindToRoomPresenter } from "../presenters/catchMindToRoom.presente
 import { CatchMindToRoom } from "./catchMindToRoom.port";
 import { TimerRepository, Timer } from "../../../utils/timer";
 import { TimerRepositoryDataPort } from "./timer.repository.port";
+import { CatchMindFactory } from "../entity/catchMind.factory";
 
 const MSEC_PER_SEC = 1000;
 
@@ -24,9 +27,9 @@ export class CatchMindService implements CatchMindInputPort {
     roomId: string,
     totalRound: number
   ) {
-    const game = new CatchMind({
+    const game = CatchMindFactory.creatCatchMind({
       goalScore,
-      players: players.map((id) => new Player({ id })),
+      players,
       roundTime,
       roomId,
       totalRound,

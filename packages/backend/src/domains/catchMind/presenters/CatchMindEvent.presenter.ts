@@ -6,7 +6,7 @@ import {
 } from "../useCases/catchMindEvent.port";
 
 import { SocketEmitter } from "../../../utils/socketEmitter";
-import { Player } from "../entity/catchMind";
+import { Player } from "../entity/player";
 
 export class CatchMindEventPresenter implements CatchMindEventPort {
   emitter: SocketEmitter;

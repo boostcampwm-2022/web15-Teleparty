@@ -1,30 +1,14 @@
-export interface PlayerData {
-  id: string;
-  score?: number;
-  isReady?: boolean;
-}
+import { Player } from "./player";
 
-export interface CatchMindData {
+interface CatchMindInitalData {
   goalScore: number;
   players: Player[];
   roundTime: number;
   roomId: string;
   totalRound: number;
-  keyword?: string;
-  currentRound?: number;
-  turnPlayerIdx?: number;
-}
-
-export class Player {
-  id: string;
-  score: number;
-  isReady: boolean;
-
-  constructor({ id, score, isReady }: PlayerData) {
-    this.id = id;
-    this.score = score || 0;
-    this.isReady = isReady || false;
-  }
+  keyword: string;
+  currentRound: number;
+  turnPlayerIdx: number;
 }
 
 export class CatchMind {
@@ -37,17 +21,15 @@ export class CatchMind {
   currentRound: number;
   turnPlayerIdx: number;
 
-  constructor(data: CatchMindData) {
-    const [goalScore, totalRound] = this.calcGameData(data.players.length);
-
+  constructor(data: CatchMindInitalData) {
     this.players = data.players;
-    this.goalScore = goalScore;
-    this.keyword = data.keyword || "";
-    this.currentRound = data.currentRound || 1;
+    this.goalScore = data.goalScore;
     this.roundTime = data.roundTime;
-    this.totalRound = totalRound;
+    this.totalRound = data.totalRound;
     this.roomId = data.roomId;
-    this.turnPlayerIdx = data.turnPlayerIdx || 0;
+    this.keyword = data.keyword;
+    this.currentRound = data.currentRound;
+    this.turnPlayerIdx = data.turnPlayerIdx;
   }
 
   get turnPlayer() {
@@ -84,10 +66,6 @@ export class CatchMind {
       playerScoreMap[player.id] = player.score;
     });
     return playerScoreMap;
-  }
-
-  calcGameData(playerNum: number) {
-    return [Math.ceil(Math.sqrt(playerNum * 2)), playerNum * 2];
   }
 
   nextTurn() {
