@@ -1,16 +1,16 @@
 import { useRef, useState } from "react";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
 import { CANVAS_SIZE } from "../../../constants/canvas";
 import { useCatchMind } from "../../../hooks/useCatchMind";
+import useCreateImage from "../../../hooks/useCreateImage";
+import useGetUsername from "../../../hooks/useUsername";
 import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../../store/game";
 import { playersAtom } from "../../../store/players";
 import { socketAtom } from "../../../store/socket";
-import { getCurrentDateTimeFormat } from "../../../utils/date";
 import Canvas from "../../Canvas/Canvas.component";
 import Chat from "../../Chat/Chat.component";
 import { Button } from "../../common/Button";
@@ -44,17 +44,18 @@ const CatchMind = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const downloadCanvasRef = useRef<HTMLCanvasElement>(null);
   const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
-
-  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
-    socket,
-    gameInfo.roundInfo
-  );
-
-  const { roundTime, currentRound, turnPlayer } = roundInfo;
-
-  const getUserNameById = (id: string | undefined | null) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
+  const {
+    gameState,
+    isMyTurn,
+    roundEndInfo,
+    roundInfo: { currentRound, roundTime, turnPlayer },
+  } = useCatchMind(socket, gameInfo.roundInfo);
+  const onDownloadClick = useCreateImage({
+    targetCanvas: downloadCanvasRef.current,
+    originalCanvas: canvasRef.current,
+    keyword: roundEndInfo?.suggestedWord ?? "",
+  });
+  const getUserNameById = useGetUsername();
 
   const currentTurnUserName = getUserNameById(turnPlayer);
 
@@ -78,52 +79,6 @@ const CatchMind = () => {
   const onGoToRoomClick = () => {
     socket.emit("quit-game");
     navigate("/room", { replace: true });
-  };
-
-  const onDownloadClick = () => {
-    const downloadCanvasContext = downloadCanvasRef.current?.getContext("2d");
-    if (
-      !canvasRef.current ||
-      !downloadCanvasRef.current ||
-      !downloadCanvasContext
-    )
-      return;
-    const KEYWORD_OFFSET = {
-      RECT: { WIDTH: 20, HEIGHT: 10 },
-      TEXT: { WIDTH: 10, HEIGHT: 40 },
-    };
-    const keyword = roundEndInfo?.suggestedWord ?? "";
-    downloadCanvasContext.drawImage(canvasRef.current, 0, 0);
-
-    downloadCanvasContext.font = "bold 36px 'Noto Sans KR', sans-serif";
-    downloadCanvasContext.fillStyle = "white";
-    const textSize = downloadCanvasContext.measureText(keyword);
-    downloadCanvasContext.fillRect(
-      0,
-      0,
-      textSize.width + KEYWORD_OFFSET.RECT.WIDTH,
-      textSize.fontBoundingBoxAscent + KEYWORD_OFFSET.RECT.HEIGHT
-    );
-
-    downloadCanvasContext.fillStyle = "black";
-    downloadCanvasContext.fillText(
-      keyword,
-      KEYWORD_OFFSET.TEXT.WIDTH,
-      KEYWORD_OFFSET.TEXT.HEIGHT
-    );
-
-    const url = downloadCanvasRef.current.toDataURL();
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `Teleparty_${keyword}_${getCurrentDateTimeFormat()}.png`;
-    anchor.click();
-    downloadCanvasContext.clearRect(
-      0,
-      0,
-      CANVAS_SIZE.WIDTH,
-      CANVAS_SIZE.HEIGHT
-    );
-    toast.success("다운로드가 완료되었습니다.");
   };
 
   const getHeaderElement = () => {
