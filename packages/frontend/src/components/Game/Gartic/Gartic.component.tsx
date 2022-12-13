@@ -91,28 +91,20 @@ const Gartic = () => {
     drawing: <Canvas canvasRef={canvasRef} />,
     inputKeyword: <GarticDrawImage src={image} alt="draw" width={1036} />,
   };
+  const KeywordInput = (
+    <KeywordInputLayout>
+      <Input
+        disabled={isDone}
+        variant="medium"
+        placeholder="제시어를 입력하세요."
+        onChange={onKeywordInputChange}
+      />
+    </KeywordInputLayout>
+  );
   const footerElementMap = {
-    gameStart: (
-      <KeywordInputLayout>
-        <Input
-          disabled={isDone}
-          variant="medium"
-          placeholder="제시어를 입력하세요."
-          onChange={onKeywordInputChange}
-        />
-      </KeywordInputLayout>
-    ),
+    gameStart: KeywordInput,
     drawing: <PaintToolBox />,
-    inputKeyword: (
-      <KeywordInputLayout>
-        <Input
-          disabled={isDone}
-          variant="medium"
-          placeholder="제시어를 입력하세요."
-          onChange={onKeywordInputChange}
-        />
-      </KeywordInputLayout>
-    ),
+    inputKeyword: KeywordInput,
   };
 
   useEffect(() => {
