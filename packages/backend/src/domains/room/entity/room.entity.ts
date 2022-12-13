@@ -1,4 +1,4 @@
-import { GAME_MODE, RoomData } from "../../../types/room";
+import { GAME_MODE } from "../../../types/room";
 import { Player } from "./player.entitiy";
 
 export interface GarticGameData {
