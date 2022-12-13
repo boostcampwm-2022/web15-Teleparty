@@ -32,9 +32,10 @@ export class CatchMindService implements CatchMindInputPort {
       totalRound,
     });
 
+    const { roundInfo } = game;
     this.eventEmitter.gameStart(game.roomId, {
-      totalRound: game.totalRound,
-      roundInfo: game.roundInfo,
+      totalRound,
+      roundInfo,
     });
 
     console.log("\x1b[32mstart CatchMind\x1b[37m", roomId);
