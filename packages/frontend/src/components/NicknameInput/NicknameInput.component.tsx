@@ -7,7 +7,7 @@ import {
   isIncludesDigit,
   isIncludesLetter,
 } from "../../utils/string";
-import { TextInput } from "../common/TextInput";
+import { Input } from "../common/Input";
 
 interface NicknameInputProps {
   setNicknameError: React.Dispatch<React.SetStateAction<boolean>>;
@@ -56,8 +56,8 @@ const NicknameInput = forwardRef<HTMLInputElement, NicknameInputProps>(
 
     return (
       <NicknameInputLayout>
-        <TextInput
-          sizeType="medium"
+        <Input
+          variant="nickname"
           placeholder="닉네임을 입력해주세요"
           onChange={onChangeHandler}
           ref={ref}
