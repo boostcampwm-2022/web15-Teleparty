@@ -6,7 +6,7 @@ import { ChatInputForm, ChatLayout } from "./Chat.styles";
 import ChatBubble from "./ChatBubble.component";
 
 import { chatAtom, ChatData } from "../../store/chat";
-import { playersAtom } from "../../store/players";
+import { playersAtom, getPlayerNameById } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
@@ -22,10 +22,6 @@ const Chat = ({ variant }: ChatProps) => {
   const chatInputRef = useRef<HTMLInputElement>(null);
   const socket = useAtomValue(socketAtom);
   const players = useAtomValue(playersAtom);
-
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
 
   const onChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -68,7 +64,7 @@ const Chat = ({ variant }: ChatProps) => {
             variant={variant}
             isRightSide={id === socket.id}
             isFirst={messages[index - 1]?.id !== id}
-            username={getUserNameById(id)}
+            username={getPlayerNameById(players, id)}
           >
             {message}
           </ChatBubble>

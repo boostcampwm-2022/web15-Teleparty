@@ -11,7 +11,11 @@ import {
 } from "./Album.styles";
 import AlbumBubble from "./AlbumBubble.component";
 
-import { playersAtom } from "../../store/players";
+import {
+  playersAtom,
+  getPlayerNameById,
+  isPlayerHost,
+} from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import Icon from "../Icon/Icon";
@@ -34,12 +38,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const navigate = useNavigate();
   const setPlayers = useSetAtom(playersAtom);
 
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
-
-  const isHost =
-    socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
+  const isHost = isPlayerHost(players, socket.id);
 
   useEffect(() => {
     albumEndRef.current?.scrollIntoView();
@@ -97,7 +96,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         <AlbumBubble
           key={index}
           isRightSide={!img}
-          username={getUserNameById(peerId) ?? ""}
+          username={getPlayerNameById(players, peerId) ?? ""}
         >
           {img ? (
             <img src={img} alt="result" width={460} onLoad={onImageLoad} />
@@ -109,7 +108,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       {showNext && (
         <AlbumNextLayout>
           <AlbumNextText>
-            {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
+            {getPlayerNameById(players, renderedAlbum[0]?.peerId)}님의 앨범
           </AlbumNextText>
           <AlbumNextButtonBox>
             <Button variant="icon">

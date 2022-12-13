@@ -6,7 +6,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { useCatchMind } from "../../../hooks/useCatchMind";
 import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../../store/game";
-import { playersAtom } from "../../../store/players";
+import { playersAtom, getPlayerNameById } from "../../../store/players";
 import { socketAtom } from "../../../store/socket";
 import Canvas from "../../Canvas/Canvas.component";
 import Chat from "../../Chat/Chat.component";
@@ -48,11 +48,7 @@ const CatchMind = () => {
 
   const { roundTime, currentRound, turnPlayer } = roundInfo;
 
-  const getUserNameById = (id: string | undefined | null) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
-
-  const currentTurnUserName = getUserNameById(turnPlayer);
+  const currentTurnUserName = getPlayerNameById(players, turnPlayer);
 
   const onKeywordChange = ({
     target: { value },
@@ -88,7 +84,8 @@ const CatchMind = () => {
           : "그림을 보고 제시어를 맞춰 주세요";
       case "roundEnd":
         return roundEndInfo?.roundWinner
-          ? `${getUserNameById(
+          ? `${getPlayerNameById(
+              players,
               roundEndInfo.roundWinner
             )}님이 정답을 맞추셨습니다. 정답: ${roundEndInfo.suggestedWord}`
           : `아무도 정답을 맞추지 못했습니다. 정답: ${roundEndInfo?.suggestedWord}`;

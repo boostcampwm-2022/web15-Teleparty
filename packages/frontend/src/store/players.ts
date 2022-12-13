@@ -18,4 +18,4 @@ export const isPlayerReady = (players: GamePlayer[], playerId: string) =>
   players.find(({ peerId }) => peerId === playerId)?.isReady ?? false;
 
 export const isAllPlayerQuitFromGame = (players: GamePlayer[]) =>
-  players.every(({ isGameQuit }) => isGameQuit);
+  players.every(({ isGameQuit }) => isGameQuit === undefined || isGameQuit);

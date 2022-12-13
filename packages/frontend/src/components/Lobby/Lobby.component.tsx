@@ -18,7 +18,11 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
-import { playersAtom } from "../../store/players";
+import {
+  playersAtom,
+  isPlayerHost,
+  isAllPlayerQuitFromGame,
+} from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -41,12 +45,12 @@ const Lobby = () => {
     toast.success("초대 링크가 복사되었습니다.");
   };
 
-  const isHost =
-    socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
-
+  const isHost = isPlayerHost(players, socket.id);
+  console.log(players);
   const onGameStartClick = () => {
     if (!isHost) return;
-    if (players.some((player) => player.isGameQuit)) {
+    if (!isAllPlayerQuitFromGame(players)) {
+      console.log(isAllPlayerQuitFromGame(players), players);
       toast.dismiss();
       toast.error("모든 플레이어가 방에 입장해야 합니다!");
     }
