@@ -1,11 +1,11 @@
 import { CatchMindControllerPort } from "../useCases/ports/CatchMind.controller.port";
-import { CatchMindService } from "../useCases/catchMind.useCase";
+import { CatchMindUseCase } from "../useCases/catchMind.useCase";
 import { Socket } from "socket.io";
 import { SocketRouter } from "../../../utils/socketRouter";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
-const gameService: CatchMindControllerPort = new CatchMindService();
+const gameService: CatchMindControllerPort = new CatchMindUseCase();
 const router = new SocketRouter();
 const connecter = DomainConnecter.getInstance();
 
@@ -17,7 +17,7 @@ router.get(
   async (socket: Socket, { keyword }: { keyword: string }) => {
     const room = await searchRoom(socket.id);
 
-    if (room) gameService.drawStart(room.roomId, keyword, socket.id);
+    if (room) gameService.inputKeyword(room.roomId, keyword, socket.id);
   }
 );
 

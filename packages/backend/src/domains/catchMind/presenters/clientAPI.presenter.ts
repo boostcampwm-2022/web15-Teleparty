@@ -8,7 +8,7 @@ import {
   StartGameData,
 } from "../../../types/catchMind.type";
 
-export class ClientEventPresenter implements ClientAPIPort {
+export class ClientAPIPresenter implements ClientAPIPort {
   emitter: SocketEmitter;
   constructor() {
     this.emitter = new SocketEmitter();
@@ -30,7 +30,7 @@ export class ClientEventPresenter implements ClientAPIPort {
     this.emitter.broadcastRoom(roomId, "round-end", data);
   }
 
-  roundReady(roomId: string, { id }: Player) {
+  roundReady(roomId: string, id: string) {
     this.emitter.broadcastRoom(roomId, "round-ready", { peerId: id });
   }
 

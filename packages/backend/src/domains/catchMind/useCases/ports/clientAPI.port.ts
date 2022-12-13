@@ -9,7 +9,7 @@ export interface ClientAPIPort {
   gameStart: (roomId: string, data: StartGameData) => void;
   drawStart: (roomId: string, player: Player) => void;
   roundEnd: (roomId: string, data: RoundEndData) => void;
-  roundReady: (roomId: string, player: Player) => void;
+  roundReady: (roomId: string, playerId: string) => void;
   roundStart: (roomId: string, data: CatchMindInfo) => void;
   playerExit: (roomId: string, playerId: string) => void;
 }

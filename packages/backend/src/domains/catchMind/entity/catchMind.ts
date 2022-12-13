@@ -48,7 +48,7 @@ export class CatchMind {
     return (
       this.currentRound === this.totalRound ||
       this.players.some((player) => player.score >= this.goalScore) ||
-      this.leftPlayerNum <= 1
+      this.remainPlayerNum <= 1
     );
   }
 
@@ -56,7 +56,7 @@ export class CatchMind {
     return this.players.every((player) => player.isReady);
   }
 
-  get leftPlayerNum() {
+  get remainPlayerNum() {
     return this.players.length;
   }
 
@@ -68,6 +68,13 @@ export class CatchMind {
     return playerScoreMap;
   }
 
+  setKeyword(keyword: string, playerId: string) {
+    if (this.turnPlayer.id !== playerId || !keyword) return false;
+
+    this.keyword = keyword;
+    return true;
+  }
+
   nextTurn() {
     this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
     this.currentRound++;
@@ -75,12 +82,16 @@ export class CatchMind {
     this.players.forEach((player) => (player.isReady = false));
   }
 
-  isRightAnswer(keyword: string, playerId: string) {
-    return (
-      this.keyword?.length &&
-      keyword === this.keyword &&
-      playerId !== this.turnPlayer.id
-    );
+  isRightAnswer(keyword: string) {
+    return this.keyword.length && keyword === this.keyword;
+  }
+
+  challengeAnswer(keyword: string, playerId: string) {
+    if (this.isRightAnswer(keyword) && this.turnPlayer.id === playerId) {
+      this.addScore(playerId);
+      this.keyword = "";
+      return true;
+    } else return false;
   }
 
   isTurnPlayer(playerId: string) {
@@ -94,18 +105,17 @@ export class CatchMind {
     }
   }
 
-  clearKeyword() {
+  timeout() {
     this.keyword = "";
-  }
-
-  findPlayer(id: string) {
-    return this.players.find((player) => player.id === id);
   }
 
   ready(id: string) {
     const player = this.players.find((player) => player.id === id);
 
-    if (player) player.isReady = true;
+    if (player && !player.isReady) {
+      player.isReady = true;
+      return true;
+    } else return false;
   }
 
   exitGame(playerId: string) {
