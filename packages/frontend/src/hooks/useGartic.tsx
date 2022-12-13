@@ -88,12 +88,13 @@ const useGartic = () => {
     };
     const setDoneOrNot = (peerId: string, isReady: boolean) => {
       setPlayers((prev) => {
-        const copiedList = [...prev];
-        const donePlayerIndex = copiedList.findIndex(
+        const newPlayers = [...prev];
+        const donePlayer = newPlayers.find(
           (player) => player.peerId === peerId
         );
-        copiedList[donePlayerIndex].isReady = isReady;
-        return copiedList;
+        if (!donePlayer) return prev;
+        donePlayer.isReady = isReady;
+        return newPlayers;
       });
     };
     const inputDoneListener = ({ peerId }: { peerId: string }) => {
@@ -107,16 +108,17 @@ const useGartic = () => {
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
       console.log("album:", peerId, isLast, result);
       setPlayers((prev) => {
-        const copiedList = [...prev];
-        const convertMyResultToDone = copiedList.map((player) =>
+        const newPlayers = [...prev];
+        const convertMyResultToDone = newPlayers.map((player) =>
           player.isCurrentTurn
             ? { ...player, isCurrentTurn: false, isReady: true }
             : player
         );
-        const currentPlayerIndex = convertMyResultToDone.findIndex(
+        const currentPlayer = convertMyResultToDone.find(
           (player) => player.peerId === peerId
         );
-        convertMyResultToDone[currentPlayerIndex].isCurrentTurn = true;
+        if (!currentPlayer) return prev;
+        currentPlayer.isCurrentTurn = true;
         return convertMyResultToDone;
       });
       setIsLastAlbum(isLast);

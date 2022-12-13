@@ -72,28 +72,19 @@ const Lobby = () => {
       ]);
     };
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitPlayerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (quitPlayerIndex === -1) return prev;
-        newPlayerList.splice(quitPlayerIndex, 1);
-        return newPlayerList;
-      });
+      setPlayers((prev) => prev.filter((player) => player.peerId !== peerId));
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
       setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitGamePlayerIndex = newPlayerList.findIndex(
+        const newPlayers = [...prev];
+        const quitGamePlayer = newPlayers.find(
           (player) => player.peerId === peerId
         );
-        if (quitGamePlayerIndex === -1) return prev;
-
-        newPlayerList[quitGamePlayerIndex].isGameQuit = false;
-        delete newPlayerList[quitGamePlayerIndex].isCurrentTurn;
-        delete newPlayerList[quitGamePlayerIndex].isReady;
-        return newPlayerList;
+        if (!quitGamePlayer) return prev;
+        quitGamePlayer.isGameQuit = false;
+        delete quitGamePlayer.isCurrentTurn;
+        delete quitGamePlayer.isReady;
+        return newPlayers;
       });
     };
     socket.on("new-join", newJoinListener);

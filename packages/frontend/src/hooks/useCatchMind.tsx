@@ -67,14 +67,11 @@ export const useCatchMind = (
     };
     const roundReadyListener = ({ peerId }: { peerId: string }) => {
       setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const playerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (playerIndex === -1) return prev;
-        newPlayerList[playerIndex].isReady =
-          !newPlayerList[playerIndex].isReady;
-        return newPlayerList;
+        const newPlayers = [...prev];
+        const player = newPlayers.find((player) => player.peerId === peerId);
+        if (!player) return prev;
+        player.isReady = !player.isReady;
+        return newPlayers;
       });
     };
     socket.on("round-start", roundStartListener);
