@@ -46,7 +46,6 @@ router.get("draw-cancel", (socket: Socket) => {
 
 router.get("request-album", async (socket: Socket) => {
   const room = await searchRoom(socket.id);
-  console.log("request");
   if (room) service.sendAlbum(room.roomId, socket.id);
 });
 

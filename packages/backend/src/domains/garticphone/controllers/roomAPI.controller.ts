@@ -9,7 +9,6 @@ const service: GarticphonePort = new GarticphoneUseCase();
 connecter.register(
   "garticphone/game-start",
   ({ roomId, drawTime, keywordTime, players }: StartData) => {
-    console.log("start-gartic", roomId);
     service.startGame(roomId, drawTime, keywordTime, players);
   }
 );

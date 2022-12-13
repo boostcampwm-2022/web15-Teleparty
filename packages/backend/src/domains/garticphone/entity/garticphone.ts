@@ -117,8 +117,8 @@ export class Garticphone {
   }
 
   getNextAlbum() {
-    if (!this.isGameEnded) return;
     const player = this.players[this.sendIdx++];
+    if (!player || !this.isGameEnded) return;
     return {
       peerId: player.id,
       isLast: this.isLastAlbum,

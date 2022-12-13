@@ -54,6 +54,8 @@ export class GarticphoneUseCase implements GarticphonePort {
       return;
     }
 
+    console.log(Chalk.fgGreen("send album"), roomId);
+
     this.eventEmitter.sendAlbum(roomId, albumData);
 
     await this.gameRepository.save(game);
