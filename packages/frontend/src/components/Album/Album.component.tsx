@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import {
   AlbumLayout,
@@ -33,10 +33,9 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const [renderedAlbum, setRenderedAlbum] = useState<AlbumType[]>([]);
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
-  const players = useAtomValue(playersAtom);
+  const [players, setPlayers] = useAtom(playersAtom);
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
-  const setPlayers = useSetAtom(playersAtom);
 
   const isHost = isPlayerHost(players, socket.id);
 
