@@ -125,7 +125,9 @@ const MoonTimer = ({ secondTime, radius, gameState }: MoonTimerProps) => {
   return (
     <MoonTimerLayout>
       <MoonTimerCanvas ref={canvasRef} width={radius * 2} height={radius * 2} />
-      <MoonTimerTimeParagraph>{`${remainMinute}:${remainSecond
+      <MoonTimerTimeParagraph
+        warning={remainSecondTime <= MOON_TIMER_TICKTOCK_START_TIME}
+      >{`${remainMinute}:${remainSecond
         .toString()
         .padStart(2, "0")}`}</MoonTimerTimeParagraph>
     </MoonTimerLayout>
