@@ -17,7 +17,6 @@ import Canvas from "../../Canvas/Canvas.component";
 import { CanvasLayout } from "../../Canvas/Canvas.styles";
 import Chat from "../../Chat/Chat.component";
 import { Button } from "../../common/Button";
-import { HidableBox } from "../../common/HidableBox";
 import { Input } from "../../common/Input";
 import { Logo } from "../../Logo/Logo.component";
 import MoonTimer from "../../MoonTimer/MoonTimer.component";
@@ -42,10 +41,9 @@ const Gartic = () => {
   } = useGartic();
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
-  const gamePlayerList = useAtomValue(playersAtom);
+  const players = useAtomValue(playersAtom);
   const isDone =
-    gamePlayerList.find((player) => player.peerId === socket.id)?.isReady ??
-    false;
+    players.find((player) => player.peerId === socket.id)?.isReady ?? false;
   const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
