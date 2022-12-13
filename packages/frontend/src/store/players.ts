@@ -251,3 +251,15 @@ export const updatePlayersNextAlbumTurnAtom = atom(
     );
   }
 );
+
+export const setPlayerisMicOnAtom = atom(
+  null,
+  (get, set, { playerId, isMicOn }: { playerId: string; isMicOn: boolean }) => {
+    set(
+      playersAtom,
+      updatePlayerWithPartialPlayerInfoHelper(get(playersAtom), playerId, {
+        isMicOn,
+      })
+    );
+  }
+);

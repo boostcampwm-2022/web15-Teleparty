@@ -13,7 +13,7 @@ import {
 
 import { colors } from "../../../global-styles/theme";
 import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
-import { updatePlayerWithPartialPlayerInfoAtom } from "../../../store/players";
+import { setPlayerisMicOnAtom } from "../../../store/players";
 import { GamePlayer } from "../../../types/game";
 import { audioStreamManager } from "../../../utils/audioStreamManager";
 import Icon from "../../Icon/Icon";
@@ -25,9 +25,7 @@ interface PlayerListItemProps {
 }
 
 const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
-  const updatePlayerWithPartialPlayerInfo = useSetAtom(
-    updatePlayerWithPartialPlayerInfoAtom
-  );
+  const setPlayerisMicOn = useSetAtom(setPlayerisMicOnAtom);
   const {
     peerId,
     userName,
@@ -49,16 +47,8 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
     : "normal";
 
   const toggleAudio = () => {
-    const setAudioStateChangedPlayer = (
-      playerId: string,
-      audioState: boolean
-    ) => {
-      updatePlayerWithPartialPlayerInfo({
-        playerId,
-        partialPlayerInfo: {
-          isAudioDetected: audioState,
-        },
-      });
+    const setMicStateOfPlayer = (playerId: string, isMicOn: boolean) => {
+      setPlayerisMicOn({ playerId, isMicOn });
     };
 
     // toggle my mic
@@ -66,7 +56,8 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
       if (!voiceInputMediaStream) return;
       voiceInputMediaStream.getAudioTracks()[0].enabled =
         !voiceInputMediaStream.getAudioTracks()[0].enabled;
-      setAudioStateChangedPlayer(
+
+      setMicStateOfPlayer(
         peerId,
         voiceInputMediaStream.getAudioTracks()[0].enabled
       );
@@ -75,7 +66,7 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
 
     // toggle peer's audio
     audioStreamManager.toggleMute(peerId);
-    setAudioStateChangedPlayer(peerId, audioStreamManager.getMute(peerId));
+    setMicStateOfPlayer(peerId, audioStreamManager.getMute(peerId));
   };
 
   return (
