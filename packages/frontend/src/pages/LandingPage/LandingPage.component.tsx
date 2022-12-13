@@ -7,6 +7,7 @@ import Peer from "peerjs";
 
 import { LandingPageLayout } from "./LandingPage.styles";
 
+import AvatarChanger from "../../components/AvatarChanger/AvatarChanger.component";
 import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
@@ -115,11 +116,11 @@ const LandingPage = () => {
   return (
     <>
       <Toaster />
-
       <LandingPageLayout ratio={ratio}>
         <div>
           <Logo />
         </div>
+        <AvatarChanger />
         <NicknameInput setNicknameError={setNicknameError} ref={nicknameRef} />
         <Button
           variant="medium"
