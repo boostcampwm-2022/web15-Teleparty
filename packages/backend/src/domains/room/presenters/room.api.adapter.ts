@@ -1,6 +1,6 @@
 import { RoomApiPort } from "./room.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
-import { GAME_MODE } from "../entity/room.entity";
+import { GameData, GAME_MODE } from "../entity/room.entity";
 
 interface StartData {
   roomId: string;
@@ -13,9 +13,9 @@ interface StartData {
 const connecter = DomainConnecter.getInstance();
 
 const gameModeStartMap = {
-  CatchMind: (data: StartData) => connecter.call("catchMind/game-start", data),
+  CatchMind: (data: GameData) => connecter.call("catchMind/game-start", data),
 
-  Garticphone: (data: StartData) =>
+  Garticphone: (data: GameData) =>
     connecter.call("garticphone/game-start", data),
 };
 
@@ -37,27 +37,14 @@ export class RoomApiAdapter implements RoomApiPort {
     connecter.call("chat/send", { message, senderId, roomId });
   }
 
-  gameStart(
-    roomId: string,
-    gameMode: GAME_MODE,
-    players: string[],
-    totalRound: number,
-    roundTime: number,
-    goalScore: number
-  ) {
+  gameStart(data: GameData) {
     // game controller gameStart 보냄
 
     // if or switch로 거르기 -> game Mode;
 
-    if (!gameMode) return;
+    if (!data.gameMode) return;
 
-    gameModeStartMap[gameMode]({
-      roomId,
-      players,
-      totalRound,
-      roundTime,
-      goalScore,
-    });
+    gameModeStartMap[data.gameMode](data);
 
     return;
   }

@@ -11,7 +11,8 @@ export interface GarticPlayerData {
 
 export interface GarticGameData {
   players: Player[];
-  roundTime: number;
+  drawTime: number;
+  keywordTime: number;
   roomId: string;
   totalRound?: number;
   currentRound?: number;
@@ -78,14 +79,16 @@ export class Garticphone {
   totalRound: number;
   currentRound: number;
   players: Player[];
-  roundTime: number;
+  drawTime: number;
+  keywordTime: number;
   roomId: string;
   sendIdx: number;
   orderSeed: number;
 
   constructor({
     players,
-    roundTime,
+    drawTime,
+    keywordTime,
     roomId,
     totalRound,
     currentRound,
@@ -94,7 +97,8 @@ export class Garticphone {
   }: GarticGameData) {
     this.players = players;
     this.totalRound = totalRound || players.length;
-    this.roundTime = roundTime;
+    this.drawTime = drawTime || 90;
+    this.keywordTime = keywordTime || 45;
     this.roomId = roomId;
     this.currentRound = currentRound || 1;
     this.sendIdx = sendIdx || 0;
@@ -114,9 +118,15 @@ export class Garticphone {
 
   get roundData() {
     return {
-      roundTime: this.roundTime,
+      roundTime: this.currentRoundTime,
       currentRound: this.currentRound,
     };
+  }
+
+  get currentRoundTime() {
+    return this.currentRoundType === "keyword"
+      ? this.keywordTime
+      : this.drawTime;
   }
 
   get isGameEnded() {

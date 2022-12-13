@@ -1,6 +1,11 @@
 export type RoundType = "painting" | "keyword";
 export interface GarticphonePort {
-  startGame: (roomId: string, roundTime: number, players: string[]) => void;
+  startGame: (
+    roomId: string,
+    drawTime: number,
+    keywordTime: number,
+    players: string[]
+  ) => void;
   setAlbumData: (
     roomId: string,
     playerId: string,

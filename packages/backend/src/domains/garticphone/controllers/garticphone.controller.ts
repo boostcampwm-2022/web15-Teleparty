@@ -59,15 +59,17 @@ connecter.register(
   "garticphone/game-start",
   ({
     roomId,
-    roundTime,
+    drawTime,
+    keywordTime,
     players,
   }: {
     roomId: string;
-    roundTime: number;
+    drawTime: number;
+    keywordTime: number;
     players: string[];
   }) => {
-    console.log("start-game", roomId);
-    service.startGame(roomId, roundTime, players);
+    console.log("start-gartic", roomId);
+    service.startGame(roomId, drawTime, keywordTime, players);
   }
 );
 
