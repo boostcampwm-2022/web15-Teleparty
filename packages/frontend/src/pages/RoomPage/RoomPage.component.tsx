@@ -8,12 +8,15 @@ import { useAudioCommunication } from "../../hooks/useAudioCommunication";
 import { useDataConnectionWithPeers } from "../../hooks/useDataConnectionWithPeers";
 import usePreventClose from "../../hooks/usePreventClose";
 import { peerAtom } from "../../store/peer";
-import { playerIdsAtom, playersAtom } from "../../store/players";
+import {
+  playerIdsAtom,
+  setPlayerisAudioDetectedAtom,
+} from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { AudioDetectListener } from "../../utils/audioStreamManager";
 
 const RoomPage = () => {
-  const setPlayers = useSetAtom(playersAtom);
+  const setPlayerisAudioDetected = useSetAtom(setPlayerisAudioDetectedAtom);
   const [playerIds] = useAtom(playerIdsAtom);
   const peer = useAtomValue(peerAtom);
   const socket = useAtomValue(socketAtom);
@@ -24,13 +27,7 @@ const RoomPage = () => {
     id,
     isAudioDetected
   ) => {
-    setPlayers((players) =>
-      players.map((player) => ({
-        ...player,
-        isAudioDetected:
-          player.peerId === id ? isAudioDetected : player.isAudioDetected,
-      }))
-    );
+    setPlayerisAudioDetected({ playerId: id, isAudioDetected });
   };
 
   useAudioCommunication(peer!, playerIds, changeAudioDetectionStateOfPlayer);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import {
   AlbumLayout,
@@ -15,6 +15,7 @@ import {
   playersAtom,
   getPlayerNameById,
   isPlayerHost,
+  updatePlayersWithPartialPlayerInfoAtom,
 } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
@@ -33,7 +34,10 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const [renderedAlbum, setRenderedAlbum] = useState<AlbumType[]>([]);
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
-  const [players, setPlayers] = useAtom(playersAtom);
+  const players = useAtomValue(playersAtom);
+  const updatePlayersWithPartialPlayerInfo = useSetAtom(
+    updatePlayersWithPartialPlayerInfoAtom
+  );
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
 
@@ -57,13 +61,10 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         clearInterval(interval);
         setShowNext(true);
         if (isLastAlbum) {
-          setPlayers((prev) =>
-            prev.map((player) => ({
-              ...player,
-              isReady: true,
-              isCurrentTurn: false,
-            }))
-          );
+          updatePlayersWithPartialPlayerInfo({
+            isReady: true,
+            isCurrentTurn: false,
+          });
         }
         return;
       }
@@ -74,7 +75,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album, isLastAlbum, setPlayers]);
+  }, [album, isLastAlbum, updatePlayersWithPartialPlayerInfo]);
 
   const onImageLoad = () => {
     albumEndRef.current?.scrollIntoView();

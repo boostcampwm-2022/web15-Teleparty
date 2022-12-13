@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router";
 
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import {
   LobbyButtonBox,
@@ -22,6 +22,10 @@ import {
   playersAtom,
   isPlayerHost,
   isAllPlayerQuitFromGame,
+  removePlayerAtom,
+  quitPlayerFromGameAtom,
+  addPlayerAtom,
+  removePlayersGameDataAtom,
 } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
@@ -32,7 +36,11 @@ import type { GameInfo, Player } from "../../types/game";
 const Lobby = () => {
   const roomId = useAtomValue(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const [players, setPlayers] = useAtom(playersAtom);
+  const players = useAtomValue(playersAtom);
+  const removePlayersGameData = useSetAtom(removePlayersGameDataAtom);
+  const addPlayer = useSetAtom(addPlayerAtom);
+  const removePlayer = useSetAtom(removePlayerAtom);
+  const quitPlayerFromGame = useSetAtom(quitPlayerFromGameAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
@@ -46,11 +54,9 @@ const Lobby = () => {
   };
 
   const isHost = isPlayerHost(players, socket.id);
-  console.log(players);
   const onGameStartClick = () => {
     if (!isHost) return;
     if (!isAllPlayerQuitFromGame(players)) {
-      console.log(isAllPlayerQuitFromGame(players), players);
       toast.dismiss();
       toast.error("모든 플레이어가 방에 입장해야 합니다!");
     }
@@ -70,35 +76,13 @@ const Lobby = () => {
 
   useEffect(() => {
     const newJoinListener = (player: Player) => {
-      setPlayers((prev) => [
-        ...prev,
-        { ...player, isMicOn: true, isAudioDetected: false },
-      ]);
+      addPlayer(player);
     };
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitPlayerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (quitPlayerIndex === -1) return prev;
-        newPlayerList.splice(quitPlayerIndex, 1);
-        return newPlayerList;
-      });
+      removePlayer(peerId);
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitGamePlayerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (quitGamePlayerIndex === -1) return prev;
-
-        newPlayerList[quitGamePlayerIndex].isGameQuit = false;
-        delete newPlayerList[quitGamePlayerIndex].isCurrentTurn;
-        delete newPlayerList[quitGamePlayerIndex].isReady;
-        return newPlayerList;
-      });
+      quitPlayerFromGame(peerId);
     };
     socket.on("new-join", newJoinListener);
     socket.on("player-quit", playerQuitListener);
@@ -108,21 +92,11 @@ const Lobby = () => {
       socket.off("player-quit", playerQuitListener);
       socket.off("quit-game", quitGameListener);
     };
-  }, [socket, setPlayers]);
+  }, [socket, addPlayer, quitPlayerFromGame, removePlayer]);
 
   useEffect(() => {
-    setPlayers((prev) =>
-      prev.map((player) => {
-        delete player.isReady;
-        delete player.isCurrentTurn;
-        delete player.score;
-        if (player.isGameQuit !== undefined) {
-          player.isGameQuit = !player.isGameQuit;
-        }
-        return player;
-      })
-    );
-  }, [setPlayers]);
+    removePlayersGameData();
+  }, [removePlayersGameData]);
 
   return roomId === undefined ? (
     <Navigate to="/" replace />

@@ -13,7 +13,7 @@ import {
 
 import { colors } from "../../../global-styles/theme";
 import { voiceInputMediaStream } from "../../../hooks/useAudioCommunication";
-import { playersAtom } from "../../../store/players";
+import { updatePlayerWithPartialPlayerInfoAtom } from "../../../store/players";
 import { GamePlayer } from "../../../types/game";
 import { audioStreamManager } from "../../../utils/audioStreamManager";
 import Icon from "../../Icon/Icon";
@@ -25,7 +25,9 @@ interface PlayerListItemProps {
 }
 
 const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
-  const setPlayers = useSetAtom(playersAtom);
+  const updatePlayerWithPartialPlayerInfo = useSetAtom(
+    updatePlayerWithPartialPlayerInfoAtom
+  );
   const {
     peerId,
     userName,
@@ -51,14 +53,12 @@ const PlayerListItem = ({ sizeType, player, isMine }: PlayerListItemProps) => {
       playerId: string,
       audioState: boolean
     ) => {
-      setPlayers((players) =>
-        players.map((player) => {
-          return {
-            ...player,
-            isMicOn: playerId === player.peerId ? audioState : player.isMicOn,
-          };
-        })
-      );
+      updatePlayerWithPartialPlayerInfo({
+        playerId,
+        partialPlayerInfo: {
+          isAudioDetected: audioState,
+        },
+      });
     };
 
     // toggle my mic

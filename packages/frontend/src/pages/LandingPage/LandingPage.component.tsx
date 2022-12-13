@@ -11,7 +11,7 @@ import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
 import { peerAtom } from "../../store/peer";
-import { playersAtom } from "../../store/players";
+import { addPlayersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -29,7 +29,7 @@ const LandingPage = () => {
   const setRoomId = useSetAtom(roomIdAtom);
   const socket = useAtomValue(socketAtom);
 
-  const setPlayers = useSetAtom(playersAtom);
+  const addPlayers = useSetAtom(addPlayersAtom);
   const [peer, setPeer] = useAtom(peerAtom);
   const nicknameRef = useRef<HTMLInputElement>(null);
   const [nicknameError, setNicknameError] = useState(true);
@@ -72,14 +72,7 @@ const LandingPage = () => {
     const joinListener = (joinResponse: JoinResponse) => {
       const { roomId, players } = joinResponse;
       setRoomId(roomId);
-      setPlayers((prev) => [
-        ...prev,
-        ...players.map((player) => ({
-          ...player,
-          isMicOn: true,
-          isAudioDetected: false,
-        })),
-      ]);
+      addPlayers(players);
       navigate(`/room`, { replace: true });
     };
     socket.on("join", joinListener);

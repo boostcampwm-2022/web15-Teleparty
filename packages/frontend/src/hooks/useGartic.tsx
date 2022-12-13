@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { gameInfoAtom } from "../store/game";
-import { playersAtom } from "../store/players";
+import {
+  initGarticGamePlayersAtom,
+  playersAtom,
+  setPlayerReadyAtom,
+  setPlayersReadyAtom,
+  updatePlayersNextAlbumTurnAtom,
+} from "../store/players";
 import { socketAtom } from "../store/socket";
 
 import type { AlbumType, GameInfo, GarticRoundInfo } from "../types/game";
@@ -36,32 +42,25 @@ const useGartic = () => {
   );
   const [gameState, setGameState] = useState<GarticGameState>("gameStart");
   const setGamePlayerList = useSetAtom(playersAtom);
+  const initGarticGamePlayers = useSetAtom(initGarticGamePlayersAtom);
+  const setPlayersReady = useSetAtom(setPlayersReadyAtom);
+  const setPlayerReady = useSetAtom(setPlayerReadyAtom);
+  const updatePlayersNextAlbumTurn = useSetAtom(updatePlayersNextAlbumTurnAtom);
   const [isLastAlbum, setIsLastAlbum] = useState(false);
 
   useEffect(() => {
-    setGamePlayerList((prev) =>
-      prev.map((player) => ({
-        ...player,
-        isReady: false,
-        isCurrentTurn: false,
-        isGameQuit: false,
-      }))
-    );
-  }, [setGamePlayerList]);
+    initGarticGamePlayers();
+  }, [initGarticGamePlayers]);
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
       console.log("gameStart:", gameStartResponse);
-      setGamePlayerList((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       setGameState("gameStart");
       setRoundInfo(gameStartResponse.roundInfo);
     };
     const drawStartListener = ({ keyword, roundInfo }: DrawStartResponse) => {
-      setGamePlayerList((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       console.log("drawStart:", keyword, roundInfo);
       setKeyword(keyword);
       setRoundInfo(roundInfo);
@@ -72,53 +71,27 @@ const useGartic = () => {
       roundInfo,
     }: KeywordInputStartResponse) => {
       console.log("keywordInputStart", img, roundInfo);
-      setGamePlayerList((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       setImage(img);
       setRoundInfo(roundInfo);
       setGameState("inputKeyword");
     };
     const gameEndListener = () => {
       setGameState("gameEnd");
-      setGamePlayerList((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       socket.emit("request-album");
-    };
-    const setDoneOrNot = (peerId: string, isReady: boolean) => {
-      setGamePlayerList((prev) => {
-        const copiedList = [...prev];
-        const donePlayerIndex = copiedList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        copiedList[donePlayerIndex].isReady = isReady;
-        return copiedList;
-      });
     };
     const inputDoneListener = ({ peerId }: { peerId: string }) => {
       console.log("input done");
-      setDoneOrNot(peerId, true);
+      setPlayerReady({ playerId: peerId, isReady: true });
     };
     const inputCancelListener = ({ peerId }: { peerId: string }) => {
       console.log("input cancel");
-      setDoneOrNot(peerId, false);
+      setPlayerReady({ playerId: peerId, isReady: false });
     };
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
       console.log("album:", peerId, isLast, result);
-      setGamePlayerList((prev) => {
-        const copiedList = [...prev];
-        const convertMyResultToDone = copiedList.map((player) =>
-          player.isCurrentTurn
-            ? { ...player, isCurrentTurn: false, isReady: true }
-            : player
-        );
-        const currentPlayerIndex = convertMyResultToDone.findIndex(
-          (player) => player.peerId === peerId
-        );
-        convertMyResultToDone[currentPlayerIndex].isCurrentTurn = true;
-        return convertMyResultToDone;
-      });
+      updatePlayersNextAlbumTurn(peerId);
       setIsLastAlbum(isLast);
       setAlbum(result);
     };
