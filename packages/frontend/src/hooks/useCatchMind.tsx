@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 
 import { playersAtom } from "../store/players";
 
@@ -17,7 +17,7 @@ export const useCatchMind = (
   const [roundInfo, setRoundInfo] =
     useState<CatchMindRoundInfo>(initialRoundInfo);
   const [gameState, setGameState] = useState<GameState>("inputKeyword");
-  const [gamePlayerList, setGamePlayerList] = useAtom(playersAtom);
+  const setGamePlayerList = useSetAtom(playersAtom);
   const [roundEndInfo, setRoundEndInfo] =
     useState<CatchMindRoundEndInfo | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(

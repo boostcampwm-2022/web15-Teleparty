@@ -32,7 +32,7 @@ import {
 } from "../Game.styles";
 
 const CatchMind = () => {
-  const [players, setPlayers] = useAtom(playersAtom);
+  const players = useAtomValue(playersAtom);
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
   const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
