@@ -133,9 +133,9 @@ export class RoomService implements RoomPort {
     }
 
     const room = await this.roomRepository.findOneByRoomId(player.roomId);
-    this.roomRepository.release(player.roomId);
     if (!room) {
       this.sendError(peerId, "leave Error, 방 정보 없음");
+      this.roomRepository.release(player.roomId);
       return;
     }
 
@@ -145,9 +145,10 @@ export class RoomService implements RoomPort {
     }
 
     this.roomRepository.deletePlayer(peerId, room);
+    this.roomRepository.release(player.roomId);
 
     // 나밖에 없을 때
-    if (room.players.length === 1) {
+    if (room.players.length === 0) {
       this.roomRepository.deleteByRoomId(room.roomId);
       console.log("나밖에 없어서 방 삭제");
       return;
