@@ -4,11 +4,10 @@ import {
 } from "../useCases/ports/garticphoneController.port";
 import { GarticphoneUseCase } from "../useCases/garticphone.useCase";
 
-import { SocketRouter } from "../../../utils/socketRouter";
 import { DomainConnecter } from "../../../utils/domainConnecter";
-import { Socket } from "socket.io";
+import express, { Router } from "express";
 
-const router = new SocketRouter();
+const router: Router = express.Router();
 const service: GarticphonePort = new GarticphoneUseCase();
 const connecter = DomainConnecter.getInstance();
 
@@ -25,34 +24,44 @@ const cancelInput = async (id: string) => {
   if (room) service.cancelAlbumData(room.roomId, id);
 };
 
-router.get(
-  "input-keyword",
-  (socket: Socket, { keyword }: { keyword: string }) => {
-    inputData(socket.id, keyword, "keyword");
-  }
-);
-
-router.get("keyword-cancel", (socket: Socket) => {
-  cancelInput(socket.id);
+router.post("/input-keyword", (req, res) => {
+  const { playerId, keyword } = req.body;
+  inputData(playerId, keyword, "keyword");
+  res.sendStatus(200);
 });
 
-router.get("draw-input", (socket: Socket, { img }: { img: string }) => {
-  inputData(socket.id, img, "painting");
+router.patch("/keyword-cancel", (req, res) => {
+  const { playerId } = req.body;
+  cancelInput(playerId);
+  res.sendStatus(200);
 });
 
-router.get("draw-cancel", (socket: Socket) => {
-  cancelInput(socket.id);
+router.post("/draw-input", (req, res) => {
+  const { playerId, img } = req.body;
+  inputData(playerId, img, "painting");
+  res.sendStatus(200);
 });
 
-router.get("request-album", async (socket: Socket) => {
-  const room = await searchRoom(socket.id);
-  if (room) service.sendAlbum(room.roomId, socket.id);
+router.patch("/draw-cancel", (req, res) => {
+  const { playerId } = req.body;
+  cancelInput(playerId);
+  res.sendStatus(200);
 });
 
-router.get("quit-game", async (socket: Socket) => {
-  const room = await searchRoom(socket.id);
+router.post("/request-album", async (req, res) => {
+  const { playerId } = req.body;
+  const room = await searchRoom(playerId);
 
-  if (room) service.exitGame(room.roomId, socket.id);
+  if (room) service.sendAlbum(room.roomId, playerId);
+  res.sendStatus(200);
 });
 
-export const garticRouter = router.router;
+router.delete("/quit-game", async (req, res) => {
+  const { playerId } = req.body;
+  const room = await searchRoom(playerId);
+
+  if (room) service.exitGame(room.roomId, playerId);
+  res.sendStatus(200);
+});
+
+export { router as garticRouter };

@@ -47,6 +47,7 @@ export class CatchMindUseCase implements CatchMindControllerPort {
   }
 
   async inputKeyword(roomId: string, keyword: string, playerId: string) {
+    console.log("catch input keyword", roomId, keyword);
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
       this.gameRepository.release(roomId);

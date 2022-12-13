@@ -1,5 +1,3 @@
-import { SocketEmitter } from "../../../utils/socketEmitter";
-
 import {
   ClientAPIPort,
   GarticStartData,
@@ -7,49 +5,74 @@ import {
   GarticRoundData,
 } from "../useCases/ports/clientAPI.port";
 import { RoundType } from "../useCases/ports/garticphoneController.port";
+import { errHandler } from "../../../utils/errorHandler";
+import axios from "axios";
+import { ADDRESS } from "../../../config/config";
 
 const EVENT_NAME = { painting: "draw-start", keyword: "keyword-input-start" };
+const garticAxios = axios.create({
+  baseURL: ADDRESS.gartic,
+  timeout: 3000,
+});
+
+const parsePlayerId = (roomId: string, playerId: string) => {
+  return { roomId, data: { peerId: playerId } };
+};
 
 export class ClientAPIPresenter implements ClientAPIPort {
-  emitter: SocketEmitter = new SocketEmitter();
-
-  gameStart(roomId: string, data: GarticStartData) {
-    this.emitter.broadcastRoom(roomId, "game-start", data);
+  @errHandler
+  async gameStart(roomId: string, data: GarticStartData) {
+    await garticAxios.post("/game-start", { roomId, data });
   }
 
-  keywordInput(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "input-keyword", { peerId: playerId });
+  @errHandler
+  async keywordInput(roomId: string, playerId: string) {
+    await garticAxios.post("/input-keyword", parsePlayerId(roomId, playerId));
   }
 
-  keywordCancel(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "keyword-cancel", { peerId: playerId });
+  @errHandler
+  async keywordCancel(roomId: string, playerId: string) {
+    await garticAxios.patch("/keyword-cancel", parsePlayerId(roomId, playerId));
   }
 
-  drawInput(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "draw-input", { peerId: playerId });
+  @errHandler
+  async drawInput(roomId: string, playerId: string) {
+    await garticAxios.post("/draw-input", parsePlayerId(roomId, playerId));
   }
 
-  drawCancel(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "draw-cancel", { peerId: playerId });
+  @errHandler
+  async drawCancel(roomId: string, playerId: string) {
+    await garticAxios.patch("/draw-cancel", parsePlayerId(roomId, playerId));
   }
 
-  timeOut(roomId: string) {
-    this.emitter.broadcastRoom(roomId, "time-out");
+  @errHandler
+  async timeOut(roomId: string) {
+    await garticAxios.post("/time-out", { roomId });
   }
 
-  roundstart(playerId: string, roundType: RoundType, data: GarticRoundData) {
-    this.emitter.emit(playerId, EVENT_NAME[roundType], data);
+  @errHandler
+  async roundstart(
+    playerId: string,
+    roundType: RoundType,
+    data: GarticRoundData
+  ) {
+    await garticAxios.post(EVENT_NAME[roundType], { playerId, data });
   }
 
-  gameEnd(roomId: string) {
-    this.emitter.broadcastRoom(roomId, "game-end");
+  @errHandler
+  async gameEnd(roomId: string) {
+    await garticAxios.post("/game-end", { roomId });
   }
 
-  sendAlbum(roomId: string, data: GarticAlbum) {
-    this.emitter.broadcastRoom(roomId, "album", data);
+  @errHandler
+  async sendAlbum(roomId: string, data: GarticAlbum) {
+    await garticAxios.post("/album", { roomId, data });
   }
 
-  playerExit(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "quit-game", { peerId: playerId });
+  @errHandler
+  async playerExit(roomId: string, playerId: string) {
+    await garticAxios.delete("/quit-game", {
+      data: parsePlayerId(roomId, playerId),
+    });
   }
 }
