@@ -10,6 +10,7 @@ import { garticRouter } from "./domains/garticphone/controllers/garticphone.cont
 
 import "./domains/chat/controllers/chatIn.controller";
 import "./domains/catchMind/controllers/catchMindAPI.controller";
+import "./domains/garticphone/controllers/roomAPI.controller";
 import "./domains/room/controllers/room.controller";
 import "./domains/room/controllers/SearchRoom.api.controller";
 import { createAdapter } from "@socket.io/cluster-adapter";

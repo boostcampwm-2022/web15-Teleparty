@@ -20,3 +20,10 @@ export interface GarticGameData {
   sendIdx?: number;
   orderSeed?: number;
 }
+
+export interface StartData {
+  roomId: string;
+  drawTime: number;
+  keywordTime: number;
+  players: string[];
+}

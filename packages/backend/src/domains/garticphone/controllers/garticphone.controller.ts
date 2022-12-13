@@ -2,14 +2,14 @@ import {
   GarticphonePort,
   RoundType,
 } from "../useCases/ports/garticphoneController.port";
-import { GarticphoneService } from "../useCases/garticphone.service";
+import { GarticphoneUseCase } from "../useCases/garticphone.useCase";
 
 import { SocketRouter } from "../../../utils/socketRouter";
 import { DomainConnecter } from "../../../utils/domainConnecter";
 import { Socket } from "socket.io";
 
 const router = new SocketRouter();
-const service: GarticphonePort = new GarticphoneService();
+const service: GarticphonePort = new GarticphoneUseCase();
 const connecter = DomainConnecter.getInstance();
 
 const searchRoom = async (id: string) =>
@@ -46,7 +46,7 @@ router.get("draw-cancel", (socket: Socket) => {
 
 router.get("request-album", async (socket: Socket) => {
   const room = await searchRoom(socket.id);
-
+  console.log("request");
   if (room) service.sendAlbum(room.roomId, socket.id);
 });
 
@@ -55,30 +55,5 @@ router.get("quit-game", async (socket: Socket) => {
 
   if (room) service.exitGame(room.roomId, socket.id);
 });
-
-connecter.register(
-  "garticphone/game-start",
-  ({
-    roomId,
-    drawTime,
-    keywordTime,
-    players,
-  }: {
-    roomId: string;
-    drawTime: number;
-    keywordTime: number;
-    players: string[];
-  }) => {
-    console.log("start-gartic", roomId);
-    service.startGame(roomId, drawTime, keywordTime, players);
-  }
-);
-
-connecter.register(
-  "garticphone/player-quit",
-  ({ roomId, playerId }: { roomId: string; playerId: string }) => {
-    service.exitGame(roomId, playerId);
-  }
-);
 
 export const garticRouter = router.router;

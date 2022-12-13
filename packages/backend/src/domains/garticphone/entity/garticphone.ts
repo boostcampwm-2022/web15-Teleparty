@@ -1,5 +1,6 @@
 import Crypto from "crypto";
 import { GarticGameData } from "../../../types/gartic.type";
+import { RoundType } from "../useCases/ports/garticphoneController.port";
 import { AlbumData } from "./albumData";
 import { Player } from "./player";
 
@@ -74,25 +75,32 @@ export class Garticphone {
   isHost(playerId: string) {
     return this.players[0].id === playerId;
   }
+
   cancelAlbumData(playerId: string) {
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
     const player = this.players.find((player) => player.id === playerId);
 
-    if (!ownerPlayer || !player) return;
+    if (!ownerPlayer || !player || this.isGameEnded) return true;
 
     ownerPlayer.cancelAlbumData(this.currentRound);
     player.isInputEnded = false;
+
+    return true;
   }
 
-  setAlbumData(data: string, playerId: string) {
-    const albumData = new AlbumData(this.currentRoundType, playerId, data);
+  setAlbumData(data: string, playerId: string, type: RoundType) {
+    if (this.currentRoundType !== type || this.isGameEnded) return false;
+
     const ownerPlayer = this.getAlbumOwner(playerId, this.currentRound);
     const player = this.players.find((player) => player.id === playerId);
 
-    if (!ownerPlayer || !player) return;
+    if (!ownerPlayer || !player) return false;
 
+    const albumData = new AlbumData(this.currentRoundType, playerId, data);
     ownerPlayer.setAlbumData(this.currentRound - 1, albumData);
     player.isInputEnded = true;
+
+    return true;
   }
 
   getAlbumOwner(playerId: string, round: number): Player | undefined {
@@ -108,9 +116,20 @@ export class Garticphone {
     return this.players[currentIdx];
   }
 
-  nextPlayer() {
-    if (!this.isGameEnded) return this.players[this.sendIdx++];
-    else return null;
+  getNextAlbum() {
+    if (!this.isGameEnded) return;
+    const player = this.players[this.sendIdx++];
+    return {
+      peerId: player.id,
+      isLast: this.isLastAlbum,
+      result: player.getAlbum().map((data) => {
+        return {
+          peerId: data.ownerId,
+          keyword: data.type === "keyword" ? data.data : null,
+          img: data.type === "painting" ? data.data : null,
+        };
+      }),
+    };
   }
 
   getPlayerList() {
@@ -123,7 +142,7 @@ export class Garticphone {
       if (!player.isExit) {
         player.isInputEnded = false;
       } else {
-        this.setAlbumData("", player.id);
+        this.setAlbumData("", player.id, this.currentRoundType);
       }
     });
   }
@@ -133,7 +152,8 @@ export class Garticphone {
 
     if (player) {
       player.exitGame();
-      if (!this.isGameEnded) this.setAlbumData("", playerId);
+      if (!this.isGameEnded)
+        this.setAlbumData("", playerId, this.currentRoundType);
       return true;
     } else return false;
   }

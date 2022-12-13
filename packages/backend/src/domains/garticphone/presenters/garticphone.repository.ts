@@ -24,8 +24,8 @@ export class GarticphoneRepository
     return this.parse(JSON.parse(data));
   }
 
-  async release(id: string) {
-    await super.release(this.getLockKey(id));
+  release(id: string) {
+    super.release(this.getLockKey(id));
     // await super.release(this.getDataKey(id), this.getLockKey(id));
   }
 
