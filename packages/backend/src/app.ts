@@ -4,14 +4,14 @@ import morgan from "morgan";
 import { Server } from "socket.io";
 
 import { SocketEmitter } from "./utils/socketEmitter";
-import { catchMindRouter } from "./domains/catchMind/inbound/catchMindInput.controller";
-import { RoomController } from "./domains/room/inbound/room.controller";
-import { garticRouter } from "./domains/garticphone/inbound/garticphone.controller";
+import { catchMindRouter } from "./domains/catchMind/controllers/catchMindInput.controller";
+import { RoomController } from "./domains/room/controllers/room.controller";
+import { garticRouter } from "./domains/garticphone/controllers/garticphone.controller";
 
-import "./domains/chat/inbound/chatIn.controller";
-import "./domains/catchMind/inbound/catchMindAPI.controller";
-import "./domains/room/inbound/room.controller";
-import "./domains/room/inbound/SearchRoom.api.controller";
+import "./domains/chat/controllers/chatIn.controller";
+import "./domains/catchMind/controllers/catchMindAPI.controller";
+import "./domains/room/controllers/room.controller";
+import "./domains/room/controllers/SearchRoom.api.controller";
 import { createAdapter } from "@socket.io/cluster-adapter";
 
 const app = express();
