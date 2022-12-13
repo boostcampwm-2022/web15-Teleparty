@@ -20,6 +20,7 @@ const RoomPage = () => {
   const [playerIds] = useAtom(playerIdsAtom);
   const peer = useAtomValue(peerAtom);
   const socket = useAtomValue(socketAtom);
+  const peerIdList = playerIds.filter((id) => id !== socket.id);
 
   usePreventClose();
 
@@ -27,11 +28,12 @@ const RoomPage = () => {
     id,
     isAudioDetected
   ) => {
+    console.log(id);
     setPlayerisAudioDetected({ playerId: id, isAudioDetected });
   };
 
-  useAudioCommunication(peer!, playerIds, changeAudioDetectionStateOfPlayer);
-  useDataConnectionWithPeers(peer!, playerIds);
+  useAudioCommunication(peer!, peerIdList, changeAudioDetectionStateOfPlayer);
+  useDataConnectionWithPeers(peer!, peerIdList);
 
   return (
     <Routes>
