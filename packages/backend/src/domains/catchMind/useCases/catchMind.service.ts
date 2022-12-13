@@ -32,10 +32,9 @@ export class CatchMindService implements CatchMindInputPort {
       totalRound,
     });
 
-    const { roundInfo } = game;
     this.eventEmitter.gameStart(game.roomId, {
-      totalRound,
-      roundInfo,
+      totalRound: game.totalRound,
+      roundInfo: game.roundInfo,
     });
 
     console.log("\x1b[32mstart CatchMind\x1b[37m", roomId);
@@ -143,13 +142,15 @@ export class CatchMindService implements CatchMindInputPort {
       this.cancelTimer(roomId);
     }
 
-    const result = game.exitGame(playerId);
-
-    if (result) {
+    if (game.exitGame(playerId)) {
+      if (game.leftPlayerNum <= 1) {
+        await this.roundEnd(game, null);
+        this.cancelTimer(roomId);
+      }
       this.eventEmitter.playerExit(roomId, playerId);
     }
 
-    if (game.isAllExit) {
+    if (game.leftPlayerNum === 0) {
       console.log("\x1b[33mend game\x1b[37m", roomId);
       this.roomAPI.gameEnded(roomId);
       this.gameRepository.delete(roomId);

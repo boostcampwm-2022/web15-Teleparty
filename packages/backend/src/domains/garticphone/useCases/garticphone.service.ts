@@ -16,9 +16,14 @@ export class GarticphoneService implements GarticphonePort {
   eventEmitter: GarticphoneEventPort = new GarticphoneEventPresenter();
   roomAPI: GarticphoneToRoom = new GarticphoneToRoomPresenter();
 
-  async startGame(roomId: string, roundTime: number, playerIds: string[]) {
+  async startGame(
+    roomId: string,
+    drawTime: number,
+    keywordTime: number,
+    playerIds: string[]
+  ) {
     const players = playerIds.map((playerId) => new Player(playerId));
-    const game = new Garticphone({ players, roundTime, roomId });
+    const game = new Garticphone({ players, drawTime, keywordTime, roomId });
 
     this.eventEmitter.gameStart(game.roomId, {
       gameMode: "Garticphone",
@@ -26,9 +31,18 @@ export class GarticphoneService implements GarticphonePort {
       roundInfo: game.roundData,
     });
 
+    console.log(
+      {
+        gameMode: "Garticphone",
+        totalRound: game.players.length,
+        roundInfo: game.roundData,
+      },
+      game.currentRoundType
+    );
+
     const timerId = setTimeout(
       () => this.timeOut(roomId),
-      game.roundTime * MSEC_PER_SEC
+      game.currentRoundTime * MSEC_PER_SEC
     );
 
     this.timerRepository.save(roomId, new Timer(roomId, timerId));
@@ -149,7 +163,7 @@ export class GarticphoneService implements GarticphonePort {
 
     const timerId = setTimeout(
       () => this.timeOut(game.roomId),
-      game.roundTime * MSEC_PER_SEC
+      game.currentRoundTime * MSEC_PER_SEC
     );
 
     this.timerRepository.save(game.roomId, new Timer(game.roomId, timerId));

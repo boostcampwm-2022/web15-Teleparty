@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 import { useAtom } from "jotai";
+import { useResetAtom } from "jotai/utils";
 
 import {
   TransparencyCircle,
@@ -18,6 +19,7 @@ const RANGE_PROPS = {
 
 const Transparency = () => {
   const [, setTransparency] = useAtom(transparencyAtom);
+  const resetTransparency = useResetAtom(transparencyAtom);
   const rangeRef = useRef<HTMLInputElement>(null);
 
   const setRangeProps = () => {
@@ -30,6 +32,10 @@ const Transparency = () => {
     setRangeProps();
     setTransparency(+e.target.value);
   };
+
+  useEffect(() => {
+    resetTransparency();
+  }, []);
 
   return (
     <TransparencyLayout>

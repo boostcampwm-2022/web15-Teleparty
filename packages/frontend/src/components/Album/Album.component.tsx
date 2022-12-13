@@ -42,8 +42,14 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
 
   useEffect(() => {
-    albumEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [renderedAlbum, showNext]);
+    albumEndRef.current?.scrollIntoView();
+  }, [showNext]);
+
+  useEffect(() => {
+    if (renderedAlbum.at(-1)?.keyword) {
+      albumEndRef.current?.scrollIntoView();
+    }
+  }, [renderedAlbum]);
 
   useEffect(() => {
     setShowNext(false);
@@ -72,6 +78,10 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     };
   }, [album, isLastAlbum, setPlayers]);
 
+  const onImageLoad = () => {
+    albumEndRef.current?.scrollIntoView();
+  };
+
   const onNextClick = () => {
     socket.emit("request-album");
   };
@@ -89,12 +99,18 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           isRightSide={!img}
           username={getUserNameById(peerId) ?? ""}
         >
-          {img ? <img src={img} alt="result" width={460} /> : keyword}
+          {img ? (
+            <img src={img} alt="result" width={460} onLoad={onImageLoad} />
+          ) : (
+            keyword
+          )}
         </AlbumBubble>
       ))}
       {showNext && (
         <AlbumNextLayout>
-          <AlbumNextText>OOO님의 앨범</AlbumNextText>
+          <AlbumNextText>
+            {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
+          </AlbumNextText>
           <AlbumNextButtonBox>
             <Button variant="icon">
               <Icon icon="download" size={36} />

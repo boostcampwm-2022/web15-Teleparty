@@ -8,28 +8,28 @@ import {
   GarticResultLayout,
 } from "./Gartic.styles";
 
-import useGartic from "../../hooks/useGartic";
+import useGartic from "../../../hooks/useGartic";
+import { gameInfoAtom } from "../../../store/game";
+import { playersAtom } from "../../../store/players";
+import { socketAtom } from "../../../store/socket";
+import Album from "../../Album/Album.component";
+import Canvas from "../../Canvas/Canvas.component";
+import { CanvasLayout } from "../../Canvas/Canvas.styles";
+import Chat from "../../Chat/Chat.component";
+import { Button } from "../../common/Button";
+import { HidableBox } from "../../common/HidableBox";
+import { Input } from "../../common/Input";
+import { Logo } from "../../Logo/Logo.component";
+import MoonTimer from "../../MoonTimer/MoonTimer.component";
+import PaintBoard from "../../PaintBoard/PaintBoard.component";
+import { KeywordInputLayout } from "../../PaintBoard/PaintBoard.styles";
+import PaintToolBox from "../../PaintToolBox/PaintToolBox.component";
+import PlayerList from "../../PlayerList/PlayerList.component";
 import {
-  GamePageContentBox,
-  GamePageRoundParagraph,
-  GamePageCenterContentBox,
-} from "../../pages/GamePage/GamePage.styles";
-import { gameInfoAtom } from "../../store/game";
-import { playersAtom } from "../../store/players";
-import { socketAtom } from "../../store/socket";
-import Album from "../Album/Album.component";
-import Canvas from "../Canvas/Canvas.component";
-import { CanvasLayout } from "../Canvas/Canvas.styles";
-import Chat from "../Chat/Chat.component";
-import { Button } from "../common/Button";
-import { HidableBox } from "../common/HidableBox";
-import { Input } from "../common/Input";
-import { Logo } from "../Logo/Logo.component";
-import MoonTimer from "../MoonTimer/MoonTimer.component";
-import PaintBoard from "../PaintBoard/PaintBoard.component";
-import { KeywordInputLayout } from "../PaintBoard/PaintBoard.styles";
-import PaintToolBox from "../PaintToolBox/PaintToolBox.component";
-import PlayerList from "../PlayerList/PlayerList.component";
+  GameContentBox,
+  GameRoundParagraph,
+  GameCenterContentBox,
+} from "../Game.styles";
 
 const Gartic = () => {
   const {
@@ -133,24 +133,22 @@ const Gartic = () => {
 
   return gameState !== "gameEnd" ? (
     <>
-      <GamePageContentBox>
-        <GamePageRoundParagraph>
+      <GameContentBox>
+        <GameRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
-        </GamePageRoundParagraph>
+        </GameRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
-      </GamePageContentBox>
-      <GamePageCenterContentBox>
+      </GameContentBox>
+      <GameCenterContentBox>
         <Logo height={70} />
         <PaintBoard
           headerText={headerElementMap[gameState]}
           centerElement={centerElementMap[gameState]}
           footerElement={footerElementMap[gameState]}
         />
-      </GamePageCenterContentBox>
-      <GamePageContentBox>
-        <HidableBox hide={gameState !== "drawing"}>
-          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
-        </HidableBox>
+      </GameCenterContentBox>
+      <GameContentBox>
+        <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         <Chat />
         <Button
           variant="medium-large"
@@ -162,19 +160,19 @@ const Gartic = () => {
         >
           {isDone ? "편집" : "완료"}
         </Button>
-      </GamePageContentBox>
+      </GameContentBox>
     </>
   ) : (
     <GarticResultLayout>
       <Logo height={80} />
       <GarticResultContentLayout>
-        <GamePageContentBox>
+        <GameContentBox>
           <PlayerList maxPlayer={10} sizeType="large" />
-        </GamePageContentBox>
-        <GamePageContentBox>
+        </GameContentBox>
+        <GameContentBox>
           <Album album={album} isLastAlbum={isLastAlbum} />
           <Chat variant="horizontal" />
-        </GamePageContentBox>
+        </GameContentBox>
       </GarticResultContentLayout>
     </GarticResultLayout>
   );

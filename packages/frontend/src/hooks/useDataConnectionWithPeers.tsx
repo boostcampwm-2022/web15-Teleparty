@@ -7,7 +7,7 @@ import { dataConnectionMapAtom } from "../store/dataConnectionMap";
 import { createPeerId, restoreIdFromPeerId } from "../utils/peer";
 
 export const useDataConnectionWithPeers = (
-  peer: Peer,
+  peer: Peer | null,
   peerIdList: string[]
 ) => {
   const setDataConnectionMap = useSetAtom(dataConnectionMapAtom);
@@ -15,23 +15,22 @@ export const useDataConnectionWithPeers = (
   // 리렌더링을 막기 위해 dataConnection을 ref로 따로 관리
   const dataConnectionsRef = useRef<DataConnection[]>([]);
 
-  if (!peer.id) {
+  if (!peer?.id) {
     console.error(
       "useDataConnectionWithPeers에서 connection이 맺어지지 않은 peer를 전달받았습니다!"
     );
   }
 
   const connectDataChannelWithPeers = () => {
+    if (!peer) return;
     const newDataConnectionMap = new Map<string, DataConnection>();
     for (const peerId of peerIdList) {
       const dataConnection = peer.connect(createPeerId(peerId));
-      console.log(dataConnection);
       newDataConnectionMap.set(peerId, dataConnection);
     }
 
     dataConnectionsRef.current = [...newDataConnectionMap.values()];
     setDataConnectionMap(newDataConnectionMap);
-    console.log(dataConnectionsRef.current);
   };
 
   const closeAllDataChannel = () => {
@@ -57,7 +56,6 @@ export const useDataConnectionWithPeers = (
   }, [peerIdList, setDataConnectionMap]);
 
   const peerConnectionHandler = (connection: DataConnection) => {
-    console.log("incomming connection!");
     dataConnectionsRef.current.push(connection);
     setDataConnectionMap((dataConnectionMap) => {
       dataConnectionMap.set(restoreIdFromPeerId(connection.peer), connection);
@@ -66,11 +64,11 @@ export const useDataConnectionWithPeers = (
   };
 
   const initPeerToAcceptConnection = () => {
-    peer.on("connection", peerConnectionHandler);
+    peer?.on("connection", peerConnectionHandler);
   };
 
   const clearPeer = () => {
-    peer.off("connection", peerConnectionHandler);
+    peer?.off("connection", peerConnectionHandler);
   };
 
   // 마운트시 피어들과 데이터 채널 연결
@@ -80,7 +78,7 @@ export const useDataConnectionWithPeers = (
 
     return () => {
       clearPeer();
-      // closeAllDataChannel();
+      closeAllDataChannel();
     };
   }, []);
 

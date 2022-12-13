@@ -38,12 +38,14 @@ export class CatchMind {
   turnPlayerIdx: number;
 
   constructor(data: CatchMindData) {
+    const [goalScore, totalRound] = this.calcGameData(data.players.length);
+
     this.players = data.players;
-    this.goalScore = data.goalScore;
+    this.goalScore = goalScore;
     this.keyword = data.keyword || "";
     this.currentRound = data.currentRound || 1;
     this.roundTime = data.roundTime;
-    this.totalRound = data.totalRound;
+    this.totalRound = totalRound;
     this.roomId = data.roomId;
     this.turnPlayerIdx = data.turnPlayerIdx || 0;
   }
@@ -63,7 +65,8 @@ export class CatchMind {
   get isGameEnded() {
     return (
       this.currentRound === this.totalRound ||
-      this.players.some((player) => player.score >= this.goalScore)
+      this.players.some((player) => player.score >= this.goalScore) ||
+      this.leftPlayerNum <= 1
     );
   }
 
@@ -71,8 +74,8 @@ export class CatchMind {
     return this.players.every((player) => player.isReady);
   }
 
-  get isAllExit() {
-    return this.players.length === 0;
+  get leftPlayerNum() {
+    return this.players.length;
   }
 
   get scoreMap() {
@@ -81,6 +84,10 @@ export class CatchMind {
       playerScoreMap[player.id] = player.score;
     });
     return playerScoreMap;
+  }
+
+  calcGameData(playerNum: number) {
+    return [Math.ceil(Math.sqrt(playerNum * 2)), playerNum * 2];
   }
 
   nextTurn() {

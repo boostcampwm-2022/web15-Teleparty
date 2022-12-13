@@ -3,33 +3,33 @@ import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
-import Canvas from "../../components/Canvas/Canvas.component";
-import Chat from "../../components/Chat/Chat.component";
-import { Button } from "../../components/common/Button";
-import { Input } from "../../components/common/Input";
-import Icon from "../../components/Icon/Icon";
-import { Logo } from "../../components/Logo/Logo.component";
-import MoonTimer from "../../components/MoonTimer/MoonTimer.component";
-import PaintBoard from "../../components/PaintBoard/PaintBoard.component";
+import { useCatchMind } from "../../../hooks/useCatchMind";
+import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
+import { gameInfoAtom } from "../../../store/game";
+import { playersAtom } from "../../../store/players";
+import { socketAtom } from "../../../store/socket";
+import Canvas from "../../Canvas/Canvas.component";
+import Chat from "../../Chat/Chat.component";
+import { Button } from "../../common/Button";
+import { HidableBox } from "../../common/HidableBox";
+import { Input } from "../../common/Input";
+import Icon from "../../Icon/Icon";
+import { Logo } from "../../Logo/Logo.component";
+import MoonTimer from "../../MoonTimer/MoonTimer.component";
+import PaintBoard from "../../PaintBoard/PaintBoard.component";
 import {
   KeywordInputLayout,
   PaintBoardButtonLayout,
   PaintBoardEmptyCenterElement,
-} from "../../components/PaintBoard/PaintBoard.styles";
-import PaintToolBox from "../../components/PaintToolBox/PaintToolBox.component";
-import PlayerList from "../../components/PlayerList/PlayerList.component";
-import Rank from "../../components/Rank/Rank.component";
-import { useCatchMind } from "../../hooks/useCatchMind";
+} from "../../PaintBoard/PaintBoard.styles";
+import PaintToolBox from "../../PaintToolBox/PaintToolBox.component";
+import PlayerList from "../../PlayerList/PlayerList.component";
+import Rank from "../../Rank/Rank.component";
 import {
-  GamePageContentBox,
-  GamePageRoundParagraph,
-  GamePageCenterContentBox,
-} from "../../pages/GamePage/GamePage.styles";
-import { dataConnectionMapAtom } from "../../store/dataConnectionMap";
-import { gameInfoAtom } from "../../store/game";
-import { playersAtom } from "../../store/players";
-import { socketAtom } from "../../store/socket";
-import { HidableBox } from "../common/HidableBox";
+  GameContentBox,
+  GameRoundParagraph,
+  GameCenterContentBox,
+} from "../Game.styles";
 
 const CatchMind = () => {
   const [players, setPlayers] = useAtom(playersAtom);
@@ -185,13 +185,13 @@ const CatchMind = () => {
 
   return (
     <>
-      <GamePageContentBox>
-        <GamePageRoundParagraph>
+      <GameContentBox>
+        <GameRoundParagraph>
           {currentRound} / {gameInfo.totalRound}
-        </GamePageRoundParagraph>
+        </GameRoundParagraph>
         <PlayerList maxPlayer={10} sizeType="medium" />
-      </GamePageContentBox>
-      <GamePageCenterContentBox>
+      </GameContentBox>
+      <GameCenterContentBox>
         <div>
           <Logo height={70} />
         </div>
@@ -201,8 +201,8 @@ const CatchMind = () => {
           centerElement={getCenterElement()}
           footerElement={getFooterElement()}
         />
-      </GamePageCenterContentBox>
-      <GamePageContentBox>
+      </GameCenterContentBox>
+      <GameContentBox>
         <HidableBox hide={gameState !== "drawing"}>
           <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
         </HidableBox>
@@ -216,7 +216,7 @@ const CatchMind = () => {
             완료
           </Button>
         </HidableBox>
-      </GamePageContentBox>
+      </GameContentBox>
     </>
   );
 };

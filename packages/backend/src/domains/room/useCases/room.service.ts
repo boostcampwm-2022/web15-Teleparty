@@ -133,9 +133,9 @@ export class RoomService implements RoomPort {
     }
 
     const room = await this.roomRepository.findOneByRoomId(player.roomId);
-    this.roomRepository.release(player.roomId);
     if (!room) {
       this.sendError(peerId, "leave Error, 방 정보 없음");
+      this.roomRepository.release(player.roomId);
       return;
     }
 
@@ -149,10 +149,12 @@ export class RoomService implements RoomPort {
     // 여전히 나간 사람이 방장일 때
     if (room.host === player.peerId) {
       this.sendError(peerId, "방장변경에러, 방장 변경안됨");
+      this.roomRepository.release(player.roomId);
       return;
     }
 
     this.roomRepository.deletePlayer(peerId, room);
+    this.roomRepository.release(player.roomId);
 
     // 나밖에 없었을 때
     if (room.players.length === 0) {
@@ -179,17 +181,12 @@ export class RoomService implements RoomPort {
       this.roomRepository.save(room.roomId, room);
       this.roomRepository.release(room.roomId);
 
-      const playerIds = room.getPlayerId();
-
+      const gameData =
+        gameMode === "Garticphone"
+          ? room.garticGameData
+          : room.catchMindGameData;
       // 게임시작 신호 보내기(game한테)
-      this.roomApiAdapter.gameStart(
-        room.roomId,
-        gameMode,
-        playerIds,
-        room.totalRound,
-        room.roundTime,
-        room.goalScore
-      );
+      this.roomApiAdapter.gameStart(gameData);
     }
 
     return;
