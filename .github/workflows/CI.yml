@@ -24,7 +24,7 @@ jobs:
         uses: tj-actions/changed-files@v34.5.1
         continue-on-error: true
         with:
-          fetch-depth: 50
+          fetch_depth: 50
           files: |
             ./packages/backend/**
 
@@ -63,7 +63,7 @@ jobs:
         uses: tj-actions/changed-files@v34.5.1
         continue-on-error: true
         with:
-          fetch-depth: 50
+          fetch_depth: 50
           files: |
             ./packages/frontend/**
 
