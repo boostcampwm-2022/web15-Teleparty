@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-import gifshot from "gifshot";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import {
@@ -14,9 +12,10 @@ import {
 import AlbumBubble from "./AlbumBubble.component";
 
 import { CANVAS_SIZE } from "../../constants/canvas";
+import useCreateGIF from "../../hooks/useCreateGIF";
+import useGetUsername from "../../hooks/useUsername";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
-import { getCurrentDateTimeFormat } from "../../utils/date";
 import { Button } from "../common/Button";
 import Icon from "../Icon/Icon";
 
@@ -38,10 +37,11 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const navigate = useNavigate();
   const setPlayers = useSetAtom(playersAtom);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
+  const getUserNameById = useGetUsername();
+  const onDownloadClick = useCreateGIF({
+    album: renderedAlbum,
+    ref: canvasRef,
+  });
 
   const isHost =
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
@@ -84,76 +84,6 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const onGoRoomClick = () => {
     socket.emit("quit-game");
     navigate("/room", { replace: true });
-  };
-
-  const onDownloadClick = async () => {
-    const canvas = canvasRef.current;
-    const context = canvasRef.current?.getContext("2d");
-    if (!canvas || !context || !renderedAlbum.length) {
-      toast.dismiss();
-      toast.error("다운로드에 실패했습니다.");
-      return;
-    }
-
-    const drawUsername = (peerId: string) => {
-      const username = getUserNameById(peerId) ?? "";
-      context.font = "bold 36px 'Noto Sans KR', sans-serif";
-      context.textAlign = "center";
-      const textSize = context.measureText(username);
-      context.fillStyle = "white";
-      context.fillRect(
-        canvas.width / 2 - textSize.actualBoundingBoxLeft - 5,
-        canvas.height * 0.95 - textSize.actualBoundingBoxAscent - 5,
-        textSize.width + 10,
-        textSize.actualBoundingBoxAscent +
-          textSize.actualBoundingBoxDescent +
-          10
-      );
-      context.fillStyle = "black";
-      context.fillText(username, canvas.width / 2, canvas.height * 0.95);
-    };
-    const drawKeyword = (keyword: string) => {
-      context.fillStyle = "white";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.fillStyle = "black";
-      context.font = "bold 48px 'Noto Sans KR', sans-serif";
-      context.textAlign = "center";
-      context.fillText(keyword ?? "", canvas.width / 2, canvas.height / 2);
-    };
-
-    const imagePromises = renderedAlbum.map(({ peerId, img, keyword }) => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      if (img) {
-        return new Promise<string>((resolve) => {
-          const image = new Image();
-          image.onload = () => {
-            context.drawImage(image, 0, 0);
-            drawUsername(peerId);
-            resolve(canvas.toDataURL() ?? "");
-          };
-          image.src = img;
-        });
-      }
-      drawKeyword(keyword ?? "");
-      drawUsername(peerId);
-      const image = canvas.toDataURL();
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      return new Promise<string>((resolve) => resolve(image));
-    });
-    const images = await Promise.all(imagePromises);
-    const options = {
-      images,
-      interval: 2,
-      gifWidth: canvas.width,
-      gifHeight: canvas.height,
-    };
-    gifshot.createGIF(options, ({ image }) => {
-      const a = document.createElement("a");
-      a.href = image;
-      a.download = `Teleparty_album_${getCurrentDateTimeFormat()}.gif`;
-      a.click();
-      toast.success("다운로드가 완료되었습니다.");
-    });
   };
 
   return (
