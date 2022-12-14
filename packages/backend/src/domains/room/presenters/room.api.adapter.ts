@@ -1,6 +1,7 @@
 import { RoomApiPort } from "./room.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
-import { GameData, GAME_MODE } from "../entity/room.entity";
+import { GAME_MODE } from "../../../types/room";
+import { GameData } from "../entity/room.entity";
 
 interface StartData {
   roomId: string;

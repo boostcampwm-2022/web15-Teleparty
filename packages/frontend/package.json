@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "gifshot": "^0.4.5",
     "icomoon-react": "^3.0.0",
     "jotai": "^1.9.2",
     "peerjs": "^1.4.7",

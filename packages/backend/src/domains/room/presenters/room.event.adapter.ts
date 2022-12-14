@@ -8,6 +8,7 @@ import axios from "axios";
 import { ADDRESS } from "../../../config/config";
 import { errHandler } from "../../../utils/errorHandler";
 
+
 const roomAxios = axios.create({
   baseURL: ADDRESS.room,
   timeout: 3000,
@@ -37,6 +38,7 @@ export class RoomEventAdapter implements RoomEvent {
     await roomAxios.delete("/player-quit", {
       data: { roomId, data: { peerId } },
     });
+
   }
 
   @errHandler
