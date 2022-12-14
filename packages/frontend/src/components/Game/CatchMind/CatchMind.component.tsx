@@ -125,9 +125,10 @@ const CatchMind = () => {
         return (
           <Rank
             rankList={players
-              .map(({ userName, score }) => ({
+              .map(({ userName, score, avatarURL }) => ({
                 userName,
                 score: score ?? 0,
+                avatarURL,
               }))
               .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))}
           />
@@ -135,12 +136,7 @@ const CatchMind = () => {
       case "inputKeyword":
         return <PaintBoardEmptyCenterElement />;
       case "roundEnd":
-        return isMyTurn ? (
-          <Canvas
-            canvasRef={canvasRef}
-            dataConnections={[...dataConnectionMap.values()]}
-          />
-        ) : (
+        return (
           <Canvas
             canvasRef={canvasRef}
             readonly={true}
