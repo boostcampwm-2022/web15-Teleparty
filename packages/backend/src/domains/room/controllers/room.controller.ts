@@ -2,8 +2,8 @@ import { RoomService } from "../useCases/room.service";
 import { RoomPort } from "./room.port";
 import { SocketRouter } from "../../../utils/socketRouter";
 import { Socket } from "socket.io";
-import { GAME_MODE } from "../entity/room.entity";
 import { DomainConnecter } from "../../../utils/domainConnecter";
+import { GAME_MODE } from "../../../types/room";
 
 const router = new SocketRouter();
 const roomService: RoomPort = new RoomService();
