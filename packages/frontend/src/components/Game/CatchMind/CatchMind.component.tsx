@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 import { useAtom, useAtomValue } from "jotai";
 
+import { CANVAS_SIZE } from "../../../constants/canvas";
 import { useCatchMind } from "../../../hooks/useCatchMind";
+import useCreateImage from "../../../hooks/useCreateImage";
+import useGetUsername from "../../../hooks/useUsername";
 import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../../store/game";
 import { playersAtom } from "../../../store/players";
@@ -39,18 +42,20 @@ const CatchMind = () => {
   const keywordRef = useRef("");
   const navigate = useNavigate();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const downloadCanvasRef = useRef<HTMLCanvasElement>(null);
   const dataConnectionMap = useAtomValue(dataConnectionMapAtom);
-
-  const { gameState, isMyTurn, roundEndInfo, roundInfo } = useCatchMind(
-    socket,
-    gameInfo.roundInfo
-  );
-
-  const { roundTime, currentRound, turnPlayer } = roundInfo;
-
-  const getUserNameById = (id: string | undefined | null) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
+  const {
+    gameState,
+    isMyTurn,
+    roundEndInfo,
+    roundInfo: { currentRound, roundTime, turnPlayer },
+  } = useCatchMind(socket, gameInfo.roundInfo);
+  const onDownloadClick = useCreateImage({
+    targetCanvas: downloadCanvasRef.current,
+    originalCanvas: canvasRef.current,
+    keyword: roundEndInfo?.suggestedWord ?? "",
+  });
+  const getUserNameById = useGetUsername();
 
   const currentTurnUserName = getUserNameById(turnPlayer);
 
@@ -170,7 +175,7 @@ const CatchMind = () => {
       case "roundEnd":
         return (
           <PaintBoardButtonLayout>
-            <Button variant="icon">
+            <Button variant="icon" onClick={onDownloadClick}>
               <Icon icon="download" size={36} />
             </Button>
             <Button variant="large" onClick={onReady}>
@@ -195,7 +200,12 @@ const CatchMind = () => {
         <div>
           <Logo height={70} />
         </div>
-
+        <canvas
+          ref={downloadCanvasRef}
+          width={CANVAS_SIZE.WIDTH}
+          height={CANVAS_SIZE.HEIGHT}
+          hidden
+        />
         <PaintBoard
           headerText={getHeaderElement()}
           centerElement={getCenterElement()}

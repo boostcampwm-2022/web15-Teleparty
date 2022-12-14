@@ -11,6 +11,9 @@ import {
 } from "./Album.styles";
 import AlbumBubble from "./AlbumBubble.component";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
+import useCreateGIF from "../../hooks/useCreateGIF";
+import useGetUsername from "../../hooks/useUsername";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
@@ -33,10 +36,12 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
   const setPlayers = useSetAtom(playersAtom);
-
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const getUserNameById = useGetUsername();
+  const onDownloadClick = useCreateGIF({
+    album: renderedAlbum,
+    ref: canvasRef,
+  });
 
   const isHost =
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
@@ -112,7 +117,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
             {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
           </AlbumNextText>
           <AlbumNextButtonBox>
-            <Button variant="icon">
+            <Button variant="icon" onClick={onDownloadClick}>
               <Icon icon="download" size={36} />
             </Button>
             {isLastAlbum ? (
@@ -129,6 +134,12 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           </AlbumNextButtonBox>
         </AlbumNextLayout>
       )}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_SIZE.WIDTH}
+        height={CANVAS_SIZE.HEIGHT}
+        hidden
+      />
       <div ref={albumEndRef}></div>
     </AlbumLayout>
   );
