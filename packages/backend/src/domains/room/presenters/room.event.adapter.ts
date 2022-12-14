@@ -1,13 +1,8 @@
-import {
-  GameMode,
-  JoinPlayerTotalInfo,
-  RoomEvent,
-  PlayerInfo,
-} from "./room.port";
+import { GameMode, JoinPlayerTotalInfo, PlayerInfo } from "../../../types/room";
 import axios from "axios";
 import { ADDRESS } from "../../../config/config";
 import { errHandler } from "../../../utils/errorHandler";
-
+import { RoomEvent } from "./room.port";
 
 const roomAxios = axios.create({
   baseURL: ADDRESS.room,
@@ -34,11 +29,10 @@ export class RoomEventAdapter implements RoomEvent {
   }
 
   @errHandler
-  async quitPlayer(roomId: string, peerId: string) {
+  async quitPlayer(roomId: string, peerId: string, newHost: string) {
     await roomAxios.delete("/player-quit", {
-      data: { roomId, data: { peerId } },
+      data: { roomId, data: { peerId, newHost } },
     });
-
   }
 
   @errHandler
