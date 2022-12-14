@@ -20,37 +20,37 @@ const parsePlayerId = (roomId: string, playerId: string) => {
 };
 
 export class ClientAPIPresenter implements ClientAPIPort {
-  @errHandler
+  // @errHandler
   async gameStart(roomId: string, data: GarticStartData) {
     await garticAxios.post("/game-start", { roomId, data });
   }
 
-  @errHandler
+  // @errHandler
   async keywordInput(roomId: string, playerId: string) {
     await garticAxios.post("/input-keyword", parsePlayerId(roomId, playerId));
   }
 
-  @errHandler
+  // @errHandler
   async keywordCancel(roomId: string, playerId: string) {
     await garticAxios.patch("/keyword-cancel", parsePlayerId(roomId, playerId));
   }
 
-  @errHandler
+  // @errHandler
   async drawInput(roomId: string, playerId: string) {
     await garticAxios.post("/draw-input", parsePlayerId(roomId, playerId));
   }
 
-  @errHandler
+  // @errHandler
   async drawCancel(roomId: string, playerId: string) {
     await garticAxios.patch("/draw-cancel", parsePlayerId(roomId, playerId));
   }
 
-  @errHandler
+  // @errHandler
   async timeOut(roomId: string) {
     await garticAxios.post("/time-out", { roomId });
   }
 
-  @errHandler
+  // @errHandler
   async roundstart(
     playerId: string,
     roundType: RoundType,
@@ -59,17 +59,17 @@ export class ClientAPIPresenter implements ClientAPIPort {
     await garticAxios.post(EVENT_NAME[roundType], { playerId, data });
   }
 
-  @errHandler
+  // @errHandler
   async gameEnd(roomId: string) {
     await garticAxios.post("/game-end", { roomId });
   }
 
-  @errHandler
+  // @errHandler
   async sendAlbum(roomId: string, data: GarticAlbum) {
     await garticAxios.post("/album", { roomId, data });
   }
 
-  @errHandler
+  // @errHandler
   async playerExit(roomId: string, playerId: string) {
     await garticAxios.delete("/quit-game", {
       data: parsePlayerId(roomId, playerId),
