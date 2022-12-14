@@ -3,13 +3,11 @@ import { RoomPort } from "./room.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
 import express, { Router } from "express";
 
-
-
 const router: Router = express.Router();
 const roomService: RoomPort = new RoomService();
 
 router.post("/join", async (req, res) => {
-  const { playerId, userName, avata, roomId } = req.body;
+  const { playerId, userName, avatar, roomId } = req.body;
   if (roomService.checkPlayer(playerId)) {
     return;
   }
@@ -17,7 +15,7 @@ router.post("/join", async (req, res) => {
   const player = await roomService.createPlayer({
     peerId: playerId,
     userName,
-    avata,
+    avatar,
     roomId,
   });
 
