@@ -27,10 +27,10 @@ export class RoomService implements RoomPort {
   async createPlayer(data: {
     peerId: string;
     userName: string;
-    avata: string;
+    avatar: string;
     roomId: string | null;
   }) {
-    const { peerId, userName, avata, roomId } = data;
+    const { peerId, userName, avatar, roomId } = data;
 
     let room: Room | undefined = undefined;
 
@@ -61,7 +61,7 @@ export class RoomService implements RoomPort {
     const player = this.roomRepository.createUser({
       peerId,
       userName,
-      avata,
+      avatar,
       roomId: room.roomId,
     });
 
@@ -93,7 +93,7 @@ export class RoomService implements RoomPort {
         {
           peerId: player.peerId,
           userName: player.userName,
-          avataURL: player.avata,
+          avatarURL: player.avatar,
           isHost: player.peerId === room.host,
           isMicOn: player.isMicOn,
         },
@@ -112,7 +112,7 @@ export class RoomService implements RoomPort {
           return {
             peerId: roomPlayer.peerId,
             userName: roomPlayer.userName,
-            avataURL: roomPlayer.avata,
+            avatarURL: roomPlayer.avatar,
             isHost: roomPlayer.peerId === room.host,
             isMicOn: roomPlayer.isMicOn,
           };

@@ -14,9 +14,9 @@ router.get(
     socket: Socket,
     {
       userName,
-      avata,
+      avatar,
       roomId,
-    }: { userName: string; avata: string; roomId: string | null }
+    }: { userName: string; avatar: string; roomId: string | null }
   ) => {
     if (roomService.checkPlayer(socket.id)) {
       return;
@@ -25,7 +25,7 @@ router.get(
     const player = await roomService.createPlayer({
       peerId: socket.id,
       userName,
-      avata,
+      avatar,
       roomId,
     });
 

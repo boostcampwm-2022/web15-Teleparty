@@ -17,7 +17,7 @@ export interface RoomData {
 export type PlayerInfo = {
   peerId: string;
   userName: string;
-  avataURL: string;
+  avatarURL: string;
   isHost: boolean;
   isMicOn: boolean;
 };
@@ -25,7 +25,7 @@ export type PlayerInfo = {
 export type NewPlayer = {
   peerId: string;
   userName: string;
-  avata: string;
+  avatar: string;
   roomId: string;
 };
 
