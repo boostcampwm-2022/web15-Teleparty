@@ -4,6 +4,7 @@ import { redisCli } from "../../../config/redis";
 import { RedisLock } from "../../../utils/redisLock";
 import { CatchMindData } from "../../../types/catchMind.type";
 import { CatchMindFactory } from "../entity/catchMind.factory";
+import { Chalk } from "../../../utils/chalk";
 
 export class CatchMindRepository
   extends RedisLock
@@ -17,6 +18,8 @@ export class CatchMindRepository
   }
 
   async findById(id: string) {
+    if (!(await redisCli.exists(this.getDataKey(id)))) return;
+
     await super.tryLock(this.getLockKey(id));
     const data = await redisCli.get(this.getDataKey(id));
     if (!data) return;

@@ -16,6 +16,8 @@ export class GarticphoneRepository
   }
 
   async findById(id: string) {
+    if (!(await redisCli.exists(this.getDataKey(id)))) return;
+
     await super.tryLock(this.getLockKey(id));
     // await super.tryLock(this.getDataKey(id), this.getLockKey(id));
     const data = await redisCli.get(this.getDataKey(id));
