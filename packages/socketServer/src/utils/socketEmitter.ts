@@ -4,11 +4,11 @@ export class SocketEmitter {
   static server: Server;
   static sockets: Socket[];
 
-  broadcastRoom(roomId: string, event: string, data?: unknown) {
+  static broadcastRoom(roomId: string, event: string, data?: unknown) {
     SocketEmitter.server.to(roomId).emit(event, data);
   }
 
-  broadcastRoomNotMe(
+  static broadcastRoomNotMe(
     roomId: string,
     peerId: string,
     event: string,
@@ -18,8 +18,13 @@ export class SocketEmitter {
     socket?.broadcast.to(roomId).emit(event, data);
   }
 
-  emit(socketId: string, event: string, data: unknown) {
+  static emit(socketId: string, event: string, data: unknown) {
     SocketEmitter.server.to(socketId).emit(event, data);
+  }
+
+  static join(socketId: string, roomId: string) {
+    const socket = SocketEmitter.server.sockets.sockets.get(socketId);
+    socket?.join(roomId);
   }
 
   static setServer(server: Server) {

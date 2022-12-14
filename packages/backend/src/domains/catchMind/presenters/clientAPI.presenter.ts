@@ -1,44 +1,61 @@
 import { ClientAPIPort } from "../useCases/ports/clientAPI.port";
-
-import { SocketEmitter } from "../../../utils/socketEmitter";
 import { Player } from "../entity/player";
 import {
   CatchMindInfo,
   RoundEndData,
   StartGameData,
 } from "../../../types/catchMind.type";
+import { errHandler } from "../../../utils/errorHandler";
+import axios from "axios";
+import { ADDRESS } from "../../../config/config";
+
+const catchMindAxios = axios.create({
+  baseURL: ADDRESS.catchMind,
+  timeout: 3000,
+});
 
 export class ClientAPIPresenter implements ClientAPIPort {
-  emitter: SocketEmitter;
-  constructor() {
-    this.emitter = new SocketEmitter();
-  }
-
-  gameStart(roomId: string, { totalRound, roundInfo }: StartGameData) {
-    this.emitter.broadcastRoom(roomId, "game-start", {
-      gameMode: "CatchMind",
-      totalRound,
-      roundInfo,
+  @errHandler
+  async gameStart(roomId: string, data: StartGameData) {
+    await catchMindAxios.post("/game-start", {
+      roomId,
+      data: {
+        gameMode: "CatchMind",
+        ...data,
+      },
     });
   }
 
-  drawStart(roomId: string, { id }: Player) {
-    this.emitter.broadcastRoom(roomId, "draw-start", { turnPlayer: id });
+  @errHandler
+  async drawStart(roomId: string, { id }: Player) {
+    await catchMindAxios.post("/draw-start", {
+      roomId,
+      data: { turnPlayer: id },
+    });
   }
 
-  roundEnd(roomId: string, data: RoundEndData) {
-    this.emitter.broadcastRoom(roomId, "round-end", data);
+  @errHandler
+  async roundEnd(roomId: string, data: RoundEndData) {
+    await catchMindAxios.post("/round-end", { roomId, data });
   }
 
-  roundReady(roomId: string, id: string) {
-    this.emitter.broadcastRoom(roomId, "round-ready", { peerId: id });
+  @errHandler
+  async roundReady(roomId: string, id: string) {
+    await catchMindAxios.post("/round-ready", { roomId, data: { peerId: id } });
   }
 
-  roundStart(roomId: string, data: CatchMindInfo) {
-    this.emitter.broadcastRoom(roomId, "round-start", data);
+  @errHandler
+  async roundStart(roomId: string, data: CatchMindInfo) {
+    await catchMindAxios.post("/round-start", { roomId, data });
   }
 
-  playerExit(roomId: string, playerId: string) {
-    this.emitter.broadcastRoom(roomId, "quit-game", { peerId: playerId });
+  @errHandler
+  async playerExit(roomId: string, playerId: string) {
+    await catchMindAxios.delete("/quit-game", {
+      data: {
+        roomId,
+        data: { peerId: playerId },
+      },
+    });
   }
 }

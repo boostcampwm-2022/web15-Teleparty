@@ -16,9 +16,21 @@ export class SocketRouter {
   get router() {
     return (socket: Socket, next: (err?: any) => void) => {
       this.#APIs.forEach((api) =>
-        socket.on(api.apiName, (data) => api.fn(socket, data))
+        socket.on(api.apiName, (data) =>
+          this.errorHandler(api.fn)(socket, data)
+        )
       );
       next();
+    };
+  }
+
+  errorHandler(fn: (...arg0: any[]) => void) {
+    return async (socket: Socket, data: any) => {
+      try {
+        await fn(socket, data);
+      } catch (err: any) {
+        console.log(err.message);
+      }
     };
   }
 }
