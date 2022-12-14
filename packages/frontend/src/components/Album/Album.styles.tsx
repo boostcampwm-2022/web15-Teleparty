@@ -18,7 +18,6 @@ const AlbumLayout = styled.div`
 
 const AlbumText = styled.span<{ isRightSide: boolean }>`
   width: fit-content;
-  max-width: ${({ isRightSide }) => (isRightSide ? "15rem" : "13rem")};
   box-shadow: ${({ theme: { shadows } }) => shadows.medium};
   padding: 1rem;
   border-radius: ${({ isRightSide }) =>
@@ -28,7 +27,6 @@ const AlbumText = styled.span<{ isRightSide: boolean }>`
   word-break: break-all;
   line-height: 22px;
   border: 1px solid ${({ theme: { colors } }) => colors.primaryLight};
-  max-width: 30rem;
 `;
 
 const AlbumNextLayout = styled.div`
