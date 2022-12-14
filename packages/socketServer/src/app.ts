@@ -17,8 +17,12 @@ import { CatchMindRouter } from "./expressRouter/catchMind";
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(
+  express.json({
+    limit: "10mb",
+  })
+);
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(express.static("public"));
 
 // morgan 로그 설정
