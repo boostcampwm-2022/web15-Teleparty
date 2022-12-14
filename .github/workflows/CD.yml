@@ -30,3 +30,6 @@ jobs:
             cd ../backend
             pm2 kill
             pm2 start src/app.ts
+
+            cd ../socketServer
+            pm2 start src/app.ts
