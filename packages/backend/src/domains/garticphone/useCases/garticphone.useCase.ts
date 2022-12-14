@@ -196,7 +196,7 @@ export class GarticphoneUseCase implements GarticphonePort {
     }
 
     if (game.isAllExit) {
-      console.log(Chalk.fgRed("end game"), game.roomId);
+      console.log(Chalk.fgRed("end gartic game"), game.roomId);
       this.roomAPI.gameEnded(game.roomId);
       this.gameRepository.delete(game.roomId);
       return;

@@ -57,6 +57,7 @@ router.post("/request-album", async (req, res) => {
 });
 
 router.delete("/quit-game", async (req, res) => {
+  console.log("quit- palywe");
   const { playerId } = req.body;
   const room = await searchRoom(playerId);
 

@@ -47,7 +47,6 @@ export class CatchMindUseCase implements CatchMindControllerPort {
   }
 
   async inputKeyword(roomId: string, keyword: string, playerId: string) {
-    console.log("catch input keyword", roomId, keyword);
     const game = await this.gameRepository.findById(roomId);
     if (!game) {
       this.gameRepository.release(roomId);
@@ -157,7 +156,7 @@ export class CatchMindUseCase implements CatchMindControllerPort {
     }
 
     if (game.remainPlayerNum === 0) {
-      console.log("\x1b[33mend game\x1b[37m", roomId);
+      console.log(Chalk.fgRed("end catch game"), roomId);
       this.roomAPI.gameEnded(roomId);
       this.gameRepository.delete(roomId);
       return;
