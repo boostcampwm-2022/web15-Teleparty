@@ -18,6 +18,7 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
+import { gameModeAtom } from "../../store/gameMode";
 import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
@@ -31,7 +32,7 @@ const Lobby = () => {
   const [players, setPlayers] = useAtom(playersAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
-  const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  const [gameMode, setGameMode] = useAtom(gameModeAtom);
   const ratio = useAtomValue(ratioAtom);
 
   const onInviteClick = () => {
@@ -71,7 +72,13 @@ const Lobby = () => {
         { ...player, isMicOn: true, isAudioDetected: false },
       ]);
     };
-    const playerQuitListener = ({ peerId }: { peerId: string }) => {
+    const playerQuitListener = ({
+      peerId,
+      newHost,
+    }: {
+      peerId: string;
+      newHost: string;
+    }) => {
       setPlayers((prev) => {
         const newPlayerList = [...prev];
         const quitPlayerIndex = newPlayerList.findIndex(
@@ -79,6 +86,12 @@ const Lobby = () => {
         );
         if (quitPlayerIndex === -1) return prev;
         newPlayerList.splice(quitPlayerIndex, 1);
+        const newHostPlayer = newPlayerList.find(
+          ({ peerId }) => peerId === newHost
+        );
+        if (!newHostPlayer) return prev;
+        newHostPlayer.isHost = true;
+
         return newPlayerList;
       });
     };

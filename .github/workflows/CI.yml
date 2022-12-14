@@ -22,8 +22,9 @@ jobs:
       - name: Get Backend File Change
         id: changed-files-backend
         uses: tj-actions/changed-files@v34.5.1
+        continue-on-error: true
         with:
-          fetch-depth: 50
+          fetch_depth: 50
           files: |
             ./packages/backend/**
 
@@ -60,8 +61,9 @@ jobs:
       - name: Get Frontend File Change
         id: changed-files-frontend
         uses: tj-actions/changed-files@v34.5.1
+        continue-on-error: true
         with:
-          fetch-depth: 50
+          fetch_depth: 50
           files: |
             ./packages/frontend/**
 

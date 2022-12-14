@@ -1,18 +1,15 @@
 import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 
-import { Server } from "socket.io";
+import { catchMindRouter } from "./domains/catchMind/controllers/catchMind.controller";
+import { roomRouter } from "./domains/room/controllers/room.controller";
+import { garticRouter } from "./domains/garticphone/controllers/garticphone.controller";
 
-import { SocketEmitter } from "./utils/socketEmitter";
-import { catchMindRouter } from "./domains/catchMind/inbound/catchMindInput.controller";
-import { RoomController } from "./domains/room/inbound/room.controller";
-import { garticRouter } from "./domains/garticphone/inbound/garticphone.controller";
-
-import "./domains/chat/inbound/chatIn.controller";
-import "./domains/catchMind/inbound/catchMindAPI.controller";
-import "./domains/room/inbound/room.controller";
-import "./domains/room/inbound/SearchRoom.api.controller";
-import { createAdapter } from "@socket.io/cluster-adapter";
+import "./domains/chat/controllers/chatIn.controller";
+import "./domains/catchMind/controllers/catchMindAPI.controller";
+import "./domains/garticphone/controllers/roomAPI.controller";
+import "./domains/room/controllers/room.controller";
+import "./domains/room/controllers/SearchRoom.api.controller";
 
 const app = express();
 
@@ -23,9 +20,13 @@ app.use(express.static("public"));
 // morgan 로그 설정
 app.use(morgan("dev"));
 
-app.get("/*", (req: Request, res: Response) => {
-  res.sendFile("index.html");
-});
+// app.get("/*", (req: Request, res: Response) => {
+//   res.sendFile("index.html");
+// });
+
+app.use("/catchMind", catchMindRouter);
+app.use("/room", roomRouter);
+app.use("/gartic", garticRouter);
 
 const logHandler = (
   err: Error,
@@ -48,25 +49,21 @@ const errorHandler = (err: Error, req: Request, res: Response) => {
 app.use(logHandler);
 app.use(errorHandler);
 
-const server = app.listen("8000", () => {
+app.listen("8001", () => {
   console.log(`
   #################################################
-  🛡️  Server listening on port: 8000
+  🛡️  Server listening on port: 8001
   #################################################
 `);
 });
 
-const io = new Server(server, { cors: { origin: "*" } });
-SocketEmitter.setServer(io);
+// const io = new Server(server, { cors: { origin: "*" } });
+// SocketEmitter.setServer(io);
 
-if (process.env.ENV_MODE === "pm2") {
-  io.adapter(createAdapter());
-}
+// if (process.env.ENV_MODE === "pm2") {
+//   io.adapter(createAdapter());
+// }
 
-io.on("connection", (socket) => {
-  socket.join("hello");
-});
-
-io.use(catchMindRouter);
-io.use(RoomController);
-io.use(garticRouter);
+// io.use(catchMindRouter);
+// io.use(RoomController);
+// io.use(garticRouter);

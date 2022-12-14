@@ -14,7 +14,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": { "gifshot": ["./src/types/gifshot"] }
   },
   "include": ["src", "custom.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

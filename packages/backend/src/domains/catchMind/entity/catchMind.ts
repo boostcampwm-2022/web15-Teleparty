@@ -1,36 +1,14 @@
-export interface CatchMindData {
+import { Player } from "./player";
+
+interface CatchMindInitalData {
   goalScore: number;
   players: Player[];
   roundTime: number;
   roomId: string;
   totalRound: number;
-  keyword?: string;
-  currentRound?: number;
-  turnPlayerIdx?: number;
-}
-
-export class Player {
-  id: string;
-  score: number;
-  isReady: boolean;
-
-  constructor(id: string, score?: number, isReady?: boolean) {
-    this.id = id;
-    this.score = score || 0;
-    this.isReady = isReady || false;
-  }
-}
-
-export class Timer {
-  roomId: string;
-  timer: NodeJS.Timeout;
-  constructor(roomId: string, id: NodeJS.Timeout) {
-    this.roomId = roomId;
-    this.timer = id;
-  }
-  cancelTimer() {
-    clearTimeout(this.timer);
-  }
+  keyword: string;
+  currentRound: number;
+  turnPlayerIdx: number;
 }
 
 export class CatchMind {
@@ -43,15 +21,15 @@ export class CatchMind {
   currentRound: number;
   turnPlayerIdx: number;
 
-  constructor(data: CatchMindData) {
+  constructor(data: CatchMindInitalData) {
     this.players = data.players;
     this.goalScore = data.goalScore;
-    this.keyword = data.keyword || "";
-    this.currentRound = data.currentRound || 1;
     this.roundTime = data.roundTime;
     this.totalRound = data.totalRound;
     this.roomId = data.roomId;
-    this.turnPlayerIdx = data.turnPlayerIdx || 0;
+    this.keyword = data.keyword;
+    this.currentRound = data.currentRound;
+    this.turnPlayerIdx = data.turnPlayerIdx;
   }
 
   get turnPlayer() {
@@ -69,7 +47,8 @@ export class CatchMind {
   get isGameEnded() {
     return (
       this.currentRound === this.totalRound ||
-      this.players.some((player) => player.score >= this.goalScore)
+      this.players.some((player) => player.score >= this.goalScore) ||
+      this.remainPlayerNum <= 1
     );
   }
 
@@ -77,8 +56,8 @@ export class CatchMind {
     return this.players.every((player) => player.isReady);
   }
 
-  get isAllExit() {
-    return this.players.length === 0;
+  get remainPlayerNum() {
+    return this.players.length;
   }
 
   get scoreMap() {
@@ -89,6 +68,17 @@ export class CatchMind {
     return playerScoreMap;
   }
 
+  setKeyword(keyword: string, playerId: string) {
+    if (this.turnPlayer.id !== playerId || !keyword) return false;
+
+    this.keyword = keyword;
+    return true;
+  }
+
+  clearKeyword() {
+    this.keyword = "";
+  }
+
   nextTurn() {
     this.turnPlayerIdx = (this.turnPlayerIdx + 1) % this.players.length;
     this.currentRound++;
@@ -96,12 +86,15 @@ export class CatchMind {
     this.players.forEach((player) => (player.isReady = false));
   }
 
-  isRightAnswer(keyword: string, playerId: string) {
-    return (
-      this.keyword?.length &&
-      keyword === this.keyword &&
-      playerId !== this.turnPlayer.id
-    );
+  isRightAnswer(keyword: string) {
+    return this.keyword.length && keyword === this.keyword;
+  }
+
+  challengeAnswer(keyword: string, playerId: string) {
+    if (this.isRightAnswer(keyword) && this.turnPlayer.id !== playerId) {
+      this.addScore(playerId);
+      return true;
+    } else return false;
   }
 
   isTurnPlayer(playerId: string) {
@@ -115,18 +108,17 @@ export class CatchMind {
     }
   }
 
-  clearKeyword() {
+  timeout() {
     this.keyword = "";
-  }
-
-  findPlayer(id: string) {
-    return this.players.find((player) => player.id === id);
   }
 
   ready(id: string) {
     const player = this.players.find((player) => player.id === id);
 
-    if (player) player.isReady = true;
+    if (player && !player.isReady) {
+      player.isReady = true;
+      return true;
+    } else return false;
   }
 
   exitGame(playerId: string) {

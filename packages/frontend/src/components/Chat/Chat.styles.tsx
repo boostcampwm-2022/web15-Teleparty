@@ -67,6 +67,7 @@ const ChatText = styled.span<ChatTextProps>`
   color: ${({ isRightSide, theme: { colors } }) =>
     isRightSide ? colors.white : colors.primaryDark};
   word-break: break-all;
+  word-wrap: break-word;
   line-height: 22px;
 
   ${({ variant }) =>
