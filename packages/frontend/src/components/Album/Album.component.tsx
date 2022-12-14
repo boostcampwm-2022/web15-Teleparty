@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtomValue, useSetAtom } from "jotai";
@@ -28,8 +28,12 @@ interface AlbumProps {
   isLastAlbum: boolean;
 }
 
+interface AlbumWithAvatar extends AlbumType {
+  avatarURL: string;
+}
+
 const Album = ({ album, isLastAlbum }: AlbumProps) => {
-  const [renderedAlbum, setRenderedAlbum] = useState<AlbumType[]>([]);
+  const [renderedAlbum, setRenderedAlbum] = useState<AlbumWithAvatar[]>([]);
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
   const players = useAtomValue(playersAtom);
@@ -45,6 +49,12 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
 
   const isHost =
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
+
+  const getAvatarURLById = useCallback(
+    (id: string) =>
+      players.find(({ peerId }) => peerId === id)?.avatarURL ?? "",
+    [players]
+  );
 
   useEffect(() => {
     albumEndRef.current?.scrollIntoView();
@@ -74,14 +84,18 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         }
         return;
       }
-      setRenderedAlbum((prev) => [...prev, albumItem]);
+      const newAlbumItem = {
+        ...albumItem,
+        avatarURL: getAvatarURLById(albumItem.peerId),
+      };
+      setRenderedAlbum((prev) => [...prev, newAlbumItem]);
     }, ALBUM_DELAY);
 
     return () => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album, isLastAlbum, setPlayers]);
+  }, [album, isLastAlbum, setPlayers, getAvatarURLById]);
 
   const onImageLoad = () => {
     albumEndRef.current?.scrollIntoView();
@@ -98,14 +112,15 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
 
   return (
     <AlbumLayout>
-      {renderedAlbum.map(({ peerId, img, keyword }, index) => (
+      {renderedAlbum.map(({ peerId, img, keyword, avatarURL }, index) => (
         <AlbumBubble
           key={index}
           isRightSide={!img}
           username={getUserNameById(peerId) ?? ""}
+          avatarURL={avatarURL}
         >
           {img ? (
-            <img src={img} alt="result" width={460} onLoad={onImageLoad} />
+            <img src={img} alt="result" width={450} onLoad={onImageLoad} />
           ) : (
             keyword
           )}
