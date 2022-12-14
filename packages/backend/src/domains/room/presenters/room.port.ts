@@ -1,5 +1,4 @@
 import { GameData, Room } from "../entity/room.entity";
-import { GAME_MODE } from "../../../types/room";
 import { Player } from "../entity/player.entitiy";
 import {
   GameMode,
