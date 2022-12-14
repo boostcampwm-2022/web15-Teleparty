@@ -163,7 +163,7 @@ export class RoomService implements RoomPort {
       return;
     }
 
-    this.roomEventEmitter.quitPlayer(room.roomId, peerId);
+    this.roomEventEmitter.quitPlayer(room.roomId, peerId, room.host);
     return;
   }
   async gameStart(peerId: string, gameMode: GAME_MODE) {
