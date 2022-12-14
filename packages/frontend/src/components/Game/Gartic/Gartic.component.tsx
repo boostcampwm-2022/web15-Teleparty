@@ -88,7 +88,7 @@ const Gartic = () => {
   };
   const centerElementMap = {
     gameStart: <CanvasLayout />,
-    drawing: <Canvas canvasRef={canvasRef} />,
+    drawing: <Canvas readonly={isDone} canvasRef={canvasRef} />,
     inputKeyword: <GarticDrawImage src={image} alt="draw" width={1036} />,
   };
   const footerElementMap = {
