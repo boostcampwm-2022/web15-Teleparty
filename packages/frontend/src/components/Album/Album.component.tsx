@@ -95,7 +95,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album, isLastAlbum, setPlayers, getAvatarURLById]);
+  }, [album, isLastAlbum, setPlayers]);
 
   const onImageLoad = () => {
     albumEndRef.current?.scrollIntoView();

@@ -10,7 +10,7 @@ const roomAxios = axios.create({
 });
 
 export class ChatPresenter implements ChatOutPort {
-  @errHandler
+  // @errHandler
   async broadcast(
     roomId: string,
     peerId: string,

@@ -15,7 +15,7 @@ const catchMindAxios = axios.create({
 });
 
 export class ClientAPIPresenter implements ClientAPIPort {
-  @errHandler
+  // @errHandler
   async gameStart(roomId: string, data: StartGameData) {
     await catchMindAxios.post("/game-start", {
       roomId,
@@ -26,7 +26,7 @@ export class ClientAPIPresenter implements ClientAPIPort {
     });
   }
 
-  @errHandler
+  // @errHandler
   async drawStart(roomId: string, { id }: Player) {
     await catchMindAxios.post("/draw-start", {
       roomId,
@@ -34,22 +34,22 @@ export class ClientAPIPresenter implements ClientAPIPort {
     });
   }
 
-  @errHandler
+  // @errHandler
   async roundEnd(roomId: string, data: RoundEndData) {
     await catchMindAxios.post("/round-end", { roomId, data });
   }
 
-  @errHandler
+  // @errHandler
   async roundReady(roomId: string, id: string) {
     await catchMindAxios.post("/round-ready", { roomId, data: { peerId: id } });
   }
 
-  @errHandler
+  // @errHandler
   async roundStart(roomId: string, data: CatchMindInfo) {
     await catchMindAxios.post("/round-start", { roomId, data });
   }
 
-  @errHandler
+  // @errHandler
   async playerExit(roomId: string, playerId: string) {
     await catchMindAxios.delete("/quit-game", {
       data: {
