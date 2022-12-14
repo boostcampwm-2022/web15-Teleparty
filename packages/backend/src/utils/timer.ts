@@ -1,5 +1,3 @@
-import { TimerRepositoryDataPort } from "../domains/garticphone/useCases/timer.repository.port";
-
 export class Timer {
   roomId: string;
   timer: NodeJS.Timeout;
@@ -12,7 +10,7 @@ export class Timer {
   }
 }
 
-export class TimerRepository implements TimerRepositoryDataPort {
+export class TimerRepository {
   static timers: Map<string, Timer> = new Map();
 
   save(id: string, timer: Timer) {

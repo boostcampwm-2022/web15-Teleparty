@@ -1,4 +1,4 @@
-import { CatchMind } from "../entity/catchMind";
+import { CatchMind } from "../../entity/catchMind";
 
 export interface CatchMindRepositoryDataPort {
   save: (game: CatchMind) => Promise<string>;

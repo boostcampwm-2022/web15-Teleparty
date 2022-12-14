@@ -1,7 +1,7 @@
-import { GarticphoneToRoom } from "../useCases/garticphoneToRoom.port";
+import { RoomAPI } from "../useCases/ports/roomAPI.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
 
-export class GarticphoneToRoomPresenter implements GarticphoneToRoom {
+export class RoomAPIPresenter implements RoomAPI {
   connecter = DomainConnecter.getInstance();
 
   gameEnded(roomId: string) {

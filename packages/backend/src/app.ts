@@ -4,12 +4,13 @@ import morgan from "morgan";
 import { Server } from "socket.io";
 
 import { SocketEmitter } from "./utils/socketEmitter";
-import { catchMindRouter } from "./domains/catchMind/controllers/catchMindInput.controller";
+import { catchMindRouter } from "./domains/catchMind/controllers/catchMind.controller";
 import { RoomController } from "./domains/room/controllers/room.controller";
 import { garticRouter } from "./domains/garticphone/controllers/garticphone.controller";
 
 import "./domains/chat/controllers/chatIn.controller";
 import "./domains/catchMind/controllers/catchMindAPI.controller";
+import "./domains/garticphone/controllers/roomAPI.controller";
 import "./domains/room/controllers/room.controller";
 import "./domains/room/controllers/SearchRoom.api.controller";
 import { createAdapter } from "@socket.io/cluster-adapter";

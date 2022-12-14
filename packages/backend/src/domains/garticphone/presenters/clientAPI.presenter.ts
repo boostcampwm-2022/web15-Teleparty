@@ -1,15 +1,16 @@
 import { SocketEmitter } from "../../../utils/socketEmitter";
 
 import {
-  GarticphoneEventPort,
+  ClientAPIPort,
   GarticStartData,
   GarticAlbum,
   GarticRoundData,
-} from "../useCases/garticphoneEvent.port";
+} from "../useCases/ports/clientAPI.port";
+import { RoundType } from "../useCases/ports/garticphoneController.port";
 
 const EVENT_NAME = { painting: "draw-start", keyword: "keyword-input-start" };
 
-export class GarticphoneEventPresenter implements GarticphoneEventPort {
+export class ClientAPIPresenter implements ClientAPIPort {
   emitter: SocketEmitter = new SocketEmitter();
 
   gameStart(roomId: string, data: GarticStartData) {
@@ -36,11 +37,7 @@ export class GarticphoneEventPresenter implements GarticphoneEventPort {
     this.emitter.broadcastRoom(roomId, "time-out");
   }
 
-  roundstart(
-    playerId: string,
-    roundType: "painting" | "keyword",
-    data: GarticRoundData
-  ) {
+  roundstart(playerId: string, roundType: RoundType, data: GarticRoundData) {
     this.emitter.emit(playerId, EVENT_NAME[roundType], data);
   }
 

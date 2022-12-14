@@ -42,7 +42,7 @@ export class RoomApiAdapter implements RoomApiPort {
     // game controller gameStart 보냄
 
     // if or switch로 거르기 -> game Mode;
-
+    connecter.call("garticphone/game-start", data);
     if (!data.gameMode) return;
 
     gameModeStartMap[data.gameMode](data);

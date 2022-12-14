@@ -1,14 +1,14 @@
+import { ClientAPIPort } from "../useCases/ports/clientAPI.port";
+
+import { SocketEmitter } from "../../../utils/socketEmitter";
+import { Player } from "../entity/player";
 import {
-  CatchMindEventPort,
   CatchMindInfo,
   RoundEndData,
   StartGameData,
-} from "../useCases/catchMindEvent.port";
+} from "../../../types/catchMind.type";
 
-import { SocketEmitter } from "../../../utils/socketEmitter";
-import { Player } from "../entity/catchMind";
-
-export class CatchMindEventPresenter implements CatchMindEventPort {
+export class ClientAPIPresenter implements ClientAPIPort {
   emitter: SocketEmitter;
   constructor() {
     this.emitter = new SocketEmitter();
@@ -30,7 +30,7 @@ export class CatchMindEventPresenter implements CatchMindEventPort {
     this.emitter.broadcastRoom(roomId, "round-end", data);
   }
 
-  roundReady(roomId: string, { id }: Player) {
+  roundReady(roomId: string, id: string) {
     this.emitter.broadcastRoom(roomId, "round-ready", { peerId: id });
   }
 

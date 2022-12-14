@@ -1,3 +1,3 @@
-export interface CatchMindToRoom {
+export interface RoomAPIPort {
   gameEnded: (roomId: string) => void;
 }

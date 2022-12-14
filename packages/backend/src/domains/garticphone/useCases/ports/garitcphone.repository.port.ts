@@ -1,4 +1,4 @@
-import { Garticphone } from "../entity/garticphone";
+import { Garticphone } from "../../entity/garticphone";
 
 export interface GarticphoneRepositoryDataPort {
   save: (game: Garticphone) => Promise<unknown>;
