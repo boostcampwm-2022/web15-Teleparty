@@ -204,7 +204,11 @@ const CatchMind = () => {
       </GameCenterContentBox>
       <GameContentBox>
         <HidableBox hide={gameState !== "drawing"}>
-          <MoonTimer radius={65} secondTime={roundTime} gameState={gameState} />
+          <MoonTimer
+            radius={65}
+            secondTime={gameState === "drawing" ? roundTime : 0}
+            gameState={gameState}
+          />
         </HidableBox>
         <Chat />
         <HidableBox hide={!(gameState === "inputKeyword" && isMyTurn)}>
