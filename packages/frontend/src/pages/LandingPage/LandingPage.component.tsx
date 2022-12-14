@@ -11,7 +11,9 @@ import AvatarChanger from "../../components/AvatarChanger/AvatarChanger.componen
 import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
+import { GameMode } from "../../constants/game-mode";
 import { avatarUrlAtom } from "../../store/avatarUrl";
+import { gameModeAtom } from "../../store/gameMode";
 import { peerAtom } from "../../store/peer";
 import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
@@ -24,13 +26,14 @@ import type { Player } from "../../types/game";
 interface JoinResponse {
   roomId: string;
   players: Player[];
+  gameMode: GameMode;
 }
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const setRoomId = useSetAtom(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-
+  const setGameMode = useSetAtom(gameModeAtom);
   const setPlayers = useSetAtom(playersAtom);
   const [peer, setPeer] = useAtom(peerAtom);
   const nicknameRef = useRef<HTMLInputElement>(null);
@@ -73,7 +76,8 @@ const LandingPage = () => {
     });
 
     const joinListener = (joinResponse: JoinResponse) => {
-      const { roomId, players } = joinResponse;
+      const { roomId, players, gameMode } = joinResponse;
+      setGameMode(gameMode);
       setRoomId(roomId);
       setPlayers((prev) => [
         ...prev,
