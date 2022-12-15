@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import { Navigate } from "react-router-dom";
 
 import { useAtomValue, useSetAtom } from "jotai";
@@ -57,9 +58,12 @@ const Game = () => {
   return roomId === undefined ? (
     <Navigate to="/" replace />
   ) : (
-    <GameLayout ratio={ratio}>
-      {gameInfo.gameMode === "CatchMind" ? <CatchMind /> : <Gartic />}
-    </GameLayout>
+    <>
+      <Toaster />
+      <GameLayout ratio={ratio}>
+        {gameInfo.gameMode === "CatchMind" ? <CatchMind /> : <Gartic />}
+      </GameLayout>
+    </>
   );
 };
 

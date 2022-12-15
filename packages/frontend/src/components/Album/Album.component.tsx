@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAtomValue, useSetAtom } from "jotai";
@@ -11,6 +11,9 @@ import {
 } from "./Album.styles";
 import AlbumBubble from "./AlbumBubble.component";
 
+import { CANVAS_SIZE } from "../../constants/canvas";
+import useCreateGIF from "../../hooks/useCreateGIF";
+import useGetUsername from "../../hooks/useUsername";
 import { playersAtom } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
@@ -25,21 +28,33 @@ interface AlbumProps {
   isLastAlbum: boolean;
 }
 
+interface AlbumWithAvatar extends AlbumType {
+  avatarURL: string;
+}
+
 const Album = ({ album, isLastAlbum }: AlbumProps) => {
-  const [renderedAlbum, setRenderedAlbum] = useState<AlbumType[]>([]);
+  const [renderedAlbum, setRenderedAlbum] = useState<AlbumWithAvatar[]>([]);
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
   const players = useAtomValue(playersAtom);
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
   const setPlayers = useSetAtom(playersAtom);
-
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const getUserNameById = useGetUsername();
+  const onDownloadClick = useCreateGIF({
+    album: renderedAlbum,
+    ref: canvasRef,
+  });
 
   const isHost =
     socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
+
+  const getAvatarURLById = useCallback(
+    (id: string) =>
+      players.find(({ peerId }) => peerId === id)?.avatarURL ?? "",
+    [players]
+  );
 
   useEffect(() => {
     albumEndRef.current?.scrollIntoView();
@@ -69,7 +84,11 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         }
         return;
       }
-      setRenderedAlbum((prev) => [...prev, albumItem]);
+      const newAlbumItem = {
+        ...albumItem,
+        avatarURL: getAvatarURLById(albumItem.peerId),
+      };
+      setRenderedAlbum((prev) => [...prev, newAlbumItem]);
     }, ALBUM_DELAY);
 
     return () => {
@@ -93,14 +112,15 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
 
   return (
     <AlbumLayout>
-      {renderedAlbum.map(({ peerId, img, keyword }, index) => (
+      {renderedAlbum.map(({ peerId, img, keyword, avatarURL }, index) => (
         <AlbumBubble
           key={index}
           isRightSide={!img}
           username={getUserNameById(peerId) ?? ""}
+          avatarURL={avatarURL}
         >
           {img ? (
-            <img src={img} alt="result" width={460} onLoad={onImageLoad} />
+            <img src={img} alt="result" width={450} onLoad={onImageLoad} />
           ) : (
             keyword
           )}
@@ -112,7 +132,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
             {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
           </AlbumNextText>
           <AlbumNextButtonBox>
-            <Button variant="icon">
+            <Button variant="icon" onClick={onDownloadClick}>
               <Icon icon="download" size={36} />
             </Button>
             {isLastAlbum ? (
@@ -129,6 +149,12 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
           </AlbumNextButtonBox>
         </AlbumNextLayout>
       )}
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_SIZE.WIDTH}
+        height={CANVAS_SIZE.HEIGHT}
+        hidden
+      />
       <div ref={albumEndRef}></div>
     </AlbumLayout>
   );

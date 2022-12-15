@@ -9,8 +9,8 @@ type GameModeStringMap = {
 };
 
 export const GAME_MODE_TITLE_MAP: GameModeStringMap = {
-  CatchMind: "캐치마인드",
-  Garticphone: "갈틱폰",
+  CatchMind: "퀴즈 모드",
+  Garticphone: "릴레이 모드",
 };
 
 export const GAME_MODE_DESCRIPTION_MAP: GameModeStringMap = {

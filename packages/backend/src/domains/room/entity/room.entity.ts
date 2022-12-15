@@ -1,6 +1,5 @@
+import { GAME_MODE } from "../../../types/room";
 import { Player } from "./player.entitiy";
-
-export type GAME_MODE = "CatchMind" | "Garticphone" | "";
 
 export interface GarticGameData {
   roomId: string;
@@ -54,7 +53,7 @@ export class Room {
     this.players = data.players || [];
     this.host = data.host || "";
     this.state = data.state !== undefined ? data.state : true; // 방 입장 여부
-    this.gameMode = data.gameMode || "";
+    this.gameMode = data.gameMode || "CatchMind"; // 방 생성시 기본 모드 캐치마인드
     this.totalRound = data.totalRound || 10;
     this.catchMindRoundTime = data.catchMindRoundTime || 60;
     this.garticdrawTime = data.garticdrawTime || 90;
@@ -63,6 +62,50 @@ export class Room {
     this.maxPlayer = data.maxPlayer || 10;
   }
 
+  getPlayerId() {
+    return this.players.map((player) => player.peerId);
+  }
+
+  addPlayer(player: Player) {
+    this.players.push(player);
+  }
+
+  leavePlayer(peerId: string) {
+    if (this.players.length === 1) {
+      return;
+    }
+
+    this.players = this.players.filter((player) => player.peerId !== peerId);
+
+    if (this.host === peerId) {
+      this.changeHost();
+    }
+  }
+
+  changeHost() {
+    const newHost = this.players.find((player) => player.peerId !== this.host);
+    if (!newHost) {
+      return;
+    }
+
+    this.host = newHost.peerId;
+  }
+
+  changeGameMode(gameMode: GAME_MODE) {
+    this.gameMode = gameMode;
+  }
+
+  changeState(state: boolean) {
+    this.state = state;
+  }
+
+  checkMaxPlayer() {
+    return this.players.length === this.maxPlayer;
+  }
+
+  checkHost(peerId: string) {
+    return this.host === peerId;
+  }
   get garticGameData() {
     return {
       roomId: this.roomId,

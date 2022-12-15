@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid/non-secure";
+
 import { Player } from "../entity/player.entitiy";
 import { RoomPort } from "../controllers/room.port";
 import { RoomApiAdapter } from "../presenters/room.api.adapter";
@@ -8,8 +10,8 @@ import {
   RoomEvent,
 } from "../presenters/room.port";
 import { RoomRepository } from "../presenters/room.repository";
-import { GAME_MODE, Room } from "../entity/room.entity";
-import { randomUUID } from "crypto";
+import { Room } from "../entity/room.entity";
+import { GAME_MODE } from "../../../types/room";
 
 export class RoomService implements RoomPort {
   roomRepository: RoomRepositoryDataPort;
@@ -25,10 +27,10 @@ export class RoomService implements RoomPort {
   async createPlayer(data: {
     peerId: string;
     userName: string;
-    avata: string;
+    avatar: string;
     roomId: string | null;
   }) {
-    const { peerId, userName, avata, roomId } = data;
+    const { peerId, userName, avatar, roomId } = data;
 
     let room: Room | undefined = undefined;
 
@@ -41,26 +43,25 @@ export class RoomService implements RoomPort {
       }
       this.roomRepository.release(roomId);
 
-      if (room.players.length === room.maxPlayer) {
+      if (room.checkMaxPlayer()) {
         // 가득 참
         this.sendError(peerId, "이미 방이 가득 찼습니다.");
-        return undefined;
+        return;
       }
 
       if (!room.state) {
         // 게임중
         this.sendError(peerId, "이미 게임이 시작한 방입니다.");
-        return undefined;
+        return;
       }
     } else {
       room = await this.createRoom();
-      // console.log(room);
     }
 
     const player = this.roomRepository.createUser({
       peerId,
       userName,
-      avata,
+      avatar,
       roomId: room.roomId,
     });
 
@@ -82,7 +83,7 @@ export class RoomService implements RoomPort {
       return;
     }
 
-    room.players.push(player);
+    room.addPlayer(player);
 
     if (!room.host) {
       // 내가 방에 처음 들어갔을 경우(내가 방을 만든 경우)
@@ -92,7 +93,7 @@ export class RoomService implements RoomPort {
         {
           peerId: player.peerId,
           userName: player.userName,
-          avataURL: player.avata,
+          avatarURL: player.avatar,
           isHost: player.peerId === room.host,
           isMicOn: player.isMicOn,
         },
@@ -100,19 +101,18 @@ export class RoomService implements RoomPort {
       );
     }
 
-    // console.log(room.players);
-
     console.log("join", room.roomId, player.peerId, room.players.length);
     this.roomRepository.save(room.roomId, room);
 
     this.roomEventEmitter.join(
       {
         roomId: room.roomId,
+        gameMode: room.gameMode,
         players: room.players.map((roomPlayer) => {
           return {
             peerId: roomPlayer.peerId,
             userName: roomPlayer.userName,
-            avataURL: roomPlayer.avata,
+            avatarURL: roomPlayer.avatar,
             isHost: roomPlayer.peerId === room.host,
             isMicOn: roomPlayer.isMicOn,
           };
@@ -144,34 +144,26 @@ export class RoomService implements RoomPort {
       this.roomApiAdapter.playerQuit(room.gameMode, room.roomId, peerId);
     }
 
+    room.leavePlayer(player.peerId);
+
+    // 여전히 나간 사람이 방장일 때
+    if (room.host === player.peerId) {
+      this.sendError(peerId, "방장변경에러, 방장 변경안됨");
+      this.roomRepository.release(player.roomId);
+      return;
+    }
+
     this.roomRepository.deletePlayer(peerId, room);
     this.roomRepository.release(player.roomId);
 
-    // 나밖에 없을 때
+    // 나밖에 없었을 때
     if (room.players.length === 0) {
       this.roomRepository.deleteByRoomId(room.roomId);
       console.log("나밖에 없어서 방 삭제");
       return;
     }
 
-    // 내가 방장일 때
-    if (room.host === player.peerId) {
-      const newHost = room.players.find((player) => {
-        return player.peerId !== room.host;
-      });
-
-      // console.log("새로운방장", newHost);
-
-      // 내가 방장인데 나밖에 없을 때? -> 위에서 걸러지긴 하는데..
-      if (!newHost) {
-        this.sendError(peerId, "leave Error, 방에 혼자 있는데 방장임");
-        return;
-      }
-
-      room.host = newHost.peerId;
-    }
-
-    this.roomEventEmitter.quitPlayer(room.roomId, peerId);
+    this.roomEventEmitter.quitPlayer(room.roomId, peerId, room.host);
     return;
   }
   async gameStart(peerId: string, gameMode: GAME_MODE) {
@@ -183,8 +175,8 @@ export class RoomService implements RoomPort {
     }
 
     if (room.state) {
-      room.gameMode = gameMode;
-      room.state = false;
+      room.changeGameMode(gameMode);
+      room.changeState(false);
 
       this.roomRepository.save(room.roomId, room);
       this.roomRepository.release(room.roomId);
@@ -202,7 +194,7 @@ export class RoomService implements RoomPort {
   async chooseMode(peerId: string, gameMode: GAME_MODE) {
     const room = await this.checkHostByPeerId(peerId);
     if (room) {
-      room.gameMode = gameMode;
+      room.changeGameMode(gameMode);
       this.roomRepository.save(room.roomId, room);
 
       // 방에 있는 모든 사람에게 게임 모드 알려주기
@@ -223,13 +215,13 @@ export class RoomService implements RoomPort {
     const player = await this.roomRepository.findPlayerByPeerId(peerId);
     if (!player) {
       this.sendError(peerId, "방장체크 중 Error, 플레이어 정보 없음");
-      return undefined;
+      return;
     }
 
     const room = await this.roomRepository.findOneByRoomId(player.roomId);
 
     if (room) {
-      if (room.host === peerId) {
+      if (room.checkHost(peerId)) {
         // 호스트만 가능
         return room;
       }
@@ -238,12 +230,11 @@ export class RoomService implements RoomPort {
     this.sendError(peerId, "방장체크 중 Error, 방장 아님");
 
     this.roomRepository.release(player.roomId);
-    return undefined;
+    return;
   }
 
   async chatting(peerId: string, message: string) {
     const room = await this.roomRepository.findOneByPeerId(peerId);
-    // console.log("채팅하는 방", room);
 
     if (!room) {
       this.sendError(peerId, "chatting Error, 방 없음");
@@ -270,12 +261,7 @@ export class RoomService implements RoomPort {
   }
 
   async createUUID() {
-    const uuid = randomUUID();
-
-    // while (await this.roomRepository.findOneByRoomId(uuid)) {
-    //   uuid = randomUUID();
-    //   // console.log("uuid 무한");
-    // }
+    const uuid = nanoid();
 
     return uuid;
   }
@@ -283,7 +269,7 @@ export class RoomService implements RoomPort {
   async endGame(roomId: string) {
     const room = await this.roomRepository.findOneByRoomId(roomId);
     if (room) {
-      room.state = true;
+      room.changeState(true);
       this.roomRepository.save(room.roomId, room);
     }
     this.roomRepository.release(roomId);

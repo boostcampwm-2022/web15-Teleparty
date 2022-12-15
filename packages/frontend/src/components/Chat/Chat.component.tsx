@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 import { useAtom, useAtomValue } from "jotai";
 
@@ -23,10 +23,15 @@ const Chat = ({ variant }: ChatProps) => {
   const socket = useAtomValue(socketAtom);
   const players = useAtomValue(playersAtom);
 
-  const getUserNameById = (id: string) => {
-    return players.find(({ peerId }) => peerId === id)?.userName;
-  };
-
+  const getUserNameById = useCallback(
+    (id: string) => players.find(({ peerId }) => peerId === id)?.userName ?? "",
+    [players]
+  );
+  const getAvatarURLById = useCallback(
+    (id: string) =>
+      players.find(({ peerId }) => peerId === id)?.avatarURL ?? "",
+    [players]
+  );
   const onChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!chatInputRef.current || !chatInputRef.current.value) return;
@@ -36,6 +41,8 @@ const Chat = ({ variant }: ChatProps) => {
     const newChat = {
       id: socket.id,
       message: chatInputRef.current.value,
+      username: getUserNameById(socket.id),
+      avatarURL: getAvatarURLById(socket.id),
     };
 
     // socket emit
@@ -47,13 +54,19 @@ const Chat = ({ variant }: ChatProps) => {
 
   useEffect(() => {
     const chatListener = (newChat: ChatData) => {
-      setChats((prev) => [...prev, newChat]);
+      const { id } = newChat;
+      const chat = {
+        ...newChat,
+        username: getUserNameById(id),
+        avatarURL: getAvatarURLById(id),
+      };
+      setChats((prev) => [...prev, chat]);
     };
     socket.on("chatting", chatListener);
     return () => {
       socket.off("chatting", chatListener);
     };
-  }, [socket, setChats]);
+  }, [socket, setChats, getUserNameById, getAvatarURLById]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView();
@@ -62,13 +75,14 @@ const Chat = ({ variant }: ChatProps) => {
   return (
     <div>
       <ChatLayout variant={variant}>
-        {chats.map(({ id, message }, index, messages) => (
+        {chats.map(({ id, message, avatarURL, username }, index, messages) => (
           <ChatBubble
             key={index}
             variant={variant}
             isRightSide={id === socket.id}
             isFirst={messages[index - 1]?.id !== id}
-            username={getUserNameById(id)}
+            username={username}
+            avatarURL={avatarURL}
           >
             {message}
           </ChatBubble>

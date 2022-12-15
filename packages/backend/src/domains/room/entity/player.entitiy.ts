@@ -1,20 +1,20 @@
 export class Player {
   peerId: string;
   userName: string;
-  avata: string;
+  avatar: string;
   isMicOn: boolean;
   roomId: string;
 
   constructor(data: {
     peerId: string;
     userName: string;
-    avata: string;
+    avatar: string;
     roomId: string;
   }) {
-    const { peerId, userName, avata, roomId } = data;
+    const { peerId, userName, avatar, roomId } = data;
     this.peerId = peerId;
     this.userName = userName;
-    this.avata = avata;
+    this.avatar = avatar;
     this.isMicOn = false;
     this.roomId = roomId;
   }
