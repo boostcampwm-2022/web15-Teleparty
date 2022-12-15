@@ -1,11 +1,11 @@
 import { Player } from "../entity/player.entitiy";
-import { GAME_MODE } from "../entity/room.entity";
+import { GAME_MODE } from "../../../types/room";
 
 export interface RoomPort {
   createPlayer: (data: {
     peerId: string;
     userName: string;
-    avata: string;
+    avatar: string;
     roomId: string | null;
   }) => Promise<Player | undefined>;
   join: (player: Player) => void;

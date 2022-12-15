@@ -16,8 +16,8 @@ import { Button } from "../../components/common/Button";
 import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
-import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
+import { gameModeAtom } from "../../store/gameMode";
 import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
@@ -31,7 +31,7 @@ const Lobby = () => {
   const [players, setPlayers] = useAtom(playersAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
-  const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  const [gameMode, setGameMode] = useAtom(gameModeAtom);
   const ratio = useAtomValue(ratioAtom);
 
   const onInviteClick = () => {
@@ -71,8 +71,23 @@ const Lobby = () => {
         { ...player, isMicOn: true, isAudioDetected: false },
       ]);
     };
-    const playerQuitListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => prev.filter((player) => player.peerId !== peerId));
+    const playerQuitListener = ({
+      peerId,
+      newHost,
+    }: {
+      peerId: string;
+      newHost: string;
+    }) => {
+      setPlayers((prev) => {
+        const newPlayers = prev.filter((player) => player.peerId !== peerId);
+        const newHostPlayer = newPlayers.find(
+          ({ peerId }) => peerId === newHost
+        );
+        if (!newHostPlayer) return prev;
+        newHostPlayer.isHost = true;
+
+        return newPlayers;
+      });
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
       setPlayers((prev) => {

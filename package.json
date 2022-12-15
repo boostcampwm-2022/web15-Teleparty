@@ -21,6 +21,7 @@
   "workspaces": [
     "packages/frontend",
     "packages/backend",
+    "packages/socketServer",
     "packages/shared"
   ],
   "devDependencies": {

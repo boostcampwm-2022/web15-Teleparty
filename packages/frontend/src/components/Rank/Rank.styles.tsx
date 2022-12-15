@@ -34,7 +34,7 @@ const RankBox = styled.div`
   gap: 0.5rem;
 `;
 
-const RankNumberBox = styled.div`
+const RankNumberBox = styled.div<{ rank: number }>`
   position: absolute;
   left: 0;
   margin-left: -1.75rem;
@@ -48,16 +48,21 @@ const RankNumberBox = styled.div`
   border-radius: 50%;
   padding: 0.5rem;
   border: 2px solid ${({ theme: { colors } }) => colors.white};
-  background-color: ${({ theme: { colors }, children }) =>
-    children === 1
+  background-color: ${({ theme: { colors }, rank }) =>
+    rank === 1
       ? colors.gold
-      : children === 2
+      : rank === 2
       ? colors.silver
-      : children === 3
+      : rank === 3
       ? colors.bronze
       : colors.primaryLight};
-  font-family: "PoetsenOne", sans-serif;
   color: ${({ theme: { colors } }) => colors.white};
+`;
+
+const RankNumberText = styled.span`
+  font-family: "Dongle", sans-serif;
+  transform: translateY(3px);
+  scale: 2;
 `;
 
 const RankPlayerText = styled.span`
@@ -75,6 +80,7 @@ export {
   RankRow,
   RankBox,
   RankNumberBox,
+  RankNumberText,
   RankScoreText,
   RankPlayerText,
 };
