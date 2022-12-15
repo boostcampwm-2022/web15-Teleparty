@@ -15,7 +15,7 @@ import {
   playersAtom,
   getPlayerNameById,
   isPlayerHost,
-  updatePlayersWithPartialPlayerInfoAtom,
+  setPlayersReadyAtom,
 } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
@@ -35,9 +35,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
   const players = useAtomValue(playersAtom);
-  const updatePlayersWithPartialPlayerInfo = useSetAtom(
-    updatePlayersWithPartialPlayerInfoAtom
-  );
+  const setPlayersReady = useSetAtom(setPlayersReadyAtom);
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
 
@@ -61,10 +59,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         clearInterval(interval);
         setShowNext(true);
         if (isLastAlbum) {
-          updatePlayersWithPartialPlayerInfo({
-            isReady: true,
-            isCurrentTurn: false,
-          });
+          setPlayersReady(false);
         }
         return;
       }
@@ -75,7 +70,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album, isLastAlbum, updatePlayersWithPartialPlayerInfo]);
+  }, [album, isLastAlbum, setPlayersReady]);
 
   const onImageLoad = () => {
     albumEndRef.current?.scrollIntoView();
