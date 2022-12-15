@@ -1,6 +1,7 @@
 import { RoomApiPort } from "./room.port";
 import { DomainConnecter } from "../../../utils/domainConnecter";
-import { GameData, GAME_MODE } from "../entity/room.entity";
+import { GAME_MODE } from "../../../types/room";
+import { GameData } from "../entity/room.entity";
 
 interface StartData {
   roomId: string;
@@ -41,7 +42,6 @@ export class RoomApiAdapter implements RoomApiPort {
     // game controller gameStart 보냄
 
     // if or switch로 거르기 -> game Mode;
-
     if (!data.gameMode) return;
 
     gameModeStartMap[data.gameMode](data);

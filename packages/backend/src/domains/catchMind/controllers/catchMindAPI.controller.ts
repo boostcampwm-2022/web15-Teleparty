@@ -1,18 +1,11 @@
-import { CatchMindInputPort } from "../useCases/CatchMindInput.port";
-import { CatchMindService } from "../useCases/catchMind.service";
+import { CatchMindControllerPort } from "../useCases/ports/CatchMind.controller.port";
+import { CatchMindUseCase } from "../useCases/catchMind.useCase";
 
 import { DomainConnecter } from "../../../utils/domainConnecter";
-
-type StartData = {
-  goalScore: number;
-  players: string[];
-  roundTime: number;
-  roomId: string;
-  totalRound: number;
-};
+import { StartData } from "../../../types/catchMind.type";
 
 const connecter = DomainConnecter.getInstance();
-const gameService: CatchMindInputPort = new CatchMindService();
+const gameService: CatchMindControllerPort = new CatchMindUseCase();
 
 connecter.register(
   "catchMind/game-start",

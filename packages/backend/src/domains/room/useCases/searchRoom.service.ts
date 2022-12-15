@@ -11,7 +11,7 @@ export class SerchRoomApiService implements SearchRoomApiPort {
     if (!room) return;
 
     this.repository.release(room.roomId);
-    return { ...room };
+    return room;
   }
 
   // getRoomByRoomId(roomId: string) {

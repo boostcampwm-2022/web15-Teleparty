@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Navigate, useNavigate } from "react-router";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import {
   LobbyButtonBox,
@@ -18,6 +18,7 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
+import { gameModeAtom } from "../../store/gameMode";
 import {
   playersAtom,
   isPlayerHost,
@@ -43,7 +44,7 @@ const Lobby = () => {
   const quitPlayerFromGame = useSetAtom(quitPlayerFromGameAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
-  const [gameMode, setGameMode] = useState<GameMode>(GAME_MODE_LIST[0]);
+  const [gameMode, setGameMode] = useAtom(gameModeAtom);
   const ratio = useAtomValue(ratioAtom);
 
   const onInviteClick = () => {
@@ -80,6 +81,7 @@ const Lobby = () => {
     };
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
       removePlayer(peerId);
+      // TODO: 방장 위임 로직
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
       quitPlayerFromGame(peerId);

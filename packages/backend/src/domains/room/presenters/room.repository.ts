@@ -1,8 +1,9 @@
-import { GAME_MODE, Room } from "../entity/room.entity";
-import { NewPlayer, RoomRepositoryDataPort } from "./room.port";
+import { Room } from "../entity/room.entity";
+import { RoomRepositoryDataPort } from "./room.port";
 import { redisCli } from "../../../config/redis";
 import { Player } from "../entity/player.entitiy";
 import { RedisLock } from "../../../utils/redisLock";
+import { NewPlayer } from "../../../types/room";
 
 export class RoomRepository
   extends RedisLock
@@ -38,7 +39,6 @@ export class RoomRepository
     const data = await redisCli.get(makeHashKeyByRoomId(roomId));
 
     if (!data) return;
-    // console.log(data);
     const room = new Room(JSON.parse(data));
     return room;
   }
@@ -46,13 +46,13 @@ export class RoomRepository
   async findOneByPeerId(peerId: string) {
     const player = await this.findPlayerByPeerId(peerId);
     if (!player) {
-      return undefined;
+      return;
     }
     await this.tryLock(makeLockKeyByRoomId(player.roomId));
     const roomJson = await redisCli.get(makeHashKeyByRoomId(player.roomId));
     if (!roomJson) {
       this.release(player.roomId);
-      return undefined;
+      return;
     }
 
     const room = new Room(JSON.parse(roomJson));
@@ -64,25 +64,19 @@ export class RoomRepository
     const playerJson = await redisCli.get(makeHashKeyByPeerId(peerId));
 
     if (!playerJson) {
-      return undefined;
+      return;
     }
 
     return new Player(JSON.parse(playerJson));
   }
 
   async deleteByRoomId(roomId: string) {
-    // console.log("delete roomId", roomId);
-
     if (await redisCli.exists(makeHashKeyByRoomId(roomId)))
       redisCli.del(makeHashKeyByRoomId(roomId));
   }
 
   deletePlayer(peerId: string, room: Room) {
     redisCli.del(makeHashKeyByPeerId(peerId));
-
-    room.players = room.players.filter((player) => {
-      return player.peerId !== peerId;
-    });
 
     this.save(room.roomId, room);
 
