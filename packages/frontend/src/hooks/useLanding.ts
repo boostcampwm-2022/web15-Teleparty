@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAtomValue, useSetAtom } from "jotai";
 import Peer from "peerjs";
 
+import { gameModeAtom } from "../store/gameMode";
 import { peerAtom } from "../store/peer";
 import { playersAtom } from "../store/players";
 import { roomIdAtom } from "../store/roomId";
@@ -11,9 +12,12 @@ import { socketAtom } from "../store/socket";
 import { Player } from "../types/game";
 import { createPeerId } from "../utils/peer";
 
+import type { GameMode } from "../constants/game-mode";
+
 interface JoinResponse {
   roomId: string;
   players: Player[];
+  gameMode: GameMode;
 }
 
 const useLanding = () => {
@@ -22,6 +26,7 @@ const useLanding = () => {
   const setPeer = useSetAtom(peerAtom);
   const socket = useAtomValue(socketAtom);
   const setRoomId = useSetAtom(roomIdAtom);
+  const setGameMode = useSetAtom(gameModeAtom);
 
   useEffect(() => {
     const setNewPeer = () => {
@@ -41,7 +46,8 @@ const useLanding = () => {
 
   useEffect(() => {
     const joinListener = (joinResponse: JoinResponse) => {
-      const { roomId, players } = joinResponse;
+      const { roomId, players, gameMode } = joinResponse;
+      setGameMode(gameMode);
       setRoomId(roomId);
       setPlayers((prev) => [
         ...prev,
@@ -59,7 +65,7 @@ const useLanding = () => {
     return () => {
       socket.off("join", joinListener);
     };
-  }, [socket, navigate, setPlayers, setRoomId]);
+  }, [socket, navigate, setPlayers, setRoomId, setGameMode]);
 };
 
 export default useLanding;
