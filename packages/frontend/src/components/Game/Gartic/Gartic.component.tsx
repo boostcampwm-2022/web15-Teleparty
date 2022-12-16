@@ -10,7 +10,7 @@ import {
 
 import useGartic from "../../../hooks/useGartic";
 import { gameInfoAtom } from "../../../store/game";
-import { playersAtom } from "../../../store/players";
+import { playersAtom, isPlayerReady } from "../../../store/players";
 import { socketAtom } from "../../../store/socket";
 import Album from "../../Album/Album.component";
 import Canvas from "../../Canvas/Canvas.component";
@@ -42,8 +42,7 @@ const Gartic = () => {
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
   const players = useAtomValue(playersAtom);
-  const isDone =
-    players.find((player) => player.peerId === socket.id)?.isReady ?? false;
+  const isDone = isPlayerReady(players, socket.id);
   const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);

@@ -6,7 +6,7 @@ import { ChatInputForm, ChatLayout } from "./Chat.styles";
 import ChatBubble from "./ChatBubble.component";
 
 import { chatAtom, ChatData } from "../../store/chat";
-import { playersAtom } from "../../store/players";
+import { playersAtom, getPlayerNameById } from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
@@ -32,6 +32,7 @@ const Chat = ({ variant }: ChatProps) => {
       players.find(({ peerId }) => peerId === id)?.avatarURL ?? "",
     [players]
   );
+
   const onChatSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!chatInputRef.current || !chatInputRef.current.value) return;

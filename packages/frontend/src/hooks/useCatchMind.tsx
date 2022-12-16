@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 
 import { useSetAtom } from "jotai";
 
-import { playersAtom } from "../store/players";
+import {
+  initCatchMindGamePlayersAtom,
+  setPlayerCurrentTurnAtom,
+  setPlayerReadyAtom,
+  updatePlayersScoreAtom,
+} from "../store/players";
 
 import type { CatchMindRoundInfo, CatchMindRoundEndInfo } from "../types/game";
 import type { Socket } from "socket.io-client";
@@ -17,7 +22,10 @@ export const useCatchMind = (
   const [roundInfo, setRoundInfo] =
     useState<CatchMindRoundInfo>(initialRoundInfo);
   const [gameState, setGameState] = useState<GameState>("inputKeyword");
-  const setPlayers = useSetAtom(playersAtom);
+  const initCatchMindGamePlayers = useSetAtom(initCatchMindGamePlayersAtom);
+  const setPlayerCurrentTurn = useSetAtom(setPlayerCurrentTurnAtom);
+  const updatePlayersScore = useSetAtom(updatePlayersScoreAtom);
+  const setPlayerReady = useSetAtom(setPlayerReadyAtom);
   const [roundEndInfo, setRoundEndInfo] =
     useState<CatchMindRoundEndInfo | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(
@@ -25,16 +33,8 @@ export const useCatchMind = (
   );
 
   useEffect(() => {
-    setPlayers((prev) =>
-      prev.map((player) => ({
-        ...player,
-        isReady: false,
-        isCurrentTurn: player.peerId === initialRoundInfo.turnPlayer,
-        score: 0,
-        isGameQuit: false,
-      }))
-    );
-  }, [setPlayers, initialRoundInfo]);
+    initCatchMindGamePlayers(initialRoundInfo.turnPlayer);
+  }, [initCatchMindGamePlayers, initialRoundInfo]);
 
   // socket for game logic
   useEffect(() => {
@@ -43,13 +43,7 @@ export const useCatchMind = (
       setGameState("inputKeyword");
       setRoundInfo(roundInfo);
       setIsMyTurn(socket.id === roundInfo.turnPlayer);
-      setPlayers((prev) =>
-        prev.map((player) => ({
-          ...player,
-          isReady: false,
-          isCurrentTurn: player.peerId === turnPlayer,
-        }))
-      );
+      setPlayerCurrentTurn(turnPlayer);
     };
     const drawStartListener = () => {
       setGameState("drawing");
@@ -58,21 +52,10 @@ export const useCatchMind = (
       const { playerScoreMap, isLastRound } = roundEndInfo;
       setGameState(isLastRound ? "gameEnd" : "roundEnd");
       setRoundEndInfo(roundEndInfo);
-      setPlayers((prev) =>
-        prev.map((player) => ({
-          ...player,
-          score: playerScoreMap[player.peerId],
-        }))
-      );
+      updatePlayersScore(playerScoreMap);
     };
     const roundReadyListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayers = [...prev];
-        const player = newPlayers.find((player) => player.peerId === peerId);
-        if (!player) return prev;
-        player.isReady = !player.isReady;
-        return newPlayers;
-      });
+      setPlayerReady({ playerId: peerId, isReady: true });
     };
     socket.on("round-start", roundStartListener);
     socket.on("draw-start", drawStartListener);
@@ -84,7 +67,7 @@ export const useCatchMind = (
       socket.off("round-end", roundEndListener);
       socket.off("round-ready", roundReadyListener);
     };
-  }, [socket, setPlayers]);
+  }, [socket, setPlayerCurrentTurn, setPlayerReady, updatePlayersScore]);
 
   return {
     roundInfo,

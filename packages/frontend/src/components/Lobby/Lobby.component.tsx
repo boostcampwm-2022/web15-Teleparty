@@ -18,7 +18,15 @@ import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
 import { gameInfoAtom } from "../../store/game";
 import { gameModeAtom } from "../../store/gameMode";
-import { playersAtom } from "../../store/players";
+import {
+  playersAtom,
+  isPlayerHost,
+  isAllPlayerQuitFromGame,
+  removePlayerAtom,
+  quitPlayerFromGameAtom,
+  addPlayerAtom,
+  removePlayersGameDataAtom,
+} from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -28,11 +36,16 @@ import type { GameInfo, Player } from "../../types/game";
 const Lobby = () => {
   const roomId = useAtomValue(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const [players, setPlayers] = useAtom(playersAtom);
+  const players = useAtomValue(playersAtom);
+  const removePlayersGameData = useSetAtom(removePlayersGameDataAtom);
+  const addPlayer = useSetAtom(addPlayerAtom);
+  const removePlayer = useSetAtom(removePlayerAtom);
+  const quitPlayerFromGame = useSetAtom(quitPlayerFromGameAtom);
   const setGameInfo = useSetAtom(gameInfoAtom);
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useAtom(gameModeAtom);
   const ratio = useAtomValue(ratioAtom);
+  const setPlayers = useSetAtom(playersAtom);
 
   const onInviteClick = () => {
     toast.dismiss();
@@ -41,12 +54,10 @@ const Lobby = () => {
     toast.success("초대 링크가 복사되었습니다.");
   };
 
-  const isHost =
-    socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
-
+  const isHost = isPlayerHost(players, socket.id);
   const onGameStartClick = () => {
     if (!isHost) return;
-    if (players.some((player) => player.isGameQuit)) {
+    if (!isAllPlayerQuitFromGame(players)) {
       toast.dismiss();
       toast.error("모든 플레이어가 방에 입장해야 합니다!");
     }
@@ -66,10 +77,7 @@ const Lobby = () => {
 
   useEffect(() => {
     const newJoinListener = (player: Player) => {
-      setPlayers((prev) => [
-        ...prev,
-        { ...player, isMicOn: true, isAudioDetected: false },
-      ]);
+      addPlayer(player);
     };
     const playerQuitListener = ({
       peerId,
@@ -90,17 +98,7 @@ const Lobby = () => {
       });
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayers = [...prev];
-        const quitGamePlayer = newPlayers.find(
-          (player) => player.peerId === peerId
-        );
-        if (!quitGamePlayer) return prev;
-        quitGamePlayer.isGameQuit = false;
-        delete quitGamePlayer.isCurrentTurn;
-        delete quitGamePlayer.isReady;
-        return newPlayers;
-      });
+      quitPlayerFromGame(peerId);
     };
     socket.on("new-join", newJoinListener);
     socket.on("player-quit", playerQuitListener);
@@ -110,21 +108,11 @@ const Lobby = () => {
       socket.off("player-quit", playerQuitListener);
       socket.off("quit-game", quitGameListener);
     };
-  }, [socket, setPlayers]);
+  }, [socket, addPlayer, quitPlayerFromGame, removePlayer, setPlayers]);
 
   useEffect(() => {
-    setPlayers((prev) =>
-      prev.map((player) => {
-        delete player.isReady;
-        delete player.isCurrentTurn;
-        delete player.score;
-        if (player.isGameQuit !== undefined) {
-          player.isGameQuit = !player.isGameQuit;
-        }
-        return player;
-      })
-    );
-  }, [setPlayers]);
+    removePlayersGameData();
+  }, [removePlayersGameData]);
 
   return roomId === undefined ? (
     <Navigate to="/" replace />

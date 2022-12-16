@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 
 import {
   AlbumLayout,
@@ -14,7 +14,12 @@ import AlbumBubble from "./AlbumBubble.component";
 import { CANVAS_SIZE } from "../../constants/canvas";
 import useCreateGIF from "../../hooks/useCreateGIF";
 import useGetUsername from "../../hooks/useUsername";
-import { playersAtom } from "../../store/players";
+import {
+  playersAtom,
+  getPlayerNameById,
+  isPlayerHost,
+  setPlayersReadyAtom,
+} from "../../store/players";
 import { socketAtom } from "../../store/socket";
 import { Button } from "../common/Button";
 import Icon from "../Icon/Icon";
@@ -37,8 +42,10 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
   const [showNext, setShowNext] = useState(false);
   const albumEndRef = useRef<HTMLDivElement>(null);
   const players = useAtomValue(playersAtom);
+  const setPlayersReady = useSetAtom(setPlayersReadyAtom);
   const socket = useAtomValue(socketAtom);
   const navigate = useNavigate();
+
   const setPlayers = useSetAtom(playersAtom);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const getUserNameById = useGetUsername();
@@ -47,8 +54,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
     ref: canvasRef,
   });
 
-  const isHost =
-    socket.id && players.find(({ isHost }) => isHost)?.peerId === socket.id;
+  const isHost = isPlayerHost(players, socket.id);
 
   const getAvatarURLById = useCallback(
     (id: string) =>
@@ -74,13 +80,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
         clearInterval(interval);
         setShowNext(true);
         if (isLastAlbum) {
-          setPlayers((prev) =>
-            prev.map((player) => ({
-              ...player,
-              isReady: true,
-              isCurrentTurn: false,
-            }))
-          );
+          setPlayersReady(false);
         }
         return;
       }
@@ -95,7 +95,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       setRenderedAlbum([]);
       clearInterval(interval);
     };
-  }, [album, isLastAlbum, setPlayers]);
+  }, [album, isLastAlbum, setPlayersReady]);
 
   const onImageLoad = () => {
     albumEndRef.current?.scrollIntoView();
@@ -129,7 +129,7 @@ const Album = ({ album, isLastAlbum }: AlbumProps) => {
       {showNext && (
         <AlbumNextLayout>
           <AlbumNextText>
-            {getUserNameById(renderedAlbum[0]?.peerId)}님의 앨범
+            {getPlayerNameById(players, renderedAlbum[0]?.peerId)}님의 앨범
           </AlbumNextText>
           <AlbumNextButtonBox>
             <Button variant="icon" onClick={onDownloadClick}>
