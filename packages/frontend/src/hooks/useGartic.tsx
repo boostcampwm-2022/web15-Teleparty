@@ -5,7 +5,6 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { gameInfoAtom } from "../store/game";
 import {
   initGarticGamePlayersAtom,
-  playersAtom,
   setPlayerReadyAtom,
   setPlayersReadyAtom,
   updatePlayersNextAlbumTurnAtom,
@@ -41,7 +40,6 @@ const useGartic = () => {
     gameInfo.roundInfo
   );
   const [gameState, setGameState] = useState<GarticGameState>("gameStart");
-  const setGamePlayerList = useSetAtom(playersAtom);
   const initGarticGamePlayers = useSetAtom(initGarticGamePlayersAtom);
   const setPlayersReady = useSetAtom(setPlayersReadyAtom);
   const setPlayerReady = useSetAtom(setPlayerReadyAtom);
@@ -116,7 +114,7 @@ const useGartic = () => {
       socket.off("draw-cancel", inputCancelListener);
       socket.off("album", albumListener);
     };
-  }, [socket, setGamePlayerList]);
+  }, [socket, setPlayerReady, setPlayersReady, updatePlayersNextAlbumTurn]);
 
   return {
     gameState,

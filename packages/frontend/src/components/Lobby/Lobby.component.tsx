@@ -16,7 +16,6 @@ import { Button } from "../../components/common/Button";
 import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
-import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
 import { gameModeAtom } from "../../store/gameMode";
 import {
@@ -46,6 +45,7 @@ const Lobby = () => {
   const navigate = useNavigate();
   const [gameMode, setGameMode] = useAtom(gameModeAtom);
   const ratio = useAtomValue(ratioAtom);
+  const setPlayers = useSetAtom(playersAtom);
 
   const onInviteClick = () => {
     toast.dismiss();
@@ -79,9 +79,23 @@ const Lobby = () => {
     const newJoinListener = (player: Player) => {
       addPlayer(player);
     };
-    const playerQuitListener = ({ peerId }: { peerId: string }) => {
-      removePlayer(peerId);
-      // TODO: 방장 위임 로직
+    const playerQuitListener = ({
+      peerId,
+      newHost,
+    }: {
+      peerId: string;
+      newHost: string;
+    }) => {
+      setPlayers((prev) => {
+        const newPlayers = prev.filter((player) => player.peerId !== peerId);
+        const newHostPlayer = newPlayers.find(
+          ({ peerId }) => peerId === newHost
+        );
+        if (!newHostPlayer) return prev;
+        newHostPlayer.isHost = true;
+
+        return newPlayers;
+      });
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
       quitPlayerFromGame(peerId);
@@ -94,7 +108,7 @@ const Lobby = () => {
       socket.off("player-quit", playerQuitListener);
       socket.off("quit-game", quitGameListener);
     };
-  }, [socket, addPlayer, quitPlayerFromGame, removePlayer]);
+  }, [socket, addPlayer, quitPlayerFromGame, removePlayer, setPlayers]);
 
   useEffect(() => {
     removePlayersGameData();

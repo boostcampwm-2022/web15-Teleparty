@@ -1,7 +1,7 @@
 import styled, { css } from "styled-components";
 
 interface InputProps {
-  variant: "medium" | "large";
+  variant: "medium" | "nickname";
 }
 
 const Input = styled.input<InputProps>`
@@ -9,6 +9,7 @@ const Input = styled.input<InputProps>`
   box-shadow: ${({ theme: { shadows } }) => shadows.small};
   width: 100%;
   transition: border-color 0.1s;
+  color: ${({ theme: { colors } }) => colors.primary};
 
   &::placeholder {
     color: ${({ theme: { colors } }) => colors.grey1};
@@ -32,14 +33,20 @@ const Input = styled.input<InputProps>`
       font-size: 14px;
     `}
   ${({ variant }) =>
-    variant === "large" &&
+    variant === "nickname" &&
     css`
+      width: 16rem;
+      height: 2.25rem;
+      padding: 0.5rem;
+      border-width: 2px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0.6;
       border-color: ${({ theme: { colors } }) => colors.primary};
-      border-width: 4px;
-      border-radius: 20px;
-      height: 4rem;
-      padding: 0.5rem 1rem;
-      font-size: 24px;
+      transition: all 0.1s;
+      &:focus {
+        opacity: 1;
+      }
     `}
 `;
 
