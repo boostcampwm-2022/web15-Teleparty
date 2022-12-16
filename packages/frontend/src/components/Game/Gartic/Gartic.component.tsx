@@ -17,7 +17,6 @@ import Canvas from "../../Canvas/Canvas.component";
 import { CanvasLayout } from "../../Canvas/Canvas.styles";
 import Chat from "../../Chat/Chat.component";
 import { Button } from "../../common/Button";
-import { HidableBox } from "../../common/HidableBox";
 import { Input } from "../../common/Input";
 import { Logo } from "../../Logo/Logo.component";
 import MoonTimer from "../../MoonTimer/MoonTimer.component";
@@ -42,10 +41,9 @@ const Gartic = () => {
   } = useGartic();
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
-  const gamePlayerList = useAtomValue(playersAtom);
+  const players = useAtomValue(playersAtom);
   const isDone =
-    gamePlayerList.find((player) => player.peerId === socket.id)?.isReady ??
-    false;
+    players.find((player) => player.peerId === socket.id)?.isReady ?? false;
   const [isKeywordEmpty, setIsKeywordEmpty] = useState(false);
   const keywordInputRef = useRef("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -91,28 +89,20 @@ const Gartic = () => {
     drawing: <Canvas readonly={isDone} canvasRef={canvasRef} />,
     inputKeyword: <GarticDrawImage src={image} alt="draw" width={1036} />,
   };
+  const KeywordInput = (
+    <KeywordInputLayout>
+      <Input
+        disabled={isDone}
+        variant="medium"
+        placeholder="제시어를 입력하세요."
+        onChange={onKeywordInputChange}
+      />
+    </KeywordInputLayout>
+  );
   const footerElementMap = {
-    gameStart: (
-      <KeywordInputLayout>
-        <Input
-          disabled={isDone}
-          variant="medium"
-          placeholder="제시어를 입력하세요."
-          onChange={onKeywordInputChange}
-        />
-      </KeywordInputLayout>
-    ),
+    gameStart: KeywordInput,
     drawing: <PaintToolBox />,
-    inputKeyword: (
-      <KeywordInputLayout>
-        <Input
-          disabled={isDone}
-          variant="medium"
-          placeholder="제시어를 입력하세요."
-          onChange={onKeywordInputChange}
-        />
-      </KeywordInputLayout>
-    ),
+    inputKeyword: KeywordInput,
   };
 
   useEffect(() => {

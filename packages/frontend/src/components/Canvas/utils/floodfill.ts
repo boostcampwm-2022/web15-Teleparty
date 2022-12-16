@@ -118,26 +118,30 @@ export const floodFill = (
     const { left, right, y, direction } = span;
 
     // 좌, 우 끝까지 확장
-    const l = findSpanEdge(left, y, -1) + 1;
-    const r = findSpanEdge(right, y, 1) + 1;
+    const leftEdge = findSpanEdge(left, y, -1) + 1;
+    const rightEdge = findSpanEdge(right, y, 1) + 1;
 
     const lineOffset = y * pixelData.width;
 
     // 왼쪽, 오른쪽 끝까지 확장 시킨 l, r을 이용해 한번에 채우기(가로로 쭉)
-    pixelData.data.fill(fillColor, lineOffset + l, lineOffset + r);
+    pixelData.data.fill(
+      fillColor,
+      lineOffset + leftEdge,
+      lineOffset + rightEdge
+    );
 
     if (direction <= 0) {
-      checkSpan(l, r, y - 1, -1);
+      checkSpan(leftEdge, rightEdge, y - 1, -1);
     } else {
-      checkSpan(l, left, y - 1, -1);
-      checkSpan(right, r, y - 1, -1);
+      checkSpan(leftEdge, left, y - 1, -1);
+      checkSpan(right, rightEdge, y - 1, -1);
     }
 
     if (direction >= 0) {
-      checkSpan(l, r, y + 1, 1);
+      checkSpan(leftEdge, rightEdge, y + 1, 1);
     } else {
-      checkSpan(l, left, y + 1, 1);
-      checkSpan(right, r, y + 1, 1);
+      checkSpan(leftEdge, left, y + 1, 1);
+      checkSpan(right, rightEdge, y + 1, 1);
     }
   }
 

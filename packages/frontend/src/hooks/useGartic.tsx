@@ -35,11 +35,11 @@ const useGartic = () => {
     gameInfo.roundInfo
   );
   const [gameState, setGameState] = useState<GarticGameState>("gameStart");
-  const setGamePlayerList = useSetAtom(playersAtom);
+  const setPlayers = useSetAtom(playersAtom);
   const [isLastAlbum, setIsLastAlbum] = useState(false);
 
   useEffect(() => {
-    setGamePlayerList((prev) =>
+    setPlayers((prev) =>
       prev.map((player) => ({
         ...player,
         isReady: false,
@@ -47,19 +47,19 @@ const useGartic = () => {
         isGameQuit: false,
       }))
     );
-  }, [setGamePlayerList]);
+  }, [setPlayers]);
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
       console.log("gameStart:", gameStartResponse);
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({ ...player, isReady: false }))
       );
       setGameState("gameStart");
       setRoundInfo(gameStartResponse.roundInfo);
     };
     const drawStartListener = ({ keyword, roundInfo }: DrawStartResponse) => {
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({ ...player, isReady: false }))
       );
       console.log("drawStart:", keyword, roundInfo);
@@ -72,7 +72,7 @@ const useGartic = () => {
       roundInfo,
     }: KeywordInputStartResponse) => {
       console.log("keywordInputStart", img, roundInfo);
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({ ...player, isReady: false }))
       );
       setImage(img);
@@ -81,19 +81,20 @@ const useGartic = () => {
     };
     const gameEndListener = () => {
       setGameState("gameEnd");
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({ ...player, isReady: false }))
       );
       socket.emit("request-album");
     };
     const setDoneOrNot = (peerId: string, isReady: boolean) => {
-      setGamePlayerList((prev) => {
-        const copiedList = [...prev];
-        const donePlayerIndex = copiedList.findIndex(
+      setPlayers((prev) => {
+        const newPlayers = [...prev];
+        const donePlayer = newPlayers.find(
           (player) => player.peerId === peerId
         );
-        copiedList[donePlayerIndex].isReady = isReady;
-        return copiedList;
+        if (!donePlayer) return prev;
+        donePlayer.isReady = isReady;
+        return newPlayers;
       });
     };
     const inputDoneListener = ({ peerId }: { peerId: string }) => {
@@ -106,17 +107,18 @@ const useGartic = () => {
     };
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
       console.log("album:", peerId, isLast, result);
-      setGamePlayerList((prev) => {
-        const copiedList = [...prev];
-        const convertMyResultToDone = copiedList.map((player) =>
+      setPlayers((prev) => {
+        const newPlayers = [...prev];
+        const convertMyResultToDone = newPlayers.map((player) =>
           player.isCurrentTurn
             ? { ...player, isCurrentTurn: false, isReady: true }
             : player
         );
-        const currentPlayerIndex = convertMyResultToDone.findIndex(
+        const currentPlayer = convertMyResultToDone.find(
           (player) => player.peerId === peerId
         );
-        convertMyResultToDone[currentPlayerIndex].isCurrentTurn = true;
+        if (!currentPlayer) return prev;
+        currentPlayer.isCurrentTurn = true;
         return convertMyResultToDone;
       });
       setIsLastAlbum(isLast);
@@ -143,7 +145,7 @@ const useGartic = () => {
       socket.off("draw-cancel", inputCancelListener);
       socket.off("album", albumListener);
     };
-  }, [socket, setGamePlayerList]);
+  }, [socket, setPlayers]);
 
   return {
     gameState,

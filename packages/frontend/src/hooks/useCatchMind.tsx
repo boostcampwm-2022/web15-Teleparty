@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 
 import { playersAtom } from "../store/players";
 
@@ -17,7 +17,7 @@ export const useCatchMind = (
   const [roundInfo, setRoundInfo] =
     useState<CatchMindRoundInfo>(initialRoundInfo);
   const [gameState, setGameState] = useState<GameState>("inputKeyword");
-  const [gamePlayerList, setGamePlayerList] = useAtom(playersAtom);
+  const setPlayers = useSetAtom(playersAtom);
   const [roundEndInfo, setRoundEndInfo] =
     useState<CatchMindRoundEndInfo | null>(null);
   const [isMyTurn, setIsMyTurn] = useState(
@@ -25,7 +25,7 @@ export const useCatchMind = (
   );
 
   useEffect(() => {
-    setGamePlayerList((prev) =>
+    setPlayers((prev) =>
       prev.map((player) => ({
         ...player,
         isReady: false,
@@ -34,7 +34,7 @@ export const useCatchMind = (
         isGameQuit: false,
       }))
     );
-  }, [setGamePlayerList, initialRoundInfo]);
+  }, [setPlayers, initialRoundInfo]);
 
   // socket for game logic
   useEffect(() => {
@@ -43,7 +43,7 @@ export const useCatchMind = (
       setGameState("inputKeyword");
       setRoundInfo(roundInfo);
       setIsMyTurn(socket.id === roundInfo.turnPlayer);
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({
           ...player,
           isReady: false,
@@ -58,7 +58,7 @@ export const useCatchMind = (
       const { playerScoreMap, isLastRound } = roundEndInfo;
       setGameState(isLastRound ? "gameEnd" : "roundEnd");
       setRoundEndInfo(roundEndInfo);
-      setGamePlayerList((prev) =>
+      setPlayers((prev) =>
         prev.map((player) => ({
           ...player,
           score: playerScoreMap[player.peerId],
@@ -66,15 +66,12 @@ export const useCatchMind = (
       );
     };
     const roundReadyListener = ({ peerId }: { peerId: string }) => {
-      setGamePlayerList((prev) => {
-        const newPlayerList = [...prev];
-        const playerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (playerIndex === -1) return prev;
-        newPlayerList[playerIndex].isReady =
-          !newPlayerList[playerIndex].isReady;
-        return newPlayerList;
+      setPlayers((prev) => {
+        const newPlayers = [...prev];
+        const player = newPlayers.find((player) => player.peerId === peerId);
+        if (!player) return prev;
+        player.isReady = !player.isReady;
+        return newPlayers;
       });
     };
     socket.on("round-start", roundStartListener);
@@ -87,7 +84,7 @@ export const useCatchMind = (
       socket.off("round-end", roundEndListener);
       socket.off("round-ready", roundReadyListener);
     };
-  }, [socket, setGamePlayerList]);
+  }, [socket, setPlayers]);
 
   return {
     roundInfo,

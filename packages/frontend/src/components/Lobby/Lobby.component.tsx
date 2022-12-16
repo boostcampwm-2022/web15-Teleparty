@@ -16,7 +16,6 @@ import { Button } from "../../components/common/Button";
 import GameModeSegmentedControl from "../../components/GameModeSegmentedControl/GameModeSegmentedControl.component";
 import { Logo } from "../../components/Logo/Logo.component";
 import PlayerList from "../../components/PlayerList/PlayerList.component";
-import { GameMode, GAME_MODE_LIST } from "../../constants/game-mode";
 import { gameInfoAtom } from "../../store/game";
 import { gameModeAtom } from "../../store/gameMode";
 import { playersAtom } from "../../store/players";
@@ -80,33 +79,27 @@ const Lobby = () => {
       newHost: string;
     }) => {
       setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitPlayerIndex = newPlayerList.findIndex(
-          (player) => player.peerId === peerId
-        );
-        if (quitPlayerIndex === -1) return prev;
-        newPlayerList.splice(quitPlayerIndex, 1);
-        const newHostPlayer = newPlayerList.find(
+        const newPlayers = prev.filter((player) => player.peerId !== peerId);
+        const newHostPlayer = newPlayers.find(
           ({ peerId }) => peerId === newHost
         );
         if (!newHostPlayer) return prev;
         newHostPlayer.isHost = true;
 
-        return newPlayerList;
+        return newPlayers;
       });
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
       setPlayers((prev) => {
-        const newPlayerList = [...prev];
-        const quitGamePlayerIndex = newPlayerList.findIndex(
+        const newPlayers = [...prev];
+        const quitGamePlayer = newPlayers.find(
           (player) => player.peerId === peerId
         );
-        if (quitGamePlayerIndex === -1) return prev;
-
-        newPlayerList[quitGamePlayerIndex].isGameQuit = false;
-        delete newPlayerList[quitGamePlayerIndex].isCurrentTurn;
-        delete newPlayerList[quitGamePlayerIndex].isReady;
-        return newPlayerList;
+        if (!quitGamePlayer) return prev;
+        quitGamePlayer.isGameQuit = false;
+        delete quitGamePlayer.isCurrentTurn;
+        delete quitGamePlayer.isReady;
+        return newPlayers;
       });
     };
     socket.on("new-join", newJoinListener);
