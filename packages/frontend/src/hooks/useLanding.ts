@@ -6,7 +6,7 @@ import Peer from "peerjs";
 
 import { gameModeAtom } from "../store/gameMode";
 import { peerAtom } from "../store/peer";
-import { playersAtom } from "../store/players";
+import { addPlayersAtom, playersAtom } from "../store/players";
 import { roomIdAtom } from "../store/roomId";
 import { socketAtom } from "../store/socket";
 import { Player } from "../types/game";
@@ -27,6 +27,7 @@ const useLanding = () => {
   const socket = useAtomValue(socketAtom);
   const setRoomId = useSetAtom(roomIdAtom);
   const setGameMode = useSetAtom(gameModeAtom);
+  const addPlayers = useSetAtom(addPlayersAtom);
 
   useEffect(() => {
     const setNewPeer = () => {
@@ -49,6 +50,7 @@ const useLanding = () => {
       const { roomId, players, gameMode } = joinResponse;
       setGameMode(gameMode);
       setRoomId(roomId);
+      addPlayers(players);
       setPlayers((prev) => [
         ...prev,
         ...players.map((player) => ({
@@ -65,7 +67,7 @@ const useLanding = () => {
     return () => {
       socket.off("join", joinListener);
     };
-  }, [socket, navigate, setPlayers, setRoomId, setGameMode]);
+  }, [socket, navigate, setPlayers, setRoomId, setGameMode, addPlayers]);
 };
 
 export default useLanding;
