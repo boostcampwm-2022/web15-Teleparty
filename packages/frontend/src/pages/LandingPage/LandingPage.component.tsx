@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router";
 
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import Peer from "peerjs";
+import { useAtomValue, useSetAtom } from "jotai";
 
 import { LandingPageLayout } from "./LandingPage.styles";
 
@@ -11,35 +9,20 @@ import AvatarChanger from "../../components/AvatarChanger/AvatarChanger.componen
 import { Button } from "../../components/common/Button";
 import { Logo } from "../../components/Logo/Logo.component";
 import NicknameInput from "../../components/NicknameInput/NicknameInput.component";
-import { GameMode } from "../../constants/game-mode";
+import useLanding from "../../hooks/useLanding";
 import { avatarUrlAtom } from "../../store/avatarUrl";
-import { gameModeAtom } from "../../store/gameMode";
-import { peerAtom } from "../../store/peer";
-import { playersAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
-import { createPeerId } from "../../utils/peer";
-
-import type { Player } from "../../types/game";
-
-interface JoinResponse {
-  roomId: string;
-  players: Player[];
-  gameMode: GameMode;
-}
 
 const LandingPage = () => {
-  const navigate = useNavigate();
   const setRoomId = useSetAtom(roomIdAtom);
   const socket = useAtomValue(socketAtom);
-  const setGameMode = useSetAtom(gameModeAtom);
-  const setPlayers = useSetAtom(playersAtom);
-  const [peer, setPeer] = useAtom(peerAtom);
   const nicknameRef = useRef<HTMLInputElement>(null);
   const [nicknameError, setNicknameError] = useState(true);
   const ratio = useAtomValue(ratioAtom);
   const avatarUrl = useAtomValue(avatarUrlAtom);
+  useLanding();
 
   const invite = new URLSearchParams(window.location.search).get("invite");
 
@@ -54,52 +37,6 @@ const LandingPage = () => {
       roomId: invite,
     });
   };
-
-  const runAfterSocketConnected = (callback: () => void) => {
-    if (socket.connected) callback();
-    else {
-      socket.on("connect", () => {
-        callback();
-      });
-    }
-  };
-
-  useEffect(() => {
-    runAfterSocketConnected(() => {
-      console.log("my id: ", socket.id);
-
-      setPeer(
-        new Peer(createPeerId(socket.id), {
-          debug: 0,
-        })
-      );
-    });
-
-    const joinListener = (joinResponse: JoinResponse) => {
-      const { roomId, players, gameMode } = joinResponse;
-      setGameMode(gameMode);
-      setRoomId(roomId);
-      setPlayers((prev) => [
-        ...prev,
-        ...players.map((player) => ({
-          ...player,
-          isMicOn: true,
-          isAudioDetected: false,
-        })),
-      ]);
-      navigate(`/room`, { replace: true });
-    };
-    socket.on("join", joinListener);
-
-    return () => {
-      if (peer) {
-        peer.destroy();
-        setPeer(null);
-      }
-
-      socket.off("join", joinListener);
-    };
-  }, []);
 
   useEffect(() => {
     const errorListener = ({ message }: { message: string }) => {
