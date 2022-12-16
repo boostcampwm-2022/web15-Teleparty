@@ -9,7 +9,7 @@ import useCreateImage from "../../../hooks/useCreateImage";
 import useGetUsername from "../../../hooks/useUsername";
 import { dataConnectionMapAtom } from "../../../store/dataConnectionMap";
 import { gameInfoAtom } from "../../../store/game";
-import { playersAtom } from "../../../store/players";
+import { playersAtom, getPlayerNameById } from "../../../store/players";
 import { socketAtom } from "../../../store/socket";
 import Canvas from "../../Canvas/Canvas.component";
 import Chat from "../../Chat/Chat.component";

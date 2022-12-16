@@ -31,7 +31,7 @@ export interface GarticRoundInfo {
   currentRound: number;
 }
 
-type PlayerScoreMap = {
+export type PlayerScoreMap = {
   [K: string]: number;
 };
 

@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 
 import { gameInfoAtom } from "../store/game";
-import { playersAtom } from "../store/players";
+import {
+  initGarticGamePlayersAtom,
+  setPlayerReadyAtom,
+  setPlayersReadyAtom,
+  updatePlayersNextAlbumTurnAtom,
+} from "../store/players";
 import { socketAtom } from "../store/socket";
 
 import type { AlbumType, GameInfo, GarticRoundInfo } from "../types/game";
@@ -35,33 +40,25 @@ const useGartic = () => {
     gameInfo.roundInfo
   );
   const [gameState, setGameState] = useState<GarticGameState>("gameStart");
-  const setPlayers = useSetAtom(playersAtom);
+  const initGarticGamePlayers = useSetAtom(initGarticGamePlayersAtom);
+  const setPlayersReady = useSetAtom(setPlayersReadyAtom);
+  const setPlayerReady = useSetAtom(setPlayerReadyAtom);
+  const updatePlayersNextAlbumTurn = useSetAtom(updatePlayersNextAlbumTurnAtom);
   const [isLastAlbum, setIsLastAlbum] = useState(false);
 
   useEffect(() => {
-    setPlayers((prev) =>
-      prev.map((player) => ({
-        ...player,
-        isReady: false,
-        isCurrentTurn: false,
-        isGameQuit: false,
-      }))
-    );
-  }, [setPlayers]);
+    initGarticGamePlayers();
+  }, [initGarticGamePlayers]);
 
   useEffect(() => {
     const gameStartListener = (gameStartResponse: GameInfo) => {
       console.log("gameStart:", gameStartResponse);
-      setPlayers((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       setGameState("gameStart");
       setRoundInfo(gameStartResponse.roundInfo);
     };
     const drawStartListener = ({ keyword, roundInfo }: DrawStartResponse) => {
-      setPlayers((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       console.log("drawStart:", keyword, roundInfo);
       setKeyword(keyword);
       setRoundInfo(roundInfo);
@@ -72,55 +69,27 @@ const useGartic = () => {
       roundInfo,
     }: KeywordInputStartResponse) => {
       console.log("keywordInputStart", img, roundInfo);
-      setPlayers((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       setImage(img);
       setRoundInfo(roundInfo);
       setGameState("inputKeyword");
     };
     const gameEndListener = () => {
       setGameState("gameEnd");
-      setPlayers((prev) =>
-        prev.map((player) => ({ ...player, isReady: false }))
-      );
+      setPlayersReady(false);
       socket.emit("request-album");
-    };
-    const setDoneOrNot = (peerId: string, isReady: boolean) => {
-      setPlayers((prev) => {
-        const newPlayers = [...prev];
-        const donePlayer = newPlayers.find(
-          (player) => player.peerId === peerId
-        );
-        if (!donePlayer) return prev;
-        donePlayer.isReady = isReady;
-        return newPlayers;
-      });
     };
     const inputDoneListener = ({ peerId }: { peerId: string }) => {
       console.log("input done");
-      setDoneOrNot(peerId, true);
+      setPlayerReady({ playerId: peerId, isReady: true });
     };
     const inputCancelListener = ({ peerId }: { peerId: string }) => {
       console.log("input cancel");
-      setDoneOrNot(peerId, false);
+      setPlayerReady({ playerId: peerId, isReady: false });
     };
     const albumListener = ({ peerId, isLast, result }: AlbumResponse) => {
       console.log("album:", peerId, isLast, result);
-      setPlayers((prev) => {
-        const newPlayers = [...prev];
-        const convertMyResultToDone = newPlayers.map((player) =>
-          player.isCurrentTurn
-            ? { ...player, isCurrentTurn: false, isReady: true }
-            : player
-        );
-        const currentPlayer = convertMyResultToDone.find(
-          (player) => player.peerId === peerId
-        );
-        if (!currentPlayer) return prev;
-        currentPlayer.isCurrentTurn = true;
-        return convertMyResultToDone;
-      });
+      updatePlayersNextAlbumTurn(peerId);
       setIsLastAlbum(isLast);
       setAlbum(result);
     };
@@ -145,7 +114,7 @@ const useGartic = () => {
       socket.off("draw-cancel", inputCancelListener);
       socket.off("album", albumListener);
     };
-  }, [socket, setPlayers]);
+  }, [socket, setPlayerReady, setPlayersReady, updatePlayersNextAlbumTurn]);
 
   return {
     gameState,

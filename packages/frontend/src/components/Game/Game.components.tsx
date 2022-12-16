@@ -9,7 +9,7 @@ import { GameLayout } from "./Game.styles";
 import Gartic from "./Gartic/Gartic.component";
 
 import { gameInfoAtom } from "../../store/game";
-import { playersAtom } from "../../store/players";
+import { quitPlayerFromGameAtom, removePlayerAtom } from "../../store/players";
 import { ratioAtom } from "../../store/ratio";
 import { roomIdAtom } from "../../store/roomId";
 import { socketAtom } from "../../store/socket";
@@ -17,26 +17,17 @@ import { socketAtom } from "../../store/socket";
 const Game = () => {
   const gameInfo = useAtomValue(gameInfoAtom);
   const socket = useAtomValue(socketAtom);
-  const setPlayers = useSetAtom(playersAtom);
+  const removePlayer = useSetAtom(removePlayerAtom);
+  const quitPlayerFromGame = useSetAtom(quitPlayerFromGameAtom);
   const roomId = useAtomValue(roomIdAtom);
   const ratio = useAtomValue(ratioAtom);
 
   useEffect(() => {
     const playerQuitListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => prev.filter((player) => player.peerId !== peerId));
+      removePlayer(peerId);
     };
     const quitGameListener = ({ peerId }: { peerId: string }) => {
-      setPlayers((prev) => {
-        const newPlayers = [...prev];
-        const quitGamePlayer = newPlayers.find(
-          (player) => player.peerId === peerId
-        );
-        if (!quitGamePlayer) return prev;
-        quitGamePlayer.isGameQuit = true;
-        delete quitGamePlayer.isCurrentTurn;
-        delete quitGamePlayer.isReady;
-        return newPlayers;
-      });
+      quitPlayerFromGame(peerId);
     };
     socket.on("player-quit", playerQuitListener);
     socket.on("quit-game", quitGameListener);
@@ -44,7 +35,7 @@ const Game = () => {
       socket.off("player-quit", playerQuitListener);
       socket.off("quit-game", quitGameListener);
     };
-  }, [socket, setPlayers]);
+  }, [socket, removePlayer, quitPlayerFromGame]);
 
   return roomId === undefined ? (
     <Navigate to="/" replace />
